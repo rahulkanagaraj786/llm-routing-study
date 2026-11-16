@@ -2,7 +2,8 @@
 out-of-fold decisions of each candidate.
 
   python scripts/06_select_algorithm.py                     # needs all three candidates
-  python scripts/06_select_algorithm.py --defer modernbert  # select among the others; the deferral is recorded
+  python scripts/06_select_algorithm.py --defer modernbert  # provisional: select among the others, final run stays blocked
+  python scripts/06_select_algorithm.py --drop modernbert   # team decision that the candidate will not be run (CPU-only comparison)
   python scripts/06_select_algorithm.py --partial           # descriptive table for those available; no winner
 """
 import sys, json, csv
@@ -16,8 +17,9 @@ QUALIFY_TOLERANCE_PP = 0.5
 MIN_IMPROVEMENT_PP = 1.0  # a more complex router must save at least this much more (protocol section 6)
 partial = "--partial" in sys.argv
 DEFERRED = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--defer"]
-assert all(d in ORDER for d in DEFERRED), DEFERRED
-REQUIRED = [f for f in ORDER if f not in DEFERRED]
+DROPPED = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--drop"]
+assert all(d in ORDER for d in DEFERRED + DROPPED), (DEFERRED, DROPPED)
+REQUIRED = [f for f in ORDER if f not in DEFERRED + DROPPED]
 BASE = S.D.ROOT / "results" / "dev_selection"
 
 tab, folds = S.load_selection_dev("select_algorithm")
@@ -47,7 +49,7 @@ if not partial and avail != REQUIRED:
     sys.exit(f"only {avail} available; run with --partial for a descriptive table (no winner is declared)")
 
 res = dict(protocol_sha256=runlog.protocol_sha256(), env=runlog.env_info(), n_questions=len(tab), candidates={},
-           deferred_candidates=DEFERRED,
+           deferred_candidates=DEFERRED, dropped_candidates=DROPPED,
            candidate_protocol_hashes={f: summaries[f]["protocol_sha256"] for f in avail})
 base = P.evaluate(np.ones(len(tab), dtype=bool), out)
 res["baselines"] = dict(always_gpt5=dict(accuracy=base["always_strong_accuracy"], cost=base["always_strong_cost"]),
@@ -130,7 +132,7 @@ for k, v in res["pairwise_at_primary"].items():
 if not partial:
     s = res["selection"]
     print("\nSELECTION:", s["selected"], "| highest savings among qualified:", s["strict_highest_savings"], "| qualified:", s["qualified"],
-          "| deferred:", DEFERRED or "none")
+          "| deferred:", DEFERRED or "none", "| dropped:", DROPPED or "none")
     for st in s["steps"]:
         print("  -", st)
 else:

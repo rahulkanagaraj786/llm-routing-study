@@ -4,7 +4,11 @@ RQ1: one router trained on the train split of all seven benchmarks, cutoffs tune
      validation split, scored once on the locked test split.
 RQ2: one router trained on the source pool only (SimpleQA, GPQA, MMLU-Pro without math and
      computer science), cutoffs tuned on the source pool's validation split, then frozen and
-     scored separately on LiveCodeBench, AIME + LiveMathBench, and HLE.
+     scored on the locked source test (reference) and separately on LiveCodeBench,
+     AIME + LiveMathBench, and HLE.
+
+Every target also gets the within-benchmark shuffle diagnostic; the RQ1 locked test gets the
+workload-mix sensitivity check (docs/PROTOCOL.md section 9).
 
   python scripts/07_final_eval.py --plan           # row counts of every fit and target; reads no outcomes
   python scripts/07_final_eval.py --dry-run        # rehearsal on source-pool development rows only
@@ -19,8 +23,6 @@ sensitivity check; nothing is refitted for it).
 
 Options: --family NAME (dry run only)
          --with-arc-agi   optional check on ARC-AGI v1 (unused benchmark from the same archive)
-         --pool-reference also score the transfer router on the locked test rows of its own
-                          source pool (in-distribution reference for RQ2)
 """
 import sys, json, time
 from pathlib import Path
@@ -31,7 +33,7 @@ from router import data as D, splits as S, policy as P, models as M, runlog
 args = sys.argv[1:]
 DRY, UNLOCK, PLAN = "--dry-run" in args, "--unlock-final" in args, "--plan" in args
 WITH_ARC = "--with-arc-agi" in args
-POOL_REFERENCE = "--pool-reference" in args
+MIX_FOCUS, MIX_SHARES = "livecodebench", (0.10, 0.25, 0.50)  # workload-mix sensitivity, RQ1 only
 if DRY + UNLOCK + PLAN != 1:
     sys.exit("choose exactly one of --plan, --dry-run or --unlock-final")
 CORPUS = tuple(D.CORPUS_BENCHMARKS)
@@ -58,8 +60,7 @@ if PLAN:
     print("RQ2 transfer (one router trained on the source pool only)")
     print("  fit       ", tot(c(splits=("train",), benchmarks=POOL, exclude=not_in_pool)))
     print("  cutoffs   ", tot(c(splits=("val",), benchmarks=POOL, exclude=not_in_pool)))
-    if POOL_REFERENCE:
-        print("  reference: source-pool locked test", tot(c(splits=("test",), benchmarks=POOL, exclude=not_in_pool)))
+    print("  reference: source-pool locked test", tot(c(splits=("test",), benchmarks=POOL, exclude=not_in_pool)))
     for name, t in TRANSFER_TARGETS.items():
         print(f"  target {name} ({t['priority']})", tot(c(splits=ALL_SPLITS, benchmarks=t["benchmarks"])))
     print("  target hle, costs repaired", tot(c(splits=ALL_SPLITS, benchmarks=("hle",), use_recovered_cost=True)))
@@ -77,6 +78,8 @@ else:
     if not sel_path.exists():
         sys.exit("results/dev_selection/selection.json not found: run the development comparison and selection first")
     sel_file = json.loads(sel_path.read_text())
+    if UNLOCK and sel_file["protocol_sha256"] != runlog.protocol_sha256():
+        print("note: docs/PROTOCOL.md has changed since the selection was made; both hashes are recorded", flush=True)
     if UNLOCK and sel_file.get("deferred_candidates"):
         sys.exit(f"selection.json is provisional: {sel_file['deferred_candidates']} deferred. "
                  "Run the deferred candidate and scripts/06_select_algorithm.py (without --defer) first.")
@@ -105,7 +108,7 @@ def list_price_outcomes(rows) -> D.Outcomes | None:
                       np.array([r["strong_cost_list"] for r in rows]), np.array([r["cheap_cost_list"] for r in rows]))
 
 
-def report(gain, cutoffs, tab: D.Table, rows, label):
+def report(gain, cutoffs, tab: D.Table, rows, label, mix=False):
     groups = np.array([man[q]["cluster_id"] for q in tab.qid])
     res = dict(label=label, n=len(tab), pp_per_question=100.0 / len(tab), allowances={},
                y_counts={str(v): int((tab.outcomes.y == v).sum()) for v in (-1, 0, 1)})
@@ -115,6 +118,9 @@ def report(gain, cutoffs, tab: D.Table, rows, label):
         m = P.evaluate(d, tab.outcomes)
         m.update(P.evaluate_by_benchmark(d, tab.outcomes, tab.benchmark))
         m["bootstrap"] = P.bootstrap(d, tab.outcomes, groups=groups)
+        m["within_benchmark_shuffle"] = P.within_benchmark_shuffle(d, tab.outcomes, tab.benchmark)
+        if mix and MIX_FOCUS in set(tab.benchmark.tolist()) and len(set(tab.benchmark.tolist())) > 1:
+            m["workload_mix"] = [P.reweighted(d, tab.outcomes, tab.benchmark, MIX_FOCUS, sh) for sh in MIX_SHARES]
         m["cutoff"] = c["cutoff"]
         m["within_allowance"] = bool(m["accuracy_loss_pp"] <= float(a) + 1e-9)
         if lp is not None:
@@ -128,7 +134,7 @@ def report(gain, cutoffs, tab: D.Table, rows, label):
     return res
 
 
-def run_one(label, tr, va, targets: dict):
+def run_one(label, tr, va, targets: dict, mix_targets=()):
     """Fit on tr, choose cutoffs on va, freeze, then evaluate each target table."""
     print(f"[{label}] fit on {len(tr)} rows, calibrate on {len(va)} rows", flush=True)
     r = fit_router(tr, va)
@@ -146,7 +152,7 @@ def run_one(label, tr, va, targets: dict):
                calibration_benchmarks=sorted(set(va.benchmark.tolist())), targets={})
     for name, (tab, rows) in targets.items():
         t0 = time.perf_counter(); g = r.predict_gain(tab.prompts); dt = time.perf_counter() - t0
-        res = report(g, cutoffs, tab, rows, f"{label}__{name}")
+        res = report(g, cutoffs, tab, rows, f"{label}__{name}", mix=name in mix_targets)
         res["predict_ms_per_question"] = 1000 * dt / len(tab)
         out["targets"][name] = res
         m = res["allowances"]["1"]
@@ -156,7 +162,7 @@ def run_one(label, tr, va, targets: dict):
 
 results = dict(mode="dry_run" if DRY else "final", family=family, config=config, protocol_sha256=runlog.protocol_sha256(),
                selection_sha256=D.sha256_file(sel_path) if sel_path.exists() else None,
-               env=runlog.env_info(), with_arc_agi=WITH_ARC, pool_reference=POOL_REFERENCE, studies={})
+               env=runlog.env_info(), with_arc_agi=WITH_ARC, studies={})
 
 if DRY:
     # Rehearsal on source-pool development rows only. Folds 0-2 train, 3 calibrate, 4 pseudo-test.
@@ -164,7 +170,8 @@ if DRY:
     rows_all = {r["qid"]: r for r in D.read_paired()}
     def sub(mask): return tab.take(np.flatnonzero(mask)), [rows_all[q] for q in tab.qid[mask]]
     tr, _ = sub(folds <= 2); va, _ = sub(folds == 3)
-    results["studies"]["rq1"] = run_one("rq1", tr, va, {"pseudo_test": sub(folds == 4)})
+    MIX_FOCUS = "mmlupro"  # rehearsal only: there is no coding benchmark in the development rows
+    results["studies"]["rq1"] = run_one("rq1", tr, va, {"pseudo_test": sub(folds == 4)}, mix_targets=("pseudo_test",))
     # transfer rehearsal: pretend GPQA is a held-out benchmark
     notg = tab.benchmark != "gpqa"
     tr, _ = sub((folds <= 2) & notg); va, _ = sub((folds == 3) & notg)
@@ -181,7 +188,7 @@ else:
                "locked_test_hle_costs_repaired": S.load_rows("final:rq1:test:hle_repaired", splits=("test",), benchmarks=CORPUS, **rep)}
     if WITH_ARC:
         targets["optional_arc_agi"] = S.load_rows("final:optional:arc", splits=("fresh_sealed",), benchmarks=("arc-agi",), **kw)
-    results["studies"]["rq1"] = dict(run_one("rq1", tr, va, targets), priority="main study")
+    results["studies"]["rq1"] = dict(run_one("rq1", tr, va, targets, mix_targets=("locked_test",)), priority="main study")
 
     # ---- RQ2: one frozen source-pool router, scored on each held-out benchmark ----
     # The source pool's train and validation rows are development data: no unlock is used to read them.
@@ -189,9 +196,7 @@ else:
     va, _ = S.load_rows("final:rq2:val", splits=("val",), benchmarks=POOL, exclude=not_in_pool)
     held_out = {b for t in TRANSFER_TARGETS.values() for b in t["benchmarks"]}
     assert not (set(tr.benchmark.tolist()) | set(va.benchmark.tolist())) & held_out
-    targets = {}
-    if POOL_REFERENCE:
-        targets["source_pool_locked_test"] = S.load_rows("final:rq2:pool_test", splits=("test",), benchmarks=POOL, exclude=not_in_pool, **kw)
+    targets = {"source_pool_locked_test": S.load_rows("final:rq2:pool_test", splits=("test",), benchmarks=POOL, exclude=not_in_pool, **kw)}
     for name, t in TRANSFER_TARGETS.items():
         targets[name] = S.load_rows(f"final:rq2:target:{name}", splits=ALL_SPLITS, benchmarks=t["benchmarks"], **kw)
     targets["hle_costs_repaired"] = S.load_rows("final:rq2:target:hle_repaired", splits=ALL_SPLITS, benchmarks=("hle",), **rep)

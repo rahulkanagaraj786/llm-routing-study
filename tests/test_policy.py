@@ -80,6 +80,35 @@ def test_per_benchmark_and_bootstrap():
     assert g["n_groups"] == 250
 
 
+def test_shuffle_and_reweight():
+    rng = np.random.default_rng(3)
+    n = 1200
+    bench = np.array(["a"] * 400 + ["b"] * 800)
+    sc = (rng.random(n) < 0.7).astype(int); cc = (rng.random(n) < 0.5).astype(int)
+    out = Outcomes(sc, cc, rng.gamma(2.0, 0.01, n), rng.gamma(2.0, 0.003, n))
+    # a router with real question-level skill: sends to Flash only where Flash is not worse
+    skilled = ~((cc >= sc) & (rng.random(n) < 0.6))
+    d = P.within_benchmark_shuffle(skilled, out, bench, n_perm=500)
+    assert d["accuracy_advantage_pp"] > 2 and d["share_of_shuffles_at_least_as_accurate"] == 0
+    # a router that ignores the question: about the same as its own shuffles
+    blind = rng.random(n) < 0.6
+    d = P.within_benchmark_shuffle(blind, out, bench, n_perm=500)
+    lo, hi = d["shuffled_range95"]["accuracy_loss_pp"]
+    assert lo - 1.5 <= d["router"]["accuracy_loss_pp"] <= hi + 1.5
+    # each shuffle keeps the per-benchmark count, so always-GPT-5 and always-Flash are unchanged
+    for dec in (np.ones(n, bool), np.zeros(n, bool)):
+        d = P.within_benchmark_shuffle(dec, out, bench, n_perm=50)
+        assert abs(d["accuracy_advantage_pp"]) < 1e-9 and abs(d["savings_advantage_pct"]) < 1e-9
+    # reweighting to the observed share reproduces the unweighted metrics
+    m = P.evaluate(skilled, out)
+    r = P.reweighted(skilled, out, bench, "a", 400 / 1200)
+    assert abs(r["gross_savings_pct"] - m["gross_savings_pct"]) < 1e-9 and abs(r["accuracy_loss_pp"] - m["accuracy_loss_pp"]) < 1e-9
+    # reweighting to (almost) only benchmark "a" approaches that benchmark's own metrics
+    ma = P.evaluate(skilled[bench == "a"], out.take(bench == "a"))
+    r = P.reweighted(skilled, out, bench, "a", 0.999999)
+    assert abs(r["accuracy_loss_pp"] - ma["accuracy_loss_pp"]) < 1e-3 and abs(r["gross_savings_pct"] - ma["gross_savings_pct"]) < 1e-3
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

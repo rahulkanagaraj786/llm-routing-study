@@ -156,3 +156,67 @@ def frontier(gain: np.ndarray, out: Outcomes, n_points: int = 201) -> list[dict]
         pts.append(dict(cutoff=float(c), gross_savings_pct=m["gross_savings_pct"], accuracy_loss_pp=m["accuracy_loss_pp"],
                         cheap_fraction=m["cheap_fraction"]))
     return pts
+
+
+def within_benchmark_shuffle(strong: np.ndarray, out: Outcomes, benchmark: np.ndarray, n_perm: int = 2000,
+                             seed: int = 221) -> dict:
+    """Diagnostic, not a baseline. Inside each benchmark, shuffle which questions go to Flash while
+    keeping the number sent to Flash in that benchmark fixed. A router that only learned
+    benchmark-level routing rates looks like its shuffles; one that picks better individual
+    questions is more accurate than its shuffles at a similar cost."""
+    rng = np.random.default_rng(seed)
+    n = len(strong)
+    s_corr, c_corr = out.strong_correct.astype(float), out.cheap_correct.astype(float)
+    s_acc, s_cost = s_corr.mean(), out.strong_cost.sum()
+    acc = np.zeros(n_perm)
+    cost = np.zeros(n_perm)
+    for b in np.unique(benchmark):
+        idx = np.flatnonzero(benchmark == b)
+        k = int((~strong[idx]).sum())  # questions of this benchmark sent to Flash
+        if k == 0 or k == len(idx):   # nothing to shuffle
+            acc += np.where(strong[idx], s_corr[idx], c_corr[idx]).sum()
+            cost += np.where(strong[idx], out.strong_cost[idx], out.cheap_cost[idx]).sum()
+            continue
+        d_corr = c_corr[idx] - s_corr[idx]                     # change if a question goes to Flash
+        d_cost = out.cheap_cost[idx] - out.strong_cost[idx]
+        # random k-subsets: rank random keys, the k smallest go to Flash
+        pick = np.argpartition(rng.random((n_perm, len(idx))), k - 1, axis=1)[:, :k]
+        acc += s_corr[idx].sum() + d_corr[pick].sum(axis=1)
+        cost += out.strong_cost[idx].sum() + d_cost[pick].sum(axis=1)
+    acc /= n
+    real = evaluate(strong, out)
+    sav = 100.0 * (1.0 - cost / s_cost)
+    loss = 100.0 * (s_acc - acc)
+    q = lambda x: [float(v) for v in np.quantile(x, [0.025, 0.975])]
+    return dict(
+        n_perm=n_perm, seed=seed,
+        router=dict(gross_savings_pct=real["gross_savings_pct"], accuracy_loss_pp=real["accuracy_loss_pp"]),
+        shuffled_mean=dict(gross_savings_pct=float(sav.mean()), accuracy_loss_pp=float(loss.mean())),
+        shuffled_range95=dict(gross_savings_pct=q(sav), accuracy_loss_pp=q(loss)),
+        # positive = the router is more accurate / saves more than a policy with the same per-benchmark rates
+        accuracy_advantage_pp=float(loss.mean() - real["accuracy_loss_pp"]),
+        savings_advantage_pct=float(real["gross_savings_pct"] - sav.mean()),
+        share_of_shuffles_at_least_as_accurate=float(np.mean(loss <= real["accuracy_loss_pp"] + 1e-12)),
+        share_of_shuffles_saving_at_least_as_much=float(np.mean(sav >= real["gross_savings_pct"] - 1e-12)),
+    )
+
+
+def reweighted(strong: np.ndarray, out: Outcomes, benchmark: np.ndarray, focus: str, share: float) -> dict:
+    """Workload-mix sensitivity: reweight questions so that `focus` makes up `share` of the
+    questions, the other benchmarks keeping their observed proportions to each other.
+    Decisions are fixed; nothing is refitted."""
+    is_f = benchmark == focus
+    obs = is_f.mean()
+    if obs in (0.0, 1.0):
+        raise ValueError(f"cannot reweight: observed share of {focus} is {obs}")
+    w = np.where(is_f, share / obs, (1.0 - share) / (1.0 - obs))
+    wm = lambda v: float((w * v).sum() / w.sum())
+    corr = np.where(strong, out.strong_correct, out.cheap_correct)
+    cost = np.where(strong, out.strong_cost, out.cheap_cost)
+    s_acc, c_acc, s_cost, c_cost = wm(out.strong_correct), wm(out.cheap_correct), wm(out.strong_cost), wm(out.cheap_cost)
+    return dict(focus=focus, share=share, observed_share=float(obs),
+                gross_savings_pct=100.0 * (1.0 - wm(cost) / s_cost), accuracy_loss_pp=100.0 * (s_acc - wm(corr)),
+                accuracy=wm(corr), cheap_fraction=wm(~strong), always_strong_accuracy=s_acc, always_cheap_accuracy=c_acc,
+                always_cheap_savings_pct=100.0 * (1.0 - c_cost / s_cost), always_cheap_loss_pp=100.0 * (s_acc - c_acc),
+                mean_cost_per_question_always_strong=s_cost)
+
