@@ -1,0 +1,6 @@
+2026-11-15T20:46:51-0800	protocol frozen	8e5a3fa8eadba937115b8c20197947fd2aacfedb07e27c6b238c588870657cc1
+2026-11-15T20:57:05-0800	deviation 1 logged	042d2b6a66fd281a03a3e122b77a48d98de956d9701e247022b77f281ed4f1d8
+2026-11-16T01:41:25-0800	amendment 2 (team decisions 2026-11-16) logged	33c446627a4a5b318d8a7aee99a7b63993a1dfd39dee7665ed1760bae1731873
+2026-11-16T01:48:22-0800	amendment 3 (source pool, selection rerun, one transfer router) logged before refitting	43695492f3c1a70f74cf7f69d5a1815e9a09586677a66a303cead9bde900da0a
+2026-11-16T01:56:51-0800	amendment 4 (ModernBERT deferred to GPU) logged before the two-candidate selection	04f2f90fa3ab8fb51d998dc5deb00d5396ef5d4b95f217d39b3b4f647eb28618
+2026-11-16T01:59:11-0800	wording only (no change of content)	dfb79c733fa730860c3be3465e0f33e7d4953fc3d9f0f2291322690c5f21b7eb
