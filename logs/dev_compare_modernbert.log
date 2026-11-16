@@ -1,0 +1,93 @@
+rotation 0: fitting modernbert {'lr': 2e-05} on 3603 rows
+W1115 20:57:10.653000 87071 torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+Loading weights:   0%|          | 0/136 [00:00<?, ?it/s]Loading weights: 100%|██████████| 136/136 [00:00<00:00, 4702.60it/s]
+[transformers] [1mModernBertForSequenceClassification LOAD REPORT[0m from: answerdotai/ModernBERT-base
+Key               | Status     | 
+------------------+------------+-
+decoder.bias      | UNEXPECTED | 
+classifier.bias   | MISSING    | 
+classifier.weight | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+    epoch 1: train_loss 0.7135  val_advantage_mse 0.23953  208s
+    epoch 2: train_loss 0.6344  val_advantage_mse 0.24207  208s
+  cal_advantage_mse 0.23953  fit 456.5s
+rotation 0: fitting modernbert {'lr': 5e-05} on 3603 rows
+Loading weights:   0%|          | 0/136 [00:00<?, ?it/s]Loading weights: 100%|██████████| 136/136 [00:00<00:00, 3121.39it/s]
+[transformers] [1mModernBertForSequenceClassification LOAD REPORT[0m from: answerdotai/ModernBERT-base
+Key               | Status     | 
+------------------+------------+-
+decoder.bias      | UNEXPECTED | 
+classifier.bias   | MISSING    | 
+classifier.weight | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+    epoch 1: train_loss 0.7202  val_advantage_mse 0.24286  197s
+    epoch 2: train_loss 0.6869  val_advantage_mse 0.24292  196s
+  cal_advantage_mse 0.24286  fit 428.4s
+rotation 1: fitting modernbert {'lr': 2e-05} on 3612 rows
+Loading weights:   0%|          | 0/136 [00:00<?, ?it/s]Loading weights: 100%|██████████| 136/136 [00:00<00:00, 4988.24it/s]
+[transformers] [1mModernBertForSequenceClassification LOAD REPORT[0m from: answerdotai/ModernBERT-base
+Key               | Status     | 
+------------------+------------+-
+decoder.bias      | UNEXPECTED | 
+classifier.bias   | MISSING    | 
+classifier.weight | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+    epoch 1: train_loss 0.7315  val_advantage_mse 0.20524  196s
+    epoch 2: train_loss 0.6429  val_advantage_mse 0.20588  197s
+  cal_advantage_mse 0.20524  fit 427.7s
+rotation 2: fitting modernbert {'lr': 2e-05} on 3611 rows
+Loading weights:   0%|          | 0/136 [00:00<?, ?it/s]Loading weights: 100%|██████████| 136/136 [00:00<00:00, 4955.22it/s]
+[transformers] [1mModernBertForSequenceClassification LOAD REPORT[0m from: answerdotai/ModernBERT-base
+Key               | Status     | 
+------------------+------------+-
+decoder.bias      | UNEXPECTED | 
+classifier.bias   | MISSING    | 
+classifier.weight | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+    epoch 1: train_loss 0.7248  val_advantage_mse 0.22772  205s
+    epoch 2: train_loss 0.6678  val_advantage_mse 0.22930  194s
+  cal_advantage_mse 0.22772  fit 434.2s
+rotation 3: fitting modernbert {'lr': 2e-05} on 3609 rows
+Loading weights:   0%|          | 0/136 [00:00<?, ?it/s]Loading weights: 100%|██████████| 136/136 [00:00<00:00, 5120.28it/s]
+[transformers] [1mModernBertForSequenceClassification LOAD REPORT[0m from: answerdotai/ModernBERT-base
+Key               | Status     | 
+------------------+------------+-
+decoder.bias      | UNEXPECTED | 
+classifier.bias   | MISSING    | 
+classifier.weight | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+    epoch 1: train_loss 0.7278  val_advantage_mse 0.22456  200s
+    epoch 2: train_loss 0.6532  val_advantage_mse 0.22234  217s
+    epoch 3: train_loss 0.4988  val_advantage_mse 0.23855  243s
+  cal_advantage_mse 0.22234  fit 718.2s
+rotation 4: fitting modernbert {'lr': 2e-05} on 3598 rows
+Loading weights:   0%|          | 0/136 [00:00<?, ?it/s]Loading weights: 100%|██████████| 136/136 [00:00<00:00, 4776.75it/s]
+[transformers] [1mModernBertForSequenceClassification LOAD REPORT[0m from: answerdotai/ModernBERT-base
+Key               | Status     | 
+------------------+------------+-
+decoder.bias      | UNEXPECTED | 
+classifier.bias   | MISSING    | 
+classifier.weight | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+    epoch 1: train_loss 0.7426  val_advantage_mse 0.21789  238s
+    epoch 2: train_loss 0.6276  val_advantage_mse 0.21807  213s
+  cal_advantage_mse 0.21789  fit 490.0s
+wrote results/dev_selection/modernbert/oof_predictions.csv and summary.json | final config {'lr': 2e-05}

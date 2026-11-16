@@ -1,0 +1,52 @@
+{
+ "n_all": 6011,
+ "n_removed": 370,
+ "n_kept": 5641,
+ "candidates": {
+  "logistic": {
+   "gross_savings_pct": 14.378654774089327,
+   "accuracy_loss_pp": 1.4004609111859634,
+   "savings_ci95": [
+    12.884908759230612,
+    15.829702239751624
+   ],
+   "loss_ci95": [
+    0.9443544695425065,
+    1.8446421184847521
+   ]
+  },
+  "forest": {
+   "gross_savings_pct": 10.118408840427007,
+   "accuracy_loss_pp": 1.240914731430598,
+   "savings_ci95": [
+    8.927284451230157,
+    11.30238658450767
+   ],
+   "loss_ci95": [
+    0.7935294297390494,
+    1.6690415009343567
+   ],
+   "minus_logistic_savings_ci90": [
+    -5.5424080586606825,
+    -3.01951749266304
+   ]
+  },
+  "modernbert": {
+   "gross_savings_pct": 9.107629253562166,
+   "accuracy_loss_pp": 0.7622761921645127,
+   "savings_ci95": [
+    7.974381329076918,
+    10.369168666763263
+   ],
+   "loss_ci95": [
+    0.4076208599003462,
+    1.1317568392024795
+   ],
+   "minus_logistic_savings_ci90": [
+    -6.646926965604021,
+    -3.943462243746532
+   ]
+  }
+ },
+ "note": "Evaluation-only restriction: the out-of-fold models were trained with these rows present. Development rows only."
+}
