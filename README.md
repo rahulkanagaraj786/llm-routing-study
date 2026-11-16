@@ -15,8 +15,8 @@ Gemini 2.5 Flash. Nothing here calls an LLM.
 
 ## Status
 
-Work in progress. The code, data pipeline and results will be added as the study is
-finalised.
+Work in progress. The data build step is in place (see `data/README.md`); the rest of
+the code and the results will be added as the study is finalised.
 
 ## Layout
 
@@ -37,3 +37,5 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
+
+Then follow `data/README.md` to download and build the data (one time per machine).
