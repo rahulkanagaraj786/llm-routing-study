@@ -19,8 +19,8 @@ repository.
 | Data audit, paired table rebuilt from the raw release | done |
 | Split manifest, locked test split, sealed held-out benchmarks | done, frozen |
 | Loader, evaluator, logistic regression / random forest / ModernBERT pipelines | done |
-| Algorithm selection on development data | provisional: done for the two CPU candidates, waiting for ModernBERT on a GPU |
-| Final evaluation (RQ1 and RQ2) | script and reporting ready, **on hold, not run** |
+| Algorithm selection on development data | provisional (logistic regression among the two CPU candidates), waiting for one ModernBERT GPU run |
+| Final evaluation (RQ1 and RQ2) | script and reporting ready, **on hold**; no router from the revised protocol has been evaluated on the locked splits |
 
 Read in this order:
 1. `docs/PROTOCOL.md`: the evaluation design, the selection rule, and every change to it.
@@ -68,8 +68,9 @@ loaders refuse to work if it or the data file changes.
 
 ## Development comparison
 
-Uses only the train and validation rows of the source pool (SimpleQA, GPQA, and MMLU-Pro
-without its math and computer-science questions).
+Uses only the train and validation rows of the source pool: SimpleQA, GPQA, and MMLU-Pro
+without its math and computer-science questions and without one question that duplicates
+an HLE item.
 
 ```bash
 .venv/bin/python scripts/05_dev_compare.py logistic     # about 1 minute
@@ -90,6 +91,10 @@ Not yet run on the source pool. On a machine with a CUDA GPU of at least 16 GB:
 3. Copy `results/dev_selection/modernbert/` back and run
    `python scripts/06_select_algorithm.py` (without `--defer`).
 
+The budget is fixed: 1,024 tokens, learning rates 2e-5 and 5e-5, one seed, the same folds.
+If no GPU run happens, `python scripts/06_select_algorithm.py --drop modernbert` records
+that and the comparison is reported as CPU-only.
+
 On an Apple-silicon Mac the same command runs on MPS with 512-token prompts. Set
 `PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.5 PYTORCH_MPS_LOW_WATERMARK_RATIO=0.4` first, or it can
 push a 16 GB machine into swap.
@@ -109,9 +114,10 @@ One time only, after the team agrees to unlock the sealed data. It refuses to ru
 - RQ1: router trained on all seven benchmarks, cutoffs tuned on validation, scored on the
   locked test split.
 - RQ2: one router trained on the source pool only, cutoffs tuned on its validation rows,
-  then scored separately on LiveCodeBench, AIME + LiveMathBench, and HLE.
-- Options: `--pool-reference` also scores the RQ2 router on the locked test rows of its own
-  pool; `--with-arc-agi` adds the optional ARC-AGI check.
+  then scored on the locked source test (reference) and separately on LiveCodeBench,
+  AIME + LiveMathBench, and HLE.
+- Reported for both: the within-benchmark shuffle diagnostic. For RQ1 also the workload-mix
+  sensitivity check. `--with-arc-agi` adds the optional ARC-AGI check.
 
 ## Rules that keep the evaluation honest
 

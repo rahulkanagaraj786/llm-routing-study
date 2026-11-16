@@ -33,6 +33,20 @@ Later changes go in the deviation log at the end, with a reason.
 | ModernBERT (later the same day) | Not refitted on this Mac. Deferred to a GPU run |
 | Final selection and evaluation (later the same day) | On hold. The team will wait for the ModernBERT GPU run, then apply the selection rule to all three candidates. The final evaluation is not to be run until the team says so; the design is still under discussion |
 
+### Team decisions recorded on 2026-11-16, review round
+
+| Item | Decision |
+|---|---|
+| Duplicates at the RQ2 boundary | A source-pool question whose near-duplicate group contains a question from a held-out benchmark is removed from the source pool, and the affected fits are rerun |
+| Selection rule | Unchanged: 1 pp cutoff target, 1.5 pp eligibility cap on out-of-fold loss. No safety margin is added to the primary analysis; the 0 pp setting shows a more conservative policy |
+| ModernBERT | One comparable run on the source pool, same folds, on a GPU: 1,024 tokens, learning rates 2e-5 and 5e-5, one seed. If GPU time falls through, the comparison is reported as CPU-only and the first ModernBERT run is cited as pilot evidence |
+| RQ1 and RQ2 | Kept separate. RQ1 has its own fit on all seven benchmarks. RQ2 uses one source-only router, scored on the locked source test as a reference and on each held-out benchmark |
+| Within-benchmark shuffle | Added as a diagnostic (section 9) |
+| Workload mix | Added as a sensitivity check on the frozen RQ1 predictions (section 9) |
+| Cost-aware routing | Future work |
+| GPT-5 label | "LLMRouterBench gpt-5; reasoning effort was not recorded for the study benchmarks." |
+| Status wording | "No router from the revised protocol has been evaluated on the locked splits." This acknowledges that the pilot and the corpus audit did touch those questions |
+
 ## 2. Data
 
 Source: `NPULH/LLMRouterBench` at revision `0e5af1b8…`, `bench-release.tar.gz`
@@ -67,9 +81,15 @@ Source pool (after removing MMLU-Pro math and computer science, 459 eligible row
 | Benchmark | Train | Val | Locked test | Removed (train / val / test) |
 |---|---:|---:|---:|---|
 | SimpleQA | 2,585 | 874 | 856 | none |
-| MMLU-Pro, filtered | 1,507 | 517 | 510 | 290 / 80 / 89 |
+| MMLU-Pro, filtered | 1,506 | 517 | 510 | 290 / 80 / 89, plus 1 boundary duplicate (train) |
 | GPQA | 119 | 39 | 40 | none |
-| **Source pool** | **4,211** | **1,430** | **1,406** | |
+| **Source pool** | **4,210** | **1,430** | **1,406** | |
+
+Boundary duplicate: one MMLU-Pro chemistry question (train split) is the same question as
+an HLE item. It is removed from the source pool because HLE is a held-out target. A check
+of every LiveCodeBench, AIME, LiveMathBench and HLE question against the source pool
+found no other near-duplicate (the next closest pair has cosine 0.63 and is two different
+questions).
 
 ARC-AGI and SWE-bench are paired runs from the same archive that the pilot did not use.
 They are not newly collected data. (The manifest and code label them `fresh` /
@@ -134,10 +154,10 @@ Notes:
 
 ## 6. Algorithm selection (source pool only)
 
-Data: the train+val rows of the source pool, 5,641 questions (SimpleQA 3,459, filtered
-MMLU-Pro 2,024, GPQA 158), in the 5 folds already recorded in the manifest. The 370
-MMLU-Pro math and computer-science development rows are removed before any
-preprocessing or model is fitted.
+Data: the train+val rows of the source pool, 5,640 questions (SimpleQA 3,459, filtered
+MMLU-Pro 2,023, GPQA 158), in the 5 folds already recorded in the manifest. The 370
+MMLU-Pro math and computer-science development rows and the one boundary duplicate are
+removed before any preprocessing or model is fitted.
 
 History: the selection was first run on 2026-11-15 with those 370 rows included (6,011
 questions) and chose logistic regression. That run is kept in
@@ -163,7 +183,7 @@ lets one binary choice depend on fold 1, which is the evaluation fold of rotatio
 disclosed as a small leak. Early stopping uses the calibration fold.
 
 Pooling the five evaluation folds gives, per candidate, out-of-fold gross savings `S` and
-accuracy loss `L` at each allowance, over 5,641 questions that the deciding policy never
+accuracy loss `L` at each allowance, over 5,640 questions that the deciding policy never
 used for fitting, configuration choice, or cutoff choice.
 
 Selection rule (1 pp allowance):
@@ -192,6 +212,10 @@ The team decided to wait: the selection becomes final when the GPU run exists an
 rule is applied to all three candidates. That run follows this section unchanged, except
 that on a CUDA device it uses 1,024 tokens, batches of 16 and mixed precision.
 `scripts/07_final_eval.py --unlock-final` refuses to run while a candidate is deferred.
+Its budget is fixed: 1,024 tokens, learning rates 2e-5 and 5e-5 (chosen in rotation 0),
+one seed, the same folds. If no GPU run happens, the team records that with
+`scripts/06_select_algorithm.py --drop modernbert`; the comparison is then reported as
+CPU-only and the two-candidate result becomes the selection.
 ModernBERT's only completed comparison so far is the first run on the unfiltered pool
 (archived), where it did not beat logistic regression.
 
@@ -211,24 +235,32 @@ HLE cost sensitivity (required): the same fitted router and the same frozen cuto
 scored a second time on the locked test split with the 499 repaired HLE rows admitted
 (those that fall in the test split). Nothing is refitted or re-tuned for it.
 
+Also reported for RQ1, from the same frozen decisions: the within-benchmark shuffle
+diagnostic and the workload-mix sensitivity check (both defined in section 9).
+
 ## 8. Transfer to held-out benchmarks, RQ2 (not run yet)
 
 Claim being tested: transfer to held-out coding and math benchmarks. The claim is about
 benchmarks the router never saw, not about training data free of related material.
 
 One router serves all three tests. It uses the selected algorithm and frozen
-configuration, is trained on the source pool's train split (4,211 questions), and has its
+configuration, is trained on the source pool's train split (4,210 questions), and has its
 cutoffs for 0, 1 and 2 pp tuned on the source pool's validation split (1,430). No
 question from LiveCodeBench, AIME, LiveMathBench or HLE is used for training, validation,
 algorithm selection or cutoff tuning. The router and cutoffs are frozen, then scored
 separately on each held-out benchmark, using every eligible question of it.
 
-| Priority | Held-out target | Questions |
+| Priority | Target | Questions |
 |---|---|---:|
+| Reference | Source pool, locked test rows (same types as training) | 1,406 |
 | Primary | Coding: LiveCodeBench | 1,055 |
 | Secondary | Math: AIME (58) + LiveMathBench (117) | 175 |
 | Secondary | HLE | 1,631 (2,130 in the cost sensitivity check) |
 
+- The source-pool reference is the same frozen router and cutoffs scored on test
+  questions of the types it was trained on. It shows what changes when that router
+  transfers. It is not a second RQ1.
+- The within-benchmark shuffle diagnostic (section 9) is reported for every target.
 - Math is secondary because of its size: one question is 0.57 pp, so two net additional
   errors already exceed a 1 pp loss. It is reported with its interval and read as
   descriptive.
@@ -253,6 +285,17 @@ default. SWE-bench Verified is not evaluated.
 - 95% paired percentile bootstrap over duplicate groups, 2,000 resamples, seed 221,
   decisions fixed. It does not include refitting, cutoff re-selection or model selection.
 - Test loss is reported even when it exceeds the allowance.
+- Within-benchmark shuffle (diagnostic, not a baseline). Take the router's frozen
+  decisions on an evaluation set. Inside each benchmark, shuffle which questions go to
+  Flash, keeping the number sent to Flash in that benchmark unchanged. Repeat 2,000
+  times (seed 221) and report the shuffled policies' mean accuracy and cost with 95%
+  ranges, next to the router's own. A router that only learned benchmark-level routing
+  rates looks like its shuffles; a router that picks better individual questions has
+  higher accuracy than its shuffles at a similar cost.
+- Workload-mix sensitivity (RQ1 only). Reweight the locked-test questions so that
+  LiveCodeBench makes up 10%, 25% and 50% of the questions, keeping the other benchmarks
+  in their observed proportions to each other, and recompute accuracy, cost, savings and
+  loss for the frozen router and both baselines. No refitting and no new cutoff.
 - Overhead: fit time, prediction time per question, hardware. Savings are labelled gross.
   Net savings need a stated serving-cost assumption and are reported separately.
 
@@ -280,9 +323,10 @@ Still open:
 1. LiveCodeBench Flash costs are 20–100% of the price schedule every other file follows
    (total $6.16 recorded vs $8.46 at $0.30/$2.50 per million tokens). Default: recorded
    costs are primary and a list-price sensitivity figure is reported.
-2. GPT-5 reasoning effort is not recorded in the result files. Label plots "GPT-5
-   (LLMRouterBench `gpt-5`)" unless the run configuration is confirmed.
+2. Who runs ModernBERT on a GPU, and by when.
 3. The team's go-ahead to run `scripts/07_final_eval.py --unlock-final`.
+
+Status: no router from the revised protocol has been evaluated on the locked splits.
 
 ## Deviation log
 
@@ -323,3 +367,11 @@ Still open:
 5. 2026-11-16, final selection and evaluation on hold. The team chose to wait for the
    ModernBERT GPU run before fixing the algorithm, and not to run the final evaluation
    yet. The two-candidate result is provisional. No sealed data has been read.
+
+6. 2026-11-16, review round, before any refit and with no router from the revised
+   protocol evaluated on the locked splits. (a) One boundary duplicate removed from the
+   source pool (5,641 to 5,640 development questions); the two CPU candidates are
+   refitted and the earlier filtered run is archived. (b) RQ2 gains the locked source
+   test as a reference target. (c) Within-benchmark shuffle diagnostic and workload-mix
+   sensitivity added, both computed from frozen decisions. (d) ModernBERT budget and the
+   CPU-only fallback fixed. (e) Selection rule confirmed unchanged; no safety margin.
