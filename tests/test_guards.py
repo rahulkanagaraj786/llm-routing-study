@@ -25,13 +25,14 @@ def test_source_pool_dev_is_allowed_filtered_and_disjoint_from_test():
     pool = ("simpleqa", "mmlupro", "gpqa")
     tab, rows = S.load_rows("guard_test", splits=("train", "val"), benchmarks=pool, exclude=lambda r: not S.in_source_pool(r))
     dev, folds = S.load_selection_dev("guard_test")
-    assert set(tab.qid) == set(dev.qid) and len(dev) == 5641
+    assert set(tab.qid) == set(dev.qid) and len(dev) == 5640
     unfiltered, _ = S.load_selection_dev("guard_test", filtered=False)
     assert len(unfiltered) == 6011 and set(dev.qid) < set(unfiltered.qid)
     man = S.read_manifest()
     assert all(man[q]["split"] in ("train", "val") and man[q]["role"] == "selection_pool" for q in dev.qid)
     assert not any(r["benchmark"] == "mmlupro" and r["subject"] in ("math", "computer science") for r in rows)
     assert set(folds.tolist()) == {0, 1, 2, 3, 4}
+    assert len(S.boundary_duplicate_qids()) == 1 and not S.boundary_duplicate_qids() & set(dev.qid)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 {
   "family": "forest",
-  "protocol_sha256": "43695492f3c1a70f74cf7f69d5a1815e9a09586677a66a303cead9bde900da0a",
+  "protocol_sha256": "0e9f4b67f5309eb7ed7dc5e17a89c4c63b5617bc9144357b29b0e64e46bcfeb7",
   "env": {
-    "timestamp": "2026-11-16T01:51:04-08:00",
+    "timestamp": "2026-11-16T10:01:30-08:00",
     "python": "3.13.9",
     "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "machine": "arm64",
@@ -19,12 +19,12 @@
       "transformers": "5.23.0",
       "tokenizers": "0.23.3"
     },
-    "git_commit": "HEAD",
+    "git_commit": "388f06bfe28a26874ee4dbc3f6119f5bdf74cc3e",
     "git_dirty": true,
     "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
     "manifest_sha256": "0f05816182c1b1b17e0e21496f3c897ffe33b1c0e6f34a4a1b733e8cfd52a69c"
   },
-  "n_questions": 5641,
+  "n_questions": 5640,
   "grid": [
     {
       "n_estimators": 160,
@@ -70,11 +70,11 @@
     "use_stats": true
   },
   "mean_cal_mse_by_config": {
-    "{\"max_depth\": 20, \"max_features\": 0.1, \"min_samples_leaf\": 10, \"n_estimators\": 160, \"use_stats\": false}": 0.23398868066081188,
-    "{\"max_depth\": null, \"max_features\": 0.1, \"min_samples_leaf\": 5, \"n_estimators\": 300, \"use_stats\": true}": 0.2379380588307499,
-    "{\"max_depth\": null, \"max_features\": 0.3, \"min_samples_leaf\": 5, \"n_estimators\": 300, \"use_stats\": true}": 0.2396655930996892,
-    "{\"max_depth\": null, \"max_features\": 0.1, \"min_samples_leaf\": 20, \"n_estimators\": 300, \"use_stats\": true}": 0.2326570902416619,
-    "{\"max_depth\": null, \"max_features\": 0.3, \"min_samples_leaf\": 20, \"n_estimators\": 300, \"use_stats\": true}": 0.2338679624954964
+    "{\"max_depth\": 20, \"max_features\": 0.1, \"min_samples_leaf\": 10, \"n_estimators\": 160, \"use_stats\": false}": 0.23361762085842636,
+    "{\"max_depth\": null, \"max_features\": 0.1, \"min_samples_leaf\": 5, \"n_estimators\": 300, \"use_stats\": true}": 0.23804791140673723,
+    "{\"max_depth\": null, \"max_features\": 0.3, \"min_samples_leaf\": 5, \"n_estimators\": 300, \"use_stats\": true}": 0.23919705690538356,
+    "{\"max_depth\": null, \"max_features\": 0.1, \"min_samples_leaf\": 20, \"n_estimators\": 300, \"use_stats\": true}": 0.232663408495598,
+    "{\"max_depth\": null, \"max_features\": 0.3, \"min_samples_leaf\": 20, \"n_estimators\": 300, \"use_stats\": true}": 0.23358380533668505
   },
   "chosen_config_per_rotation": [
     {
@@ -114,46 +114,46 @@
     }
   ],
   "fit_seconds_per_rotation": [
-    14.315642206463963,
-    13.648041914682835,
-    14.255211625248194,
-    14.201748623978347,
-    14.525498166680336
+    14.795204166788608,
+    13.80431641638279,
+    14.422484415583313,
+    14.117471375036985,
+    14.777501997537911
   ],
   "chosen_fit_seconds": [
-    1.6438781251199543,
-    1.6305451658554375,
-    1.6824522907845676,
-    0.9945930000394583,
-    1.6452937088906765
+    1.644643499981612,
+    1.6284735416993499,
+    1.6638414580374956,
+    0.9557529157027602,
+    1.6495728748850524
   ],
-  "predict_seconds_per_question": 0.00013586392072015857,
+  "predict_seconds_per_question": 0.0001342169217601682,
   "cutoffs_per_rotation": [
     {
       "0": 0.04233027400263066,
-      "1": 0.0855792521645238,
-      "2": 0.09583787626793486
+      "1": 0.08106925070380609,
+      "2": 0.09510292620107594
     },
     {
       "0": -0.11171531807353813,
       "1": 0.06277134302243031,
-      "2": 0.09637047729613456
+      "2": 0.09637047729613457
     },
     {
-      "0": -0.045548804823758435,
-      "1": 0.057575147215408864,
-      "2": 0.07240904369231613
+      "0": -0.038508894962474734,
+      "1": 0.047975967813634945,
+      "2": 0.06961807194950231
     },
     {
-      "0": -0.0016597135167214516,
-      "1": 0.048593262435208104,
-      "2": 0.07781444705568408
+      "0": -0.004045521342957201,
+      "1": 0.0524559677141304,
+      "2": 0.07211044746045679
     },
     {
-      "0": 0.009369550867068756,
-      "1": 0.05386164901649208,
-      "2": 0.08123393847934973
+      "0": 0.020599230031599525,
+      "1": 0.05433908255719993,
+      "2": 0.0803317942253369
     }
   ],
-  "mean_cal_advantage_mse_chosen": 0.232570905327565
+  "mean_cal_advantage_mse_chosen": 0.23249807911792578
 }

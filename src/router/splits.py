@@ -7,6 +7,7 @@ question's assignment does not change if eligibility rules change later.
 from __future__ import annotations
 
 import csv
+import functools
 import datetime as _dt
 import hashlib
 import json
@@ -160,13 +161,28 @@ def _log_access(purpose: str, what: str, n: int) -> None:
 
 # Team decision 2026-11-16: the source pool for router development (algorithm selection,
 # training, validation, cutoff tuning) and for the transfer study is SimpleQA, GPQA and
-# MMLU-Pro without its math and computer-science questions.
+# MMLU-Pro without its math and computer-science questions, minus any question that
+# duplicates a held-out benchmark question (review round, same day).
 SOURCE_POOL_EXCLUDED_MMLU_SUBJECTS = ("math", "computer science")
 
 
+HELD_OUT_ROLES = ("holdout_hle", "holdout_code", "holdout_math")
+
+
+@functools.lru_cache(maxsize=1)
+def boundary_duplicate_qids() -> frozenset:
+    """Source-pool questions whose near-duplicate group also contains a question from a
+    held-out benchmark (HLE, LiveCodeBench, AIME, LiveMathBench). They are removed from the
+    source pool so that nothing the transfer router trains on is a copy of a target question."""
+    man = read_manifest()
+    held = {m["cluster_id"] for m in man.values() if m["role"] in HELD_OUT_ROLES}
+    return frozenset(q for q, m in man.items() if m["role"] == "selection_pool" and m["cluster_id"] in held)
+
+
 def in_source_pool(r: dict) -> bool:
-    return r["role"] == "selection_pool" and not (
-        r["benchmark"] == "mmlupro" and r["subject"] in SOURCE_POOL_EXCLUDED_MMLU_SUBJECTS)
+    return (r["role"] == "selection_pool"
+            and not (r["benchmark"] == "mmlupro" and r["subject"] in SOURCE_POOL_EXCLUDED_MMLU_SUBJECTS)
+            and r["qid"] not in boundary_duplicate_qids())
 
 
 def load_selection_dev(purpose: str, filtered: bool = True) -> tuple[D.Table, np.ndarray]:
