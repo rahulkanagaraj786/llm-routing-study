@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# large or reproducible data
+data/raw/
+data/processed/*.gz
+
+# fitted models
+results/**/model/
+results/**/router.joblib
+
+# local notes
+outputs/
