@@ -38,3 +38,4 @@
 2026-11-16T01:59:42	guard_test	splits=train,val;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	5641
 2026-11-16T01:59:43	guard_test	source_pool_dev_filtered	5641
 2026-11-16T01:59:44	guard_test	selection_pool_dev_unfiltered	6011
+2026-11-16T02:05:06	final_eval_dry_run	source_pool_dev_filtered	5641

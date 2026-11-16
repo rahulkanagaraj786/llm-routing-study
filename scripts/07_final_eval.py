@@ -68,7 +68,6 @@ if PLAN:
 OUT = D.ROOT / "results" / ("final_dryrun" if DRY else "final")
 if UNLOCK and (OUT / "final_results.json").exists():
     sys.exit("results/final/final_results.json already exists: the final evaluation is one-time. Do not rerun it to compare alternatives.")
-OUT.mkdir(parents=True, exist_ok=True)
 
 sel_path = D.ROOT / "results/dev_selection/selection.json"
 if DRY and "--family" in args:
@@ -77,9 +76,14 @@ if DRY and "--family" in args:
 else:
     if not sel_path.exists():
         sys.exit("results/dev_selection/selection.json not found: run the development comparison and selection first")
-    sel = json.loads(sel_path.read_text())["selection"]
+    sel_file = json.loads(sel_path.read_text())
+    if UNLOCK and sel_file.get("deferred_candidates"):
+        sys.exit(f"selection.json is provisional: {sel_file['deferred_candidates']} deferred. "
+                 "Run the deferred candidate and scripts/06_select_algorithm.py (without --defer) first.")
+    sel = sel_file["selection"]
     family, config = sel["selected"], sel["selected_config"]
 print(f"algorithm: {family}  config: {config}  mode: {'DRY RUN' if DRY else 'FINAL'}", flush=True)
+OUT.mkdir(parents=True, exist_ok=True)
 man = S.read_manifest()
 
 

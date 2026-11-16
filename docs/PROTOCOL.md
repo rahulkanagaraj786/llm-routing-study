@@ -30,7 +30,8 @@ Later changes go in the deviation log at the end, with a reason.
 | Algorithm selection | Rerun from scratch on the source pool: all three candidates refitted, cutoffs retuned, qualification rechecked. The first run is kept as a record |
 | Transfer design | One frozen router, trained on the source pool only, evaluated separately on LiveCodeBench, AIME + LiveMathBench, and HLE |
 | Additional analyses | On hold until the primary findings are presented |
-| ModernBERT (later the same day) | Not refitted on this Mac. Deferred to a GPU run; the selection for the main study is made among logistic regression and random forest |
+| ModernBERT (later the same day) | Not refitted on this Mac. Deferred to a GPU run |
+| Final selection and evaluation (later the same day) | On hold. The team will wait for the ModernBERT GPU run, then apply the selection rule to all three candidates. The final evaluation is not to be run until the team says so; the design is still under discussion |
 
 ## 2. Data
 
@@ -185,13 +186,14 @@ Selection rule (1 pp allowance):
 
 Deferred candidate. ModernBERT was not refitted on the source pool: the refit on this
 Mac was stopped after one epoch of its first fit, before it produced any prediction, and
-the team deferred it to a GPU. The selection rule above is therefore applied to logistic
-regression and random forest. ModernBERT's only completed comparison is the first run on
-the unfiltered pool (archived), where it did not beat logistic regression. When the GPU
-run exists it follows this section unchanged, except that on a CUDA device it uses 1,024
-tokens, batches of 16 and mixed precision. If the final evaluation has already been run
-by then, the main-study algorithm stays as selected and the ModernBERT result is reported
-as a development comparison only; the final evaluation is not repeated for it.
+the team deferred it to a GPU. Applying the rule to logistic regression and random forest
+alone gives a provisional result only (`selection.json` records ModernBERT as deferred).
+The team decided to wait: the selection becomes final when the GPU run exists and the
+rule is applied to all three candidates. That run follows this section unchanged, except
+that on a CUDA device it uses 1,024 tokens, batches of 16 and mixed precision.
+`scripts/07_final_eval.py --unlock-final` refuses to run while a candidate is deferred.
+ModernBERT's only completed comparison so far is the first run on the unfiltered pool
+(archived), where it did not beat logistic regression.
 
 The selected family's configuration for all later fits is the one with the lowest mean
 calibration MSE across rotations (for ModernBERT, the rotation-0 choice). Nothing is
@@ -317,3 +319,7 @@ Still open:
    written; the only number seen was one calibration-fold value, 0.2532). The selection
    is made among the two CPU candidates and records ModernBERT as deferred. The GPU
    settings for the later run are fixed in section 6.
+
+5. 2026-11-16, final selection and evaluation on hold. The team chose to wait for the
+   ModernBERT GPU run before fixing the algorithm, and not to run the final evaluation
+   yet. The two-candidate result is provisional. No sealed data has been read.

@@ -19,8 +19,8 @@ repository.
 | Data audit, paired table rebuilt from the raw release | done |
 | Split manifest, locked test split, sealed held-out benchmarks | done, frozen |
 | Loader, evaluator, logistic regression / random forest / ModernBERT pipelines | done |
-| Algorithm selection on development data | done for the two CPU candidates; ModernBERT deferred to a GPU |
-| Final evaluation (RQ1 and RQ2) | script and reporting ready, **not run** |
+| Algorithm selection on development data | provisional: done for the two CPU candidates, waiting for ModernBERT on a GPU |
+| Final evaluation (RQ1 and RQ2) | script and reporting ready, **on hold, not run** |
 
 Read in this order:
 1. `docs/PROTOCOL.md`: the evaluation design, the selection rule, and every change to it.
@@ -96,7 +96,8 @@ push a 16 GB machine into swap.
 
 ## Final evaluation
 
-One time only, after the team agrees to unlock the sealed data.
+One time only, after the team agrees to unlock the sealed data. It refuses to run while
+`selection.json` still lists a deferred candidate.
 
 ```bash
 .venv/bin/python scripts/07_final_eval.py --plan           # row counts of every fit and target; reads no outcomes

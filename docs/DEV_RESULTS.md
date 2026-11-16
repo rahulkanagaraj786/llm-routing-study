@@ -11,17 +11,18 @@ Source files: `results/dev_selection/selection.json`, per-candidate
 Procedure: `docs/PROTOCOL.md` section 6. The first run, on the unfiltered pool, is kept
 in `docs/archive/DEV_RESULTS_v1_unfiltered.md`.
 
-## Outcome
+## Outcome (provisional)
 
-**Selected for the main study under the pre-specified rule: random forest** (300 trees,
+**Among the two CPU candidates, the pre-specified rule picks random forest** (300 trees,
 minimum leaf size 20, 10% of features per split, TF-IDF plus the ten prompt statistics).
 
 Logistic regression saved more, but its out-of-fold accuracy loss at the 1 pp allowance
-was 1.68 pp, above the 1.5 pp qualification limit, so the rule excludes it. ModernBERT
-was not refitted on this pool; the team deferred it to a GPU run.
+was 1.68 pp, above the 1.5 pp qualification limit, so the rule excludes it. It is a close
+call; see "How to read the comparison" below.
 
-This is a close call that the team should confirm before the final evaluation; see
-"How to read the comparison" below.
+This is not the final selection. ModernBERT was not refitted on this pool, and the team
+decided to wait for its GPU run and then apply the rule to all three candidates. The
+final evaluation is on hold until then.
 
 ## Baselines on the same questions
 
@@ -122,9 +123,8 @@ and engineering time were not measured.
   to logistic regression. Details are in the archived write-up.
 - Refit on the source pool: not done. It is deferred to a GPU, where it will use
   1,024-token prompts and batches of 16 (`python scripts/05_dev_compare.py modernbert`,
-  then `scripts/06_select_algorithm.py`). If the final evaluation has been run by then,
-  the result is reported as a development comparison and does not change the
-  main-study algorithm.
+  then `scripts/06_select_algorithm.py`). The team is waiting for this run before the
+  algorithm is fixed.
 
 ## Not done
 
