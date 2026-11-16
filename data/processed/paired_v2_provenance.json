@@ -1,0 +1,366 @@
+{
+  "files": [
+    {
+      "path": "bench-release/hle/subset_500/gpt-5/hle-subset_500-gpt-5-20251013_001912.json",
+      "dataset": "hle",
+      "split": "subset_500",
+      "model_dir": "gpt-5",
+      "bytes": 1549315,
+      "sha256": "88e2ca48871e48e5cb8fbe5c7327d0d9fdddee8dcca0c5b65fd37ae4a1f480ea"
+    },
+    {
+      "path": "bench-release/simpleqa/test/gpt-5/simpleqa-test-gpt-5-20251025_131712.json",
+      "dataset": "simpleqa",
+      "split": "test",
+      "model_dir": "gpt-5",
+      "bytes": 2195965,
+      "sha256": "dd7ce81675db4167bbfba89c65107ae3dbe2251fc1060ec4ef9b7ed70b01086f",
+      "model_name": "gpt-5",
+      "counts": 4326,
+      "performance": 0.47896440129449835,
+      "data_fingerprint": "a4073cf4befb2d617498fdde3c12d3606765961f5e4d51604633a27046331bb8"
+    },
+    {
+      "path": "bench-release/simpleqa/test/gemini-2.5-flash/simpleqa-test-gemini-2.5-flash-20251024_101744.json",
+      "dataset": "simpleqa",
+      "split": "test",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 2802764,
+      "sha256": "648d4e0b18bb1b9e4e4d7be58d3ecdb232976a247649984bae41a7dedd96ea81",
+      "model_name": "gemini-2.5-flash",
+      "counts": 4326,
+      "performance": 0.29819694868238555,
+      "data_fingerprint": "a4073cf4befb2d617498fdde3c12d3606765961f5e4d51604633a27046331bb8"
+    },
+    {
+      "path": "bench-release/mmlupro/test_3000/gpt-5/mmlupro-test_3000-gpt-5-20251025_121135.json",
+      "dataset": "mmlupro",
+      "split": "test_3000",
+      "model_dir": "gpt-5",
+      "bytes": 5242433,
+      "sha256": "e4265bc336265cabf16d79386c7bfd41b77671f9d6b61e494e2d4cba1d401334",
+      "model_name": "gpt-5",
+      "counts": 3000,
+      "performance": 0.8736666666666667,
+      "data_fingerprint": "048b39e0ed481da8d6d04e4e009b815783f336802393fc7f1f5f9b2e1571e825"
+    },
+    {
+      "path": "bench-release/mmlupro/test_3000/gemini-2.5-flash/mmlupro-test_3000-gemini-2.5-flash-20251024_100341.json",
+      "dataset": "mmlupro",
+      "split": "test_3000",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 18428446,
+      "sha256": "ccc7f21bbee27a527535e1ccaec379dfc08ea8d5c1c00aec979b58cf566c208f",
+      "model_name": "gemini-2.5-flash",
+      "counts": 3000,
+      "performance": 0.8093333333333333,
+      "data_fingerprint": "048b39e0ed481da8d6d04e4e009b815783f336802393fc7f1f5f9b2e1571e825"
+    },
+    {
+      "path": "bench-release/gpqa/test/gpt-5/gpqa-test-gpt-5-20251019_024120.json",
+      "dataset": "gpqa",
+      "split": "test",
+      "model_dir": "gpt-5",
+      "bytes": 450318,
+      "sha256": "8a2aae8f6b105db1e40876b269f65005c89430c966cbed9fe7593a25a7f35191",
+      "model_name": "gpt-5",
+      "counts": 198,
+      "performance": 0.8484848484848485,
+      "data_fingerprint": "c8ae21899fff07b3219cd6fe529af112c5b2758dd3805a776747fca2635f29d3"
+    },
+    {
+      "path": "bench-release/gpqa/test/gemini-2.5-flash/gpqa-test-gemini-2.5-flash-20251019_024111.json",
+      "dataset": "gpqa",
+      "split": "test",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 3528915,
+      "sha256": "2ae29b5fe93517c3a58546fa7236510cf6310267a0686ed3c12ba70bded99310",
+      "model_name": "gemini-2.5-flash",
+      "counts": 198,
+      "performance": 0.6616161616161617,
+      "data_fingerprint": "c8ae21899fff07b3219cd6fe529af112c5b2758dd3805a776747fca2635f29d3"
+    },
+    {
+      "path": "bench-release/hle/test/gpt-5/hle-test-gpt-5-20251025_114522.json",
+      "dataset": "hle",
+      "split": "test",
+      "model_dir": "gpt-5",
+      "bytes": 6688555,
+      "sha256": "a7f381a66a8454e8aa2e0c73dba80e0a690dbd605b54580d482fb45c47522457",
+      "model_name": "gpt-5",
+      "counts": 2158,
+      "performance": 0.2632066728452271,
+      "data_fingerprint": "ef4c81f6b98c214597cf452bce4f626889829e634176a2f16d72596dbf637b94"
+    },
+    {
+      "path": "bench-release/hle/test/gemini-2.5-flash/hle-test-gemini-2.5-flash-20251024_095135.json",
+      "dataset": "hle",
+      "split": "test",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 86091398,
+      "sha256": "a65e74c86d2c89b3fed721f846187831d108419b180213ae01a8d15fe1f56746",
+      "model_name": "gemini-2.5-flash",
+      "counts": 2158,
+      "performance": 0.0778498609823911,
+      "data_fingerprint": "ef4c81f6b98c214597cf452bce4f626889829e634176a2f16d72596dbf637b94"
+    },
+    {
+      "path": "bench-release/livecodebench/test/gpt-5/livecodebench-test-gpt-5-20251013_115531.json",
+      "dataset": "livecodebench",
+      "split": "test",
+      "model_dir": "gpt-5",
+      "bytes": 6842474,
+      "sha256": "68871a481043a8d129daaf300edc68b94f95df87ba676814c42bbc6bc2f81ad6",
+      "model_name": "gpt-5",
+      "counts": 1055,
+      "performance": 0.8644549763033176,
+      "data_fingerprint": "5b6020ea195c260d426803fb6db244b44c74fcc25c4892c5e74cb1400707915a"
+    },
+    {
+      "path": "bench-release/livecodebench/test/gemini-2.5-flash/livecodebench-test-gemini-2.5-flash-20251013_003249.json",
+      "dataset": "livecodebench",
+      "split": "test",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 18615974,
+      "sha256": "902afe4bfa74465f524c21ea69b81a18015694929d59703f1647582db9089b36",
+      "model_name": "gemini-2.5-flash",
+      "counts": 1055,
+      "performance": 0.6,
+      "data_fingerprint": "5b6020ea195c260d426803fb6db244b44c74fcc25c4892c5e74cb1400707915a"
+    },
+    {
+      "path": "bench-release/aime/hybrid/gpt-5/aime-hybrid-gpt-5-20251105_155925.json",
+      "dataset": "aime",
+      "split": "hybrid",
+      "model_dir": "gpt-5",
+      "bytes": 137826,
+      "sha256": "84e378e4df88065db47bfa2a29f168883a1557d723a2fb0360f7304d6a78e172",
+      "model_name": "gpt-5",
+      "counts": 60,
+      "performance": 0.8833333333333333,
+      "data_fingerprint": "fdd43055e4a110990681acac6e814bde1ae9bc89eba943ea1fa020214fa95b80"
+    },
+    {
+      "path": "bench-release/aime/hybrid/gemini-2.5-flash/aime-hybrid-gemini-2.5-flash-20251105_072706.json",
+      "dataset": "aime",
+      "split": "hybrid",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 2487694,
+      "sha256": "19debc4971cdbf8118f421aaca264c4a8ae105e02bcb116ff2c2dc73d66457c2",
+      "model_name": "gemini-2.5-flash",
+      "counts": 60,
+      "performance": 0.6333333333333333,
+      "data_fingerprint": "fdd43055e4a110990681acac6e814bde1ae9bc89eba943ea1fa020214fa95b80"
+    },
+    {
+      "path": "bench-release/livemathbench/test/gpt-5/livemathbench-test-gpt-5-20251105_071836.json",
+      "dataset": "livemathbench",
+      "split": "test",
+      "model_dir": "gpt-5",
+      "bytes": 199785,
+      "sha256": "a448a13954d001d2021b2f67076f532c0f4fe021077e34ab56752306a47eb73c",
+      "model_name": "gpt-5",
+      "counts": 121,
+      "performance": 0.7933884297520661,
+      "data_fingerprint": "66ca37cc2e1ddbbe29ca49e6fbd77cbf0cebdd3b632ef2d5ffa9e988cf4345da"
+    },
+    {
+      "path": "bench-release/livemathbench/test/gemini-2.5-flash/livemathbench-test-gemini-2.5-flash-20251105_071201.json",
+      "dataset": "livemathbench",
+      "split": "test",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 1801925,
+      "sha256": "1a2ced3b79c3005726386294c8963f5bcef6c07826f977a06edcba1a0e94cf0c",
+      "model_name": "gemini-2.5-flash",
+      "counts": 121,
+      "performance": 0.7355371900826446,
+      "data_fingerprint": "66ca37cc2e1ddbbe29ca49e6fbd77cbf0cebdd3b632ef2d5ffa9e988cf4345da"
+    },
+    {
+      "path": "bench-release/arc-agi/v1/gpt-5/arc-agi-v1-gpt-5-20251017_155245.json",
+      "dataset": "arc-agi",
+      "split": "v1",
+      "model_dir": "gpt-5",
+      "bytes": 5160255,
+      "sha256": "c18e5a68f5dda070b2212827a59f7b3401ca2f2572a0251fd67cb30a789dcff6",
+      "model_name": "gpt-5",
+      "counts": 400,
+      "performance": 0.52,
+      "data_fingerprint": "4092d33f0f1cd97ae53b7ffce8995aade552f3a0bcad1f4d9c4204321989e181"
+    },
+    {
+      "path": "bench-release/arc-agi/v1/gemini-2.5-flash/arc-agi-v1-gemini-2.5-flash-20251016_065442.json",
+      "dataset": "arc-agi",
+      "split": "v1",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 5225123,
+      "sha256": "63e2cc0026f5b0ade6f472c7eb730d3bcbaf5a2eef54f9bddd62885656db0cf5",
+      "model_name": "gemini-2.5-flash",
+      "counts": 400,
+      "performance": 0.1075,
+      "data_fingerprint": "4092d33f0f1cd97ae53b7ffce8995aade552f3a0bcad1f4d9c4204321989e181"
+    },
+    {
+      "path": "bench-release/swe-bench/verified/gpt-5/SWE-Bench-verified_gpt-5-medium-20251023_195432.json",
+      "dataset": "swe-bench",
+      "split": "verified",
+      "model_dir": "gpt-5",
+      "bytes": 73710983,
+      "sha256": "5c5b8b0c3882f2342d0801a330c8d6056c93ba679e5c3ea6d91e1088e8e61883",
+      "model_name": "gpt-5",
+      "counts": 500,
+      "performance": 0.158,
+      "data_fingerprint": "b133eff5fe0f85a53235964061506d42e0470dbe678ac5c78af178b0ead5207f"
+    },
+    {
+      "path": "bench-release/swe-bench/verified/gemini-2.5-flash/swe-bench-verified_gemini-2.5-flash-20251024_132354.json",
+      "dataset": "swe-bench",
+      "split": "verified",
+      "model_dir": "gemini-2.5-flash",
+      "bytes": 73104627,
+      "sha256": "3533ce717feaa3fa790c4cb25bc1acac2a940ab6505d5dc81c42a619de92a105",
+      "model_name": "gemini-2.5-flash",
+      "counts": 500,
+      "performance": 0.182,
+      "data_fingerprint": "b133eff5fe0f85a53235964061506d42e0470dbe678ac5c78af178b0ead5207f"
+    }
+  ],
+  "benchmarks": {
+    "simpleqa": {
+      "n_records": 4326,
+      "fingerprint_strong": "a4073cf4befb2d617498fdde3c12d3606765961f5e4d51604633a27046331bb8",
+      "fingerprint_cheap": "a4073cf4befb2d617498fdde3c12d3606765961f5e4d51604633a27046331bb8",
+      "fingerprint_match": true
+    },
+    "mmlupro": {
+      "n_records": 3000,
+      "fingerprint_strong": "048b39e0ed481da8d6d04e4e009b815783f336802393fc7f1f5f9b2e1571e825",
+      "fingerprint_cheap": "048b39e0ed481da8d6d04e4e009b815783f336802393fc7f1f5f9b2e1571e825",
+      "fingerprint_match": true
+    },
+    "gpqa": {
+      "n_records": 198,
+      "fingerprint_strong": "c8ae21899fff07b3219cd6fe529af112c5b2758dd3805a776747fca2635f29d3",
+      "fingerprint_cheap": "c8ae21899fff07b3219cd6fe529af112c5b2758dd3805a776747fca2635f29d3",
+      "fingerprint_match": true
+    },
+    "hle": {
+      "n_records": 2158,
+      "fingerprint_strong": "ef4c81f6b98c214597cf452bce4f626889829e634176a2f16d72596dbf637b94",
+      "fingerprint_cheap": "ef4c81f6b98c214597cf452bce4f626889829e634176a2f16d72596dbf637b94",
+      "fingerprint_match": true
+    },
+    "livecodebench": {
+      "n_records": 1055,
+      "fingerprint_strong": "5b6020ea195c260d426803fb6db244b44c74fcc25c4892c5e74cb1400707915a",
+      "fingerprint_cheap": "5b6020ea195c260d426803fb6db244b44c74fcc25c4892c5e74cb1400707915a",
+      "fingerprint_match": true
+    },
+    "aime": {
+      "n_records": 60,
+      "fingerprint_strong": "fdd43055e4a110990681acac6e814bde1ae9bc89eba943ea1fa020214fa95b80",
+      "fingerprint_cheap": "fdd43055e4a110990681acac6e814bde1ae9bc89eba943ea1fa020214fa95b80",
+      "fingerprint_match": true
+    },
+    "livemathbench": {
+      "n_records": 121,
+      "fingerprint_strong": "66ca37cc2e1ddbbe29ca49e6fbd77cbf0cebdd3b632ef2d5ffa9e988cf4345da",
+      "fingerprint_cheap": "66ca37cc2e1ddbbe29ca49e6fbd77cbf0cebdd3b632ef2d5ffa9e988cf4345da",
+      "fingerprint_match": true
+    },
+    "arc-agi": {
+      "n_records": 400,
+      "fingerprint_strong": "4092d33f0f1cd97ae53b7ffce8995aade552f3a0bcad1f4d9c4204321989e181",
+      "fingerprint_cheap": "4092d33f0f1cd97ae53b7ffce8995aade552f3a0bcad1f4d9c4204321989e181",
+      "fingerprint_match": true
+    },
+    "swe-bench": {
+      "n_records": 500,
+      "fingerprint_strong": "b133eff5fe0f85a53235964061506d42e0470dbe678ac5c78af178b0ead5207f",
+      "fingerprint_cheap": "b133eff5fe0f85a53235964061506d42e0470dbe678ac5c78af178b0ead5207f",
+      "fingerprint_match": true
+    }
+  },
+  "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
+  "paired_path": "data/processed/paired_v2.jsonl.gz",
+  "n_rows": 11818,
+  "archive": {
+    "hf_repo": "NPULH/LLMRouterBench",
+    "hf_revision": "0e5af1b84bf73437a01a1849c0f1d2468baa93fc",
+    "file": "bench-release.tar.gz",
+    "sha256": "b79f8cde1a6f029c2efa663a3a3b6f7748defb22341fe59f328cebef6648c8f1",
+    "bytes": 1283503080
+  },
+  "package_crosscheck": {
+    "rows": 10918,
+    "prompt_equal": 10917,
+    "scores_equal": 10918,
+    "costs_equal": 10918,
+    "eligibility_equal": 10918,
+    "pkg_eligible": 10367
+  },
+  "per_benchmark": {
+    "simpleqa": {
+      "n": 4326,
+      "eligible": 4315,
+      "eligible_recovered": 4315,
+      "cheap_cost_missing": 2,
+      "strong_empty_response": 9,
+      "strong_cost_missing": 9
+    },
+    "mmlupro": {
+      "n": 3000,
+      "eligible": 2993,
+      "eligible_recovered": 2993,
+      "strong_empty_response": 2,
+      "strong_cost_missing": 2,
+      "cheap_cost_missing": 5
+    },
+    "gpqa": {
+      "n": 198,
+      "eligible": 198,
+      "eligible_recovered": 198
+    },
+    "hle": {
+      "n": 2158,
+      "eligible": 1631,
+      "eligible_recovered": 2130,
+      "strong_cost_missing": 507,
+      "cheap_cost_missing": 20,
+      "strong_empty_response": 8
+    },
+    "livecodebench": {
+      "n": 1055,
+      "eligible": 1055,
+      "eligible_recovered": 1055
+    },
+    "aime": {
+      "n": 60,
+      "eligible": 58,
+      "eligible_recovered": 58,
+      "strong_empty_response": 1,
+      "strong_cost_missing": 1,
+      "cheap_cost_missing": 1
+    },
+    "livemathbench": {
+      "n": 121,
+      "eligible": 117,
+      "eligible_recovered": 117,
+      "strong_empty_response": 4,
+      "strong_cost_missing": 4
+    },
+    "arc-agi": {
+      "n": 400,
+      "eligible": 396,
+      "eligible_recovered": 396,
+      "strong_empty_response": 4,
+      "strong_cost_missing": 4
+    },
+    "swe-bench": {
+      "n": 500,
+      "eligible": 491,
+      "eligible_recovered": 491,
+      "strong_empty_response": 9
+    }
+  }
+}
