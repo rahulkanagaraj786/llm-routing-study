@@ -1,0 +1,52 @@
+rotation 0: fitting forest {'n_estimators': 160, 'max_depth': 20, 'min_samples_leaf': 10, 'max_features': 0.1, 'use_stats': False} on 3376 rows
+  cal_advantage_mse 0.25052  fit 0.9s
+rotation 0: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.1, 'use_stats': True} on 3376 rows
+  cal_advantage_mse 0.25555  fit 2.8s
+rotation 0: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.3, 'use_stats': True} on 3376 rows
+  cal_advantage_mse 0.25781  fit 6.2s
+rotation 0: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.1, 'use_stats': True} on 3376 rows
+  cal_advantage_mse 0.24996  fit 1.6s
+rotation 0: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.3, 'use_stats': True} on 3376 rows
+  cal_advantage_mse 0.25120  fit 2.7s
+rotation 1: fitting forest {'n_estimators': 160, 'max_depth': 20, 'min_samples_leaf': 10, 'max_features': 0.1, 'use_stats': False} on 3385 rows
+  cal_advantage_mse 0.21467  fit 0.9s
+rotation 1: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.1, 'use_stats': True} on 3385 rows
+  cal_advantage_mse 0.21562  fit 2.7s
+rotation 1: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.3, 'use_stats': True} on 3385 rows
+  cal_advantage_mse 0.21471  fit 5.7s
+rotation 1: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.1, 'use_stats': True} on 3385 rows
+  cal_advantage_mse 0.21269  fit 1.6s
+rotation 1: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.3, 'use_stats': True} on 3385 rows
+  cal_advantage_mse 0.21278  fit 2.7s
+rotation 2: fitting forest {'n_estimators': 160, 'max_depth': 20, 'min_samples_leaf': 10, 'max_features': 0.1, 'use_stats': False} on 3386 rows
+  cal_advantage_mse 0.24094  fit 0.9s
+rotation 2: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.1, 'use_stats': True} on 3386 rows
+  cal_advantage_mse 0.24696  fit 2.8s
+rotation 2: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.3, 'use_stats': True} on 3386 rows
+  cal_advantage_mse 0.25027  fit 6.0s
+rotation 2: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.1, 'use_stats': True} on 3386 rows
+  cal_advantage_mse 0.23800  fit 1.7s
+rotation 2: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.3, 'use_stats': True} on 3386 rows
+  cal_advantage_mse 0.23922  fit 2.8s
+rotation 3: fitting forest {'n_estimators': 160, 'max_depth': 20, 'min_samples_leaf': 10, 'max_features': 0.1, 'use_stats': False} on 3393 rows
+  cal_advantage_mse 0.23380  fit 1.0s
+rotation 3: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.1, 'use_stats': True} on 3393 rows
+  cal_advantage_mse 0.24023  fit 2.8s
+rotation 3: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.3, 'use_stats': True} on 3393 rows
+  cal_advantage_mse 0.24251  fit 5.9s
+rotation 3: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.1, 'use_stats': True} on 3393 rows
+  cal_advantage_mse 0.23423  fit 1.7s
+rotation 3: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.3, 'use_stats': True} on 3393 rows
+  cal_advantage_mse 0.23704  fit 2.8s
+rotation 4: fitting forest {'n_estimators': 160, 'max_depth': 20, 'min_samples_leaf': 10, 'max_features': 0.1, 'use_stats': False} on 3383 rows
+  cal_advantage_mse 0.23001  fit 0.9s
+rotation 4: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.1, 'use_stats': True} on 3383 rows
+  cal_advantage_mse 0.23133  fit 2.8s
+rotation 4: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 5, 'max_features': 0.3, 'use_stats': True} on 3383 rows
+  cal_advantage_mse 0.23304  fit 6.4s
+rotation 4: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.1, 'use_stats': True} on 3383 rows
+  cal_advantage_mse 0.22840  fit 1.6s
+rotation 4: fitting forest {'n_estimators': 300, 'max_depth': None, 'min_samples_leaf': 20, 'max_features': 0.3, 'use_stats': True} on 3383 rows
+  cal_advantage_mse 0.22910  fit 2.8s
+wrote results/dev_selection/forest/oof_predictions.csv and summary.json | final config {'max_depth': None, 'max_features': 0.1, 'min_samples_leaf': 20, 'n_estimators': 300, 'use_stats': True}
+.venv/bin/python scripts/05_dev_compare.py forest  402.89s user 3.41s system 488% cpu 1:23.22 total
