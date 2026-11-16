@@ -1,0 +1,83 @@
+{
+  "repo_revision": "0b81ba3053fbb74828382690a883849e2443e2d8",
+  "hf_repo": "NPULH/LLMRouterBench",
+  "hf_revision": "0e5af1b84bf73437a01a1849c0f1d2468baa93fc",
+  "archive_url": "https://huggingface.co/datasets/NPULH/LLMRouterBench/resolve/0e5af1b84bf73437a01a1849c0f1d2468baa93fc/bench-release.tar.gz?download=true",
+  "archive_sha256": "b79f8cde1a6f029c2efa663a3a3b6f7748defb22341fe59f328cebef6648c8f1",
+  "archive_bytes": 1283503080,
+  "selected_files": [
+    {
+      "archive_path": "bench-release/livecodebench/test/gemini-2.5-flash/livecodebench-test-gemini-2.5-flash-20251013_003249.json",
+      "relative_file": "raw/selected/bench-release/livecodebench/test/gemini-2.5-flash/livecodebench-test-gemini-2.5-flash-20251013_003249.json",
+      "bytes": 18615974,
+      "sha256": "902afe4bfa74465f524c21ea69b81a18015694929d59703f1647582db9089b36"
+    },
+    {
+      "archive_path": "bench-release/livecodebench/test/gpt-5/livecodebench-test-gpt-5-20251013_115531.json",
+      "relative_file": "raw/selected/bench-release/livecodebench/test/gpt-5/livecodebench-test-gpt-5-20251013_115531.json",
+      "bytes": 6842474,
+      "sha256": "68871a481043a8d129daaf300edc68b94f95df87ba676814c42bbc6bc2f81ad6"
+    },
+    {
+      "archive_path": "bench-release/gpqa/test/gemini-2.5-flash/gpqa-test-gemini-2.5-flash-20251019_024111.json",
+      "relative_file": "raw/selected/bench-release/gpqa/test/gemini-2.5-flash/gpqa-test-gemini-2.5-flash-20251019_024111.json",
+      "bytes": 3528915,
+      "sha256": "2ae29b5fe93517c3a58546fa7236510cf6310267a0686ed3c12ba70bded99310"
+    },
+    {
+      "archive_path": "bench-release/gpqa/test/gpt-5/gpqa-test-gpt-5-20251019_024120.json",
+      "relative_file": "raw/selected/bench-release/gpqa/test/gpt-5/gpqa-test-gpt-5-20251019_024120.json",
+      "bytes": 450318,
+      "sha256": "8a2aae8f6b105db1e40876b269f65005c89430c966cbed9fe7593a25a7f35191"
+    },
+    {
+      "archive_path": "bench-release/livemathbench/test/gemini-2.5-flash/livemathbench-test-gemini-2.5-flash-20251105_071201.json",
+      "relative_file": "raw/selected/bench-release/livemathbench/test/gemini-2.5-flash/livemathbench-test-gemini-2.5-flash-20251105_071201.json",
+      "bytes": 1801925,
+      "sha256": "1a2ced3b79c3005726386294c8963f5bcef6c07826f977a06edcba1a0e94cf0c"
+    },
+    {
+      "archive_path": "bench-release/livemathbench/test/gpt-5/livemathbench-test-gpt-5-20251105_071836.json",
+      "relative_file": "raw/selected/bench-release/livemathbench/test/gpt-5/livemathbench-test-gpt-5-20251105_071836.json",
+      "bytes": 199785,
+      "sha256": "a448a13954d001d2021b2f67076f532c0f4fe021077e34ab56752306a47eb73c"
+    },
+    {
+      "archive_path": "bench-release/aime/hybrid/gemini-2.5-flash/aime-hybrid-gemini-2.5-flash-20251105_072706.json",
+      "relative_file": "raw/selected/bench-release/aime/hybrid/gemini-2.5-flash/aime-hybrid-gemini-2.5-flash-20251105_072706.json",
+      "bytes": 2487694,
+      "sha256": "19debc4971cdbf8118f421aaca264c4a8ae105e02bcb116ff2c2dc73d66457c2"
+    },
+    {
+      "archive_path": "bench-release/aime/hybrid/gpt-5/aime-hybrid-gpt-5-20251105_155925.json",
+      "relative_file": "raw/selected/bench-release/aime/hybrid/gpt-5/aime-hybrid-gpt-5-20251105_155925.json",
+      "bytes": 137826,
+      "sha256": "84e378e4df88065db47bfa2a29f168883a1557d723a2fb0360f7304d6a78e172"
+    },
+    {
+      "archive_path": "bench-release/mmlupro/test_3000/gemini-2.5-flash/mmlupro-test_3000-gemini-2.5-flash-20251024_100341.json",
+      "relative_file": "raw/selected/bench-release/mmlupro/test_3000/gemini-2.5-flash/mmlupro-test_3000-gemini-2.5-flash-20251024_100341.json",
+      "bytes": 18428446,
+      "sha256": "ccc7f21bbee27a527535e1ccaec379dfc08ea8d5c1c00aec979b58cf566c208f"
+    },
+    {
+      "archive_path": "bench-release/mmlupro/test_3000/gpt-5/mmlupro-test_3000-gpt-5-20251025_121135.json",
+      "relative_file": "raw/selected/bench-release/mmlupro/test_3000/gpt-5/mmlupro-test_3000-gpt-5-20251025_121135.json",
+      "bytes": 5242433,
+      "sha256": "e4265bc336265cabf16d79386c7bfd41b77671f9d6b61e494e2d4cba1d401334"
+    },
+    {
+      "archive_path": "bench-release/mmlupro/test_1000/gemini-2.5-flash/mmlupro-test-gemini-2.5-flash-20251019_024127.json",
+      "relative_file": "raw/selected/bench-release/mmlupro/test_1000/gemini-2.5-flash/mmlupro-test-gemini-2.5-flash-20251019_024127.json",
+      "bytes": 6747401,
+      "sha256": "300346aaf09ca3af4eaf77b28db37784571d0d66579ca756e16ab3f744b28aa9"
+    },
+    {
+      "archive_path": "bench-release/mmlupro/test_1000/gpt-5/mmlupro-test-gpt-5-20251019_025250.json",
+      "relative_file": "raw/selected/bench-release/mmlupro/test_1000/gpt-5/mmlupro-test-gpt-5-20251019_025250.json",
+      "bytes": 1736969,
+      "sha256": "c1e8d6022030ff33b809e798eb3ca25060ec7388e9bda344c59ceef7f1b0d386"
+    }
+  ],
+  "note": "Two models and five objective-score benchmarks chosen before inspecting their outcomes."
+}
