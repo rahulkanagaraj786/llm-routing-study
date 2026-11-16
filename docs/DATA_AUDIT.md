@@ -84,8 +84,8 @@ at 20–30% of that, and the total is $6.16 recorded vs $8.46 at the schedule. R
 costs stay primary; the final evaluation also reports savings at list prices.
 
 ### 6. Zero-cost and empty-response records
-Besides HLE, 51 corpus rows are excluded for a zero cost or an empty GPT-5 response
-(SimpleQA 11, MMLU-Pro 7, HLE 28, AIME 2, LiveMathBench 4). Empty GPT-5 responses are
+Besides those 507 HLE rows, 44 corpus rows are excluded for a zero cost or an empty
+GPT-5 response (SimpleQA 11, MMLU-Pro 7, HLE 20, AIME 2, LiveMathBench 4). Empty GPT-5 responses are
 scored 0 in the release, so excluding them slightly favours GPT-5's baseline accuracy.
 
 ### 7. Flash is not always the cheaper model
