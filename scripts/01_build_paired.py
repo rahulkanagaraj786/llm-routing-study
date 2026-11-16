@@ -1,18 +1,26 @@
-"""Build data/processed/paired_v2.jsonl.gz from the raw LLMRouterBench files and
-cross-check it against the paired file shipped in the handoff package."""
+"""Build data/processed/paired_v2.jsonl.gz from the raw LLMRouterBench files.
+
+One-time step per machine: the table it writes stays in data/processed/ and every other
+script reads that local copy. See data/README.md for the download step."""
 import gzip, json, sys, collections
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from router import data as D
 
+EXPECTED_CONTENT_SHA256 = "dc295bd9b9f337138b729d242ffb04aed7f78d5bbf7240820a3be365eb3c925e"
+
 rows, prov = D.build_paired()
 sha = D.write_paired(rows)
+content_sha = D.sha256_gz_content(D.PAIRED_PATH)
 C = collections.Counter
-print("rows", len(rows), "| sha256", sha)
+print("rows", len(rows), "| content sha256", content_sha)
+if content_sha != EXPECTED_CONTENT_SHA256:
+    sys.exit("the rebuilt table differs from the one this study uses; check the archive hash and the list of extracted files")
+print("table matches the expected content hash")
 
 # --- cross-check against the handoff package (position-wise, per benchmark) ---
 pkg_path = D.ROOT / "Handoff/Router_Development_Comparison/data/paired_full.jsonl.gz"
-pkg = [json.loads(l) for l in gzip.open(pkg_path, "rt") if l.strip()]
+pkg = [json.loads(l) for l in gzip.open(pkg_path, "rt") if l.strip()] if pkg_path.exists() else []
 mine = {(r["benchmark"], r["position"]): r for r in rows}
 chk = C()
 for p in pkg:
@@ -26,7 +34,7 @@ for p in pkg:
     chk["pkg_eligible"] += pkg_elig
     if p["prompt"] != m["prompt"]:
         print("  prompt differs:", p["benchmark"], p["strong_position"], repr(p["prompt"][:80]), "|| raw:", repr(m["prompt"][:80]), "| pkg valid", p["measurement_valid"], "| mine eligible", m["eligible"])
-print("package cross-check:", dict(chk))
+print("package cross-check:", dict(chk) if pkg else "skipped (pilot package not present)")
 
 by = collections.defaultdict(C)
 for r in rows:
@@ -45,10 +53,11 @@ dq = [q for q, c in C(r["qid"] for r in rows).items() if c > 1]
 for q in dq[:5]:
     print("  dup:", [(r["benchmark"], r["position"], r["eligible"], repr(r["prompt"][:60])) for r in rows if r["qid"] == q])
 
-prov.update(paired_sha256=sha, paired_path=str(D.PAIRED_PATH.relative_to(D.ROOT)), n_rows=len(rows),
+archive_path = D.ROOT / "data/raw/bench-release.tar.gz"  # may have been deleted after extraction
+archive_facts = dict(sha256=D.sha256_file(archive_path), bytes=archive_path.stat().st_size) if archive_path.exists() else {}
+prov.update(paired_sha256=sha, paired_content_sha256=content_sha, paired_path=str(D.PAIRED_PATH.relative_to(D.ROOT)), n_rows=len(rows),
             archive=dict(hf_repo="NPULH/LLMRouterBench", hf_revision="0e5af1b84bf73437a01a1849c0f1d2468baa93fc",
-                         file="bench-release.tar.gz", sha256=D.sha256_file(D.ROOT / "data/raw/bench-release.tar.gz"),
-                         bytes=(D.ROOT / "data/raw/bench-release.tar.gz").stat().st_size),
+                         file="bench-release.tar.gz", **archive_facts),
             package_crosscheck=dict(chk), per_benchmark={k: dict(v) for k, v in by.items()})
 out = D.ROOT / "data/processed/paired_v2_provenance.json"
 out.write_text(json.dumps(prov, indent=2))

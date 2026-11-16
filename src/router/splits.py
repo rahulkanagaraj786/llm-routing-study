@@ -135,7 +135,8 @@ def write_manifest(manifest: list[dict], extra_meta: dict) -> dict:
     for m in manifest:
         if m["eligible"]:
             counts[m["benchmark"]][m["split"]] += 1
-    meta = dict(manifest_sha256=D.sha256_file(MANIFEST_PATH), paired_sha256=D.sha256_file(D.PAIRED_PATH), salt=SALT,
+    meta = dict(manifest_sha256=D.sha256_file(MANIFEST_PATH), paired_sha256=D.sha256_file(D.PAIRED_PATH),
+                paired_content_sha256=D.sha256_gz_content(D.PAIRED_PATH), salt=SALT,
                 test_fraction=TEST_FRACTION, val_fraction=VAL_FRACTION, n_folds=N_FOLDS,
                 near_dup_threshold=NEAR_DUP_THRESHOLD, n_rows=len(manifest),
                 eligible_counts={b: dict(v) for b, v in counts.items()}, **extra_meta)
@@ -147,7 +148,7 @@ def read_manifest() -> dict[str, dict]:
     meta = json.loads(META_PATH.read_text())
     if D.sha256_file(MANIFEST_PATH) != meta["manifest_sha256"]:
         raise RuntimeError("split manifest does not match its recorded hash")
-    if D.sha256_file(D.PAIRED_PATH) != meta["paired_sha256"]:
+    if D.sha256_gz_content(D.PAIRED_PATH) != meta["paired_content_sha256"]:
         raise RuntimeError("paired data does not match the hash recorded in the split manifest")
     with open(MANIFEST_PATH) as f:
         return {m["qid"]: m for m in csv.DictReader(f)}

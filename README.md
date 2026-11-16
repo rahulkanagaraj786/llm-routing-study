@@ -56,9 +56,9 @@ mkdir -p data/raw/extracted
 curl -L -o data/raw/bench-release.tar.gz \
   "https://huggingface.co/datasets/NPULH/LLMRouterBench/resolve/0e5af1b84bf73437a01a1849c0f1d2468baa93fc/bench-release.tar.gz"
 shasum -a 256 data/raw/bench-release.tar.gz   # b79f8cde1a6f029c2efa663a3a3b6f7748defb22341fe59f328cebef6648c8f1
-tar -xzf data/raw/bench-release.tar.gz -C data/raw/extracted -T logs/selected_members.txt
+tar -xzf data/raw/bench-release.tar.gz -C data/raw/extracted -T data/selected_members.txt
 
-.venv/bin/python scripts/01_build_paired.py   # must print sha256 b0c551f4...
+.venv/bin/python scripts/01_build_paired.py   # one-time; checks the table against the expected hash
 .venv/bin/python scripts/00_audit.py
 .venv/bin/python tests/test_policy.py && .venv/bin/python tests/test_guards.py
 ```

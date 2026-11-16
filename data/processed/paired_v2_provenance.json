@@ -282,6 +282,7 @@
     }
   },
   "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
+  "paired_content_sha256": "dc295bd9b9f337138b729d242ffb04aed7f78d5bbf7240820a3be365eb3c925e",
   "paired_path": "data/processed/paired_v2.jsonl.gz",
   "n_rows": 11818,
   "archive": {

@@ -1,6 +1,7 @@
 {
   "manifest_sha256": "0f05816182c1b1b17e0e21496f3c897ffe33b1c0e6f34a4a1b733e8cfd52a69c",
   "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
+  "paired_content_sha256": "dc295bd9b9f337138b729d242ffb04aed7f78d5bbf7240820a3be365eb3c925e",
   "salt": "STA221-llm-router-split-v1",
   "test_fraction": 0.2,
   "val_fraction": 0.2,

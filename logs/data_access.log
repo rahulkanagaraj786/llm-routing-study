@@ -52,3 +52,6 @@
 2026-11-16T10:05:28	guard_test	splits=train,val;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	5640
 2026-11-16T10:05:29	guard_test	source_pool_dev_filtered	5640
 2026-11-16T10:05:29	guard_test	selection_pool_dev_unfiltered	6011
+2026-11-16T12:56:05	guard_test	splits=train,val;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	5640
+2026-11-16T12:56:06	guard_test	source_pool_dev_filtered	5640
+2026-11-16T12:56:07	guard_test	selection_pool_dev_unfiltered	6011

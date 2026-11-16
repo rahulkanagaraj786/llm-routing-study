@@ -74,6 +74,16 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def sha256_gz_content(path: Path) -> str:
+    """SHA-256 of the uncompressed bytes of a .gz file. Unlike the hash of the file itself,
+    this is the same on every machine, whatever zlib build compressed it."""
+    h = hashlib.sha256()
+    with gzip.open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def _raw_file(dataset: str, split: str, model: str) -> Path:
     files = sorted((RAW_DIR / dataset / split / model).glob("*.json"))
     if len(files) != 1:
