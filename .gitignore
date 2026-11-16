@@ -14,3 +14,6 @@ Handoff/Router_Development_Comparison.zip
 results/**/model/
 results/**/router.joblib
 results/final_dryrun/
+
+# working notes, not part of the repo
+outputs/
