@@ -1,0 +1,10 @@
+# CPU pipeline (same pins as the handoff package)
+numpy==2.3.5
+scipy==1.17.0
+scikit-learn==1.8.0
+threadpoolctl==3.6.0
+joblib
+# ModernBERT candidate and plots
+torch==2.15.0
+transformers==5.23.0
+matplotlib
