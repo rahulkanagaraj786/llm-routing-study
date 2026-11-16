@@ -17,3 +17,6 @@ results/final_dryrun/
 
 # working notes, not part of the repo
 outputs/
+
+# course slides (screenshots), not ours to publish
+Handoff/Screenshot*.png
