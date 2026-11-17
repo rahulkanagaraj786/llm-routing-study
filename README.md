@@ -41,7 +41,7 @@ rq2/                           separate pipeline for RQ2, on hold
 manifests/                     split manifest and its hashes
 data/                          instructions for building the data (not stored here)
 tests/                         checks for the evaluation code and the data guards
-docs/                          team guide
+docs/                          team guide, protocol, data audit, EDA
 ```
 
 ## Setup
