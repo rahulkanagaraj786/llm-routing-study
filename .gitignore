@@ -13,3 +13,6 @@ results/**/router.joblib
 
 # local notes
 outputs/
+
+# per-machine run logs
+logs/

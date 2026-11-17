@@ -1,0 +1,61 @@
+{
+  "manifest_sha256": "0f05816182c1b1b17e0e21496f3c897ffe33b1c0e6f34a4a1b733e8cfd52a69c",
+  "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
+  "paired_content_sha256": "dc295bd9b9f337138b729d242ffb04aed7f78d5bbf7240820a3be365eb3c925e",
+  "salt": "STA221-llm-router-split-v1",
+  "test_fraction": 0.2,
+  "val_fraction": 0.2,
+  "n_folds": 5,
+  "near_dup_threshold": 0.85,
+  "n_rows": 11818,
+  "eligible_counts": {
+    "simpleqa": {
+      "val": 874,
+      "train": 2585,
+      "test": 856
+    },
+    "mmlupro": {
+      "test": 599,
+      "val": 597,
+      "train": 1797
+    },
+    "hle": {
+      "train": 976,
+      "test": 319,
+      "val": 336
+    },
+    "arc-agi": {
+      "fresh_sealed": 396
+    },
+    "swe-bench": {
+      "fresh_sealed": 491
+    },
+    "livecodebench": {
+      "val": 211,
+      "train": 633,
+      "test": 211
+    },
+    "aime": {
+      "test": 11,
+      "val": 11,
+      "train": 36
+    },
+    "gpqa": {
+      "val": 39,
+      "train": 119,
+      "test": 40
+    },
+    "livemathbench": {
+      "val": 23,
+      "train": 70,
+      "test": 24
+    }
+  },
+  "near_duplicates": {
+    "n_pairs_at_threshold": 296,
+    "n_clusters": 10697,
+    "n_multi_member_clusters": 160,
+    "rows_in_multi_member_clusters": 381,
+    "largest_cluster": 5
+  }
+}
