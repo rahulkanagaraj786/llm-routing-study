@@ -146,6 +146,36 @@ the design is agreed; see `rq2/README.md` for the open questions.
 If you think a shared piece is wrong, raise it with the team first. A change there affects
 everyone's numbers.
 
+## Recording your results properly
+
+We can only compare the three models later, and defend them in the report, if every run
+is recorded the same way. Please follow these rules.
+
+1. **Commit your development results before you run the test.** `results/dev_selection/<name>/`
+   is the evidence of which settings you chose and why. Commit it, then run step 6.
+2. **Run the test once.** `07_final_eval.py --unlock-final` refuses to run twice, but only
+   while `results/final/<name>/` exists. **Never delete or rename your results to run the test
+   again.** If something genuinely went wrong (a crash, a bug in the shared code), stop and
+   tell the team before doing anything; a rerun has to be agreed and written into
+   `docs/PROTOCOL.md`.
+3. **Commit your final results straight away**, all of `results/final/<name>/`, without
+   editing anything in it. The result file records your exact settings, the code version, your
+   machine, and every read of the test split made from your machine (`test_reads`), so a
+   rerun is visible later.
+4. **Never edit result files by hand.** If a number looks wrong, raise it; do not fix the file.
+5. **Write down anything unusual** in your pull request: a crash and restart, a change to
+   your grid, a different machine or GPU, anything you had to work around.
+6. **Keep the settings fixed once declared.** Your grid goes into `docs/PROTOCOL.md`
+   section 5 before your first real development run and does not change afterwards.
+
+What to commit, in short:
+
+| When | Commit |
+|---|---|
+| Model written | `src/router/<name>.py`, your entry in `src/router/registry.py`, your grid in `docs/PROTOCOL.md` |
+| After step 4 | `results/dev_selection/<name>/` |
+| After step 6 | `results/final/<name>/` (including `report/`) |
+
 ## Working with git
 
 - Work on a branch named after your model, for example `gbm`, and open a pull request.
@@ -157,6 +187,7 @@ everyone's numbers.
 - [ ] `tests/test_models.py` passes with your model.
 - [ ] Your grid is written in `docs/PROTOCOL.md` and has not changed since your first real run.
 - [ ] `results/dev_selection/<name>/` is committed.
+- [ ] You have read "Recording your results properly" above.
 - [ ] The dry run and its report look sensible.
 - [ ] The team has agreed to run the final evaluations.
 

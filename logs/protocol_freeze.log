@@ -16,3 +16,4 @@
 2026-11-16T21:47:18-0800	entry 12 (limits 3 and 5 added after the first logistic test) logged before rerunning	fe6fb1cee44adfeb428d24fe0ae501bf638143d04e9af1358143c6eed2ae86ec
 2026-11-17T01:15:04-0800	entry 12 closed, entry 13 (four test reads accounted for) logged	c7f76b450000893504a9e71ddf51d1db36fd0427fc071494aa5e4c41fd2fbdab
 2026-11-17T01:20:06-0800	entry 14 (runlog robustness fix) logged	414f3293f3aa4c211e1a6da789b210c644dadda9946b030dd914e64ac81a307a
+2026-11-17T01:37:53-0800	entry 15 (test-read recording) logged	9e2e4ac714f88d7e8ee330d9131ff730aeea30f9b0552e55bd2710823f114641

@@ -80,15 +80,25 @@ if DRY:
 else:
     kw = dict(unlock_final=True)
     rep = dict(unlock_final=True, use_recovered_cost=True)  # HLE cost sensitivity: scoring only
-    tr, _ = S.load_rows("final:rq1:train", splits=("train",), benchmarks=CORPUS, **kw)
-    va, _ = S.load_rows("final:rq1:val", splits=("val",), benchmarks=CORPUS, **kw)
-    targets = {"locked_test": S.load_rows("final:rq1:test", splits=("test",), benchmarks=CORPUS, **kw),
-               "locked_test_hle_costs_repaired": S.load_rows("final:rq1:test:hle_repaired", splits=("test",), benchmarks=CORPUS, **rep)}
+    tr, _ = S.load_rows(f"final:rq1:{family}:train", splits=("train",), benchmarks=CORPUS, **kw)
+    va, _ = S.load_rows(f"final:rq1:{family}:val", splits=("val",), benchmarks=CORPUS, **kw)
+    targets = {"locked_test": S.load_rows(f"final:rq1:{family}:test", splits=("test",), benchmarks=CORPUS, **kw),
+               "locked_test_hle_costs_repaired": S.load_rows(f"final:rq1:{family}:test:hle_repaired", splits=("test",), benchmarks=CORPUS, **rep)}
     if WITH_ARC:
-        targets["optional_arc_agi"] = S.load_rows("final:optional:arc", splits=("fresh_sealed",), benchmarks=("arc-agi",), **kw)
+        targets["optional_arc_agi"] = S.load_rows(f"final:optional:{family}:arc", splits=("fresh_sealed",), benchmarks=("arc-agi",), **kw)
     results["studies"]["rq1"] = dict(final.run_one(family, config, "rq1", tr, va, targets, OUT, man,
                                                    mix_targets=("locked_test",), mix=(MIX_FOCUS, MIX_SHARES)),
                                      priority="main study")
 
+if not DRY:
+    # Copy the record of test reads into the result file itself, so it travels with the
+    # results in git. "this_run" = the reads just made; "earlier_on_this_machine" = any
+    # previous test reads in this machine's log (a rerun after deleting results shows here).
+    lines = S.ACCESS_LOG.read_text().splitlines() if S.ACCESS_LOG.exists() else []
+    test_reads = [ln for ln in lines if "unlock_final=True" in ln and "splits=test" in ln]
+    mine = [ln for ln in test_reads if f":{family}:" in ln.split("\t")[1]]
+    this_run = mine[-2:] if len(mine) >= 2 else mine          # the test and its HLE-repaired version
+    results["test_reads"] = dict(this_run=this_run, earlier_on_this_machine=mine[:-len(this_run)] if this_run else [],
+                                 other_test_reads_on_this_machine=len(test_reads) - len(mine))
 RESULT_FILE.write_text(json.dumps(results, indent=2))
 print("wrote", RESULT_FILE.relative_to(D.ROOT))

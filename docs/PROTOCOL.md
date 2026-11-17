@@ -474,3 +474,10 @@ Status: no router from the revised protocol has been evaluated on the locked spl
     scripts run on a copy of the repository that does not include this document. Where the
     file exists the behaviour is unchanged. No result was recomputed.
 
+15. 2026-11-17, recording of test reads. From now on `scripts/07_final_eval.py` names the
+    model in every logged read and copies the record of test reads into the result file
+    (`test_reads`), so that it is committed with the results. The team guide adds rules for
+    recording results, including never deleting results to rerun a test. No result was
+    recomputed; logistic regression's existing result file predates this and its reads are
+    recorded in entry 13.
+
