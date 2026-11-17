@@ -29,7 +29,7 @@ Read in this order:
 0. `docs/TEAM_GUIDE.md`: if you are adding or running a model, start here.
 1. `docs/PROTOCOL.md`: the evaluation design, the selection rule, and every change to it.
 2. `docs/DATA_AUDIT.md`: what the data is and its known problems.
-3. `docs/DEV_RESULTS.md`: development results and the selected algorithm.
+3. `docs/DEV_RESULTS.md`: development results so far (logistic regression).
 
 ## Layout
 
@@ -87,9 +87,9 @@ python scripts/07_final_eval.py <model> --unlock-final   # final evaluation, ONC
 python scripts/09_report_final.py <model>                # tables and figures
 ```
 
-- The development comparison uses only train and validation questions of the source pool:
-  SimpleQA, GPQA, and MMLU-Pro without its math and computer-science questions and without
-  one question that duplicates an HLE item.
+- The development comparison uses the train and validation questions of all seven
+  benchmarks. It chooses each model's settings and gives the results from which the final
+  model is named. It never touches the test split.
 - The final evaluation answers RQ1: train on the train split of all seven benchmarks, tune
   cutoffs on the validation split, score the locked test split once.
 - `python scripts/06_select_algorithm.py` compares the models on development results and

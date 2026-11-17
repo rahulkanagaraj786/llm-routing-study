@@ -7,10 +7,13 @@
 
 What it does, five times (once per rotation): learn on three folds, pick the best setting and
 tune the cutoffs on a fourth, then score the fifth. Every development question ends up scored
-by a router that never saw it. It reads only train+validation rows of the source pool
-(SimpleQA, GPQA, MMLU-Pro without math and computer science). It never touches the test split.
+by a router that never saw it. It reads the train+validation questions of all seven
+benchmarks. It never touches the test split.
 
 Output: results/dev_selection/<model>/  (rotation_*.json, oof_predictions.csv, summary.json)
+
+(--source-pool restricts it to SimpleQA, GPQA and filtered MMLU-Pro and writes to
+ results/rq2_dev_selection/. That is the RQ2 pipeline's development run; see rq2/README.md.)
 """
 import sys, json, time, csv
 from pathlib import Path
@@ -24,10 +27,12 @@ if len(args) != 1:
 family = args[0]
 registry.check(family)
 SMOKE = "--smoke" in sys.argv
-OUT = S.D.ROOT / "results" / "dev_selection" / family
+SOURCE_POOL = "--source-pool" in sys.argv  # RQ2 pipeline only
+OUT = S.D.ROOT / "results" / ("rq2_dev_selection" if SOURCE_POOL else "dev_selection") / family
 log = lambda s: print(s, flush=True)
 
-tab, folds = S.load_selection_dev(f"dev_compare:{family}{':smoke' if SMOKE else ''}")
+_purpose = f"dev_compare:{family}{':smoke' if SMOKE else ''}"
+tab, folds = S.load_selection_dev(_purpose) if SOURCE_POOL else S.load_rq1_dev(_purpose)
 if SMOKE:  # a small, fixed sample: enough to prove the model trains and predicts
     keep = np.arange(len(tab))[::8]
     tab, folds = tab.take(keep), folds[keep]

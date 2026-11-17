@@ -173,7 +173,15 @@ Candidates from 2026-11-16 (this replaces the table above):
 Each owner writes the grid into this table before their first full development run and
 does not change it afterwards.
 
-## 6. Algorithm selection (source pool only)
+## 6. Development comparison and algorithm selection
+
+> **Changed on 2026-11-16 (amendment 9).** RQ1 now has its own development run on the
+> train+validation questions of **all seven benchmarks** (8,307 questions), so that each
+> model's settings and the choice of final model reflect the mix RQ1 is about. The
+> procedure below (five rotations, the selection rule) is unchanged; only the questions
+> it runs on differ. The earlier source-pool development run described in the "Data" and
+> "History" paragraphs is kept as RQ2's development run (`results/rq2_dev_selection/`).
+> Test questions are never used in either.
 
 Data: the train+val rows of the source pool, 5,640 questions (SimpleQA 3,459, filtered
 MMLU-Pro 2,023, GPQA 158), in the 5 folds already recorded in the manifest. The 370
@@ -415,3 +423,13 @@ Status: no router from the revised protocol has been evaluated on the locked spl
    pipeline in `rq2/` that is disabled until the design is agreed. HLE, LiveCodeBench, AIME and LiveMathBench remain excluded from the
    development comparison in the meantime. No router from the revised protocol has been
    evaluated on the locked splits.
+
+9. 2026-11-16, RQ1 development run on all seven benchmarks. Until now the development
+   comparison ran on the source pool (three benchmarks) for both research questions, to
+   keep the held-out benchmarks out of model choice. With RQ1 and RQ2 now separate
+   pipelines, RQ1's development run uses the train+validation questions of all seven
+   benchmarks, and RQ2 keeps the source-pool run as its own. Reason: the final model for
+   RQ1 should be chosen on the kinds of questions RQ1 covers, including coding, math and
+   HLE. Decided before any model was evaluated on the locked splits, and before the other
+   two models were written. Logistic regression's development run is redone on the new
+   set; its source-pool results are moved, not discarded.

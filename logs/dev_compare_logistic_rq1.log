@@ -1,0 +1,102 @@
+rotation 0: fitting logistic {'C': 0.1, 'use_stats': False} on 4989 rows
+  cal_advantage_mse 0.23189  fit 1.4s
+rotation 0: fitting logistic {'C': 0.3, 'use_stats': False} on 4989 rows
+  cal_advantage_mse 0.23104  fit 1.4s
+rotation 0: fitting logistic {'C': 1.0, 'use_stats': False} on 4989 rows
+  cal_advantage_mse 0.23318  fit 1.5s
+rotation 0: fitting logistic {'C': 3.0, 'use_stats': False} on 4989 rows
+  cal_advantage_mse 0.24193  fit 1.6s
+rotation 0: fitting logistic {'C': 10.0, 'use_stats': False} on 4989 rows
+  cal_advantage_mse 0.26093  fit 1.8s
+rotation 0: fitting logistic {'C': 0.1, 'use_stats': True} on 4989 rows
+  cal_advantage_mse 0.23025  fit 2.6s
+rotation 0: fitting logistic {'C': 0.3, 'use_stats': True} on 4989 rows
+  cal_advantage_mse 0.22952  fit 2.9s
+rotation 0: fitting logistic {'C': 1.0, 'use_stats': True} on 4989 rows
+  cal_advantage_mse 0.23165  fit 3.3s
+rotation 0: fitting logistic {'C': 3.0, 'use_stats': True} on 4989 rows
+  cal_advantage_mse 0.24047  fit 3.8s
+rotation 0: fitting logistic {'C': 10.0, 'use_stats': True} on 4989 rows
+  cal_advantage_mse 0.25940  fit 4.5s
+rotation 1: fitting logistic {'C': 0.1, 'use_stats': False} on 4996 rows
+  cal_advantage_mse 0.21899  fit 1.3s
+rotation 1: fitting logistic {'C': 0.3, 'use_stats': False} on 4996 rows
+  cal_advantage_mse 0.21824  fit 1.4s
+rotation 1: fitting logistic {'C': 1.0, 'use_stats': False} on 4996 rows
+  cal_advantage_mse 0.21972  fit 1.5s
+rotation 1: fitting logistic {'C': 3.0, 'use_stats': False} on 4996 rows
+  cal_advantage_mse 0.22600  fit 1.6s
+rotation 1: fitting logistic {'C': 10.0, 'use_stats': False} on 4996 rows
+  cal_advantage_mse 0.24073  fit 1.8s
+rotation 1: fitting logistic {'C': 0.1, 'use_stats': True} on 4996 rows
+  cal_advantage_mse 0.21741  fit 2.7s
+rotation 1: fitting logistic {'C': 0.3, 'use_stats': True} on 4996 rows
+  cal_advantage_mse 0.21692  fit 2.9s
+rotation 1: fitting logistic {'C': 1.0, 'use_stats': True} on 4996 rows
+  cal_advantage_mse 0.21865  fit 3.3s
+rotation 1: fitting logistic {'C': 3.0, 'use_stats': True} on 4996 rows
+  cal_advantage_mse 0.22526  fit 3.7s
+rotation 1: fitting logistic {'C': 10.0, 'use_stats': True} on 4996 rows
+  cal_advantage_mse 0.24045  fit 4.4s
+rotation 2: fitting logistic {'C': 0.1, 'use_stats': False} on 4983 rows
+  cal_advantage_mse 0.22479  fit 1.3s
+rotation 2: fitting logistic {'C': 0.3, 'use_stats': False} on 4983 rows
+  cal_advantage_mse 0.22520  fit 1.4s
+rotation 2: fitting logistic {'C': 1.0, 'use_stats': False} on 4983 rows
+  cal_advantage_mse 0.22837  fit 1.5s
+rotation 2: fitting logistic {'C': 3.0, 'use_stats': False} on 4983 rows
+  cal_advantage_mse 0.23642  fit 1.6s
+rotation 2: fitting logistic {'C': 10.0, 'use_stats': False} on 4983 rows
+  cal_advantage_mse 0.25365  fit 1.7s
+rotation 2: fitting logistic {'C': 0.1, 'use_stats': True} on 4983 rows
+  cal_advantage_mse 0.22370  fit 2.7s
+rotation 2: fitting logistic {'C': 0.3, 'use_stats': True} on 4983 rows
+  cal_advantage_mse 0.22425  fit 2.9s
+rotation 2: fitting logistic {'C': 1.0, 'use_stats': True} on 4983 rows
+  cal_advantage_mse 0.22739  fit 3.3s
+rotation 2: fitting logistic {'C': 3.0, 'use_stats': True} on 4983 rows
+  cal_advantage_mse 0.23526  fit 3.7s
+rotation 2: fitting logistic {'C': 10.0, 'use_stats': True} on 4983 rows
+  cal_advantage_mse 0.25201  fit 4.5s
+rotation 3: fitting logistic {'C': 0.1, 'use_stats': False} on 4980 rows
+  cal_advantage_mse 0.22375  fit 1.3s
+rotation 3: fitting logistic {'C': 0.3, 'use_stats': False} on 4980 rows
+  cal_advantage_mse 0.22280  fit 1.4s
+rotation 3: fitting logistic {'C': 1.0, 'use_stats': False} on 4980 rows
+  cal_advantage_mse 0.22460  fit 1.5s
+rotation 3: fitting logistic {'C': 3.0, 'use_stats': False} on 4980 rows
+  cal_advantage_mse 0.23192  fit 1.5s
+rotation 3: fitting logistic {'C': 10.0, 'use_stats': False} on 4980 rows
+  cal_advantage_mse 0.24947  fit 1.9s
+rotation 3: fitting logistic {'C': 0.1, 'use_stats': True} on 4980 rows
+  cal_advantage_mse 0.22512  fit 2.6s
+rotation 3: fitting logistic {'C': 0.3, 'use_stats': True} on 4980 rows
+  cal_advantage_mse 0.22430  fit 2.8s
+rotation 3: fitting logistic {'C': 1.0, 'use_stats': True} on 4980 rows
+  cal_advantage_mse 0.22598  fit 3.4s
+rotation 3: fitting logistic {'C': 3.0, 'use_stats': True} on 4980 rows
+  cal_advantage_mse 0.23339  fit 3.7s
+rotation 3: fitting logistic {'C': 10.0, 'use_stats': True} on 4980 rows
+  cal_advantage_mse 0.25050  fit 4.3s
+rotation 4: fitting logistic {'C': 0.1, 'use_stats': False} on 4973 rows
+  cal_advantage_mse 0.21583  fit 1.3s
+rotation 4: fitting logistic {'C': 0.3, 'use_stats': False} on 4973 rows
+  cal_advantage_mse 0.21490  fit 1.3s
+rotation 4: fitting logistic {'C': 1.0, 'use_stats': False} on 4973 rows
+  cal_advantage_mse 0.21573  fit 1.5s
+rotation 4: fitting logistic {'C': 3.0, 'use_stats': False} on 4973 rows
+  cal_advantage_mse 0.22195  fit 1.7s
+rotation 4: fitting logistic {'C': 10.0, 'use_stats': False} on 4973 rows
+  cal_advantage_mse 0.23943  fit 1.7s
+rotation 4: fitting logistic {'C': 0.1, 'use_stats': True} on 4973 rows
+  cal_advantage_mse 0.21497  fit 2.6s
+rotation 4: fitting logistic {'C': 0.3, 'use_stats': True} on 4973 rows
+  cal_advantage_mse 0.21443  fit 2.8s
+rotation 4: fitting logistic {'C': 1.0, 'use_stats': True} on 4973 rows
+  cal_advantage_mse 0.21539  fit 3.2s
+rotation 4: fitting logistic {'C': 3.0, 'use_stats': True} on 4973 rows
+  cal_advantage_mse 0.22137  fit 3.8s
+rotation 4: fitting logistic {'C': 10.0, 'use_stats': True} on 4973 rows
+  cal_advantage_mse 0.23826  fit 4.3s
+wrote results/dev_selection/logistic/oof_predictions.csv and summary.json | final config {'C': 0.3, 'use_stats': True}
+.venv/bin/python scripts/05_dev_compare.py logistic  144.81s user 3.17s system 99% cpu 2:29.25 total

@@ -35,6 +35,15 @@ def test_source_pool_dev_is_allowed_filtered_and_disjoint_from_test():
     assert len(S.boundary_duplicate_qids()) == 1 and not S.boundary_duplicate_qids() & set(dev.qid)
 
 
+def test_rq1_dev_covers_all_benchmarks_and_never_the_test_split():
+    dev, folds = S.load_rq1_dev("guard_test")
+    man = S.read_manifest()
+    assert len(dev) == 6216 + 2091
+    assert set(dev.benchmark.tolist()) == {"simpleqa", "mmlupro", "gpqa", "hle", "livecodebench", "aime", "livemathbench"}
+    assert all(man[q]["split"] in ("train", "val") for q in dev.qid)
+    assert set(folds.tolist()) == {0, 1, 2, 3, 4}
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

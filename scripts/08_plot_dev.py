@@ -13,7 +13,7 @@ from router import registry
 _PALETTE = ["#2a78d6", "#eb6834", "#1baf7a"]  # validated together for up to three series
 SERIES = {f: (_PALETTE[i], registry.label(f)) for i, f in enumerate(registry.names()[:3])}
 BASE = S.D.ROOT / "results/dev_selection"
-tab, _ = S.load_selection_dev("plot_dev")
+tab, _ = S.load_rq1_dev("plot_dev")
 pos = {q: i for i, q in enumerate(tab.qid)}
 
 fig, ax = plt.subplots(figsize=(8.2, 5.2), dpi=160)
@@ -49,7 +49,7 @@ for i, (yv, label) in enumerate(ends):  # direct labels at the line ends, nudged
 ax.set_xlim(-0.3, XMAX); ax.set_ylim(0, None)
 ax.set_xlabel("Accuracy loss vs always GPT-5 (percentage points)", color=INK2, fontsize=9)
 ax.set_ylabel("Gross API cost saved vs always GPT-5 (%)", color=INK2, fontsize=9)
-ax.set_title("Development cost–accuracy trade-off, source pool (out-of-fold, n = %d)" % len(tab), loc="left", fontsize=11, color=INK, pad=18)
+ax.set_title("Development cost–accuracy trade-off, all seven benchmarks (out-of-fold, n = %d)" % len(tab), loc="left", fontsize=11, color=INK, pad=18)
 ax.grid(axis="y", color=GRID, lw=1); ax.set_axisbelow(True)
 for s in ("top", "right"):
     ax.spines[s].set_visible(False)
@@ -58,7 +58,7 @@ for s in ("left", "bottom"):
 ax.tick_params(colors=INK2, labelsize=8, length=0)
 leg = ax.legend(loc="upper left", frameon=False, fontsize=9, labelcolor=INK)
 fig.text(0.01, 0.01, "Lines: every cutoff applied to pooled out-of-fold gains. Dots: cutoffs chosen on a calibration fold for 0, 1 and 2 pp, applied to unseen folds.\n"
-                     "SimpleQA, GPQA and MMLU-Pro (without math and computer science) development rows only. Not a test result.", fontsize=7.5, color=INK2, va="bottom")
+                     "Train and validation questions of all seven benchmarks. Not a test result.", fontsize=7.5, color=INK2, va="bottom")
 fig.subplots_adjust(left=0.08, right=0.83, top=0.88, bottom=0.2)
 out = S.D.ROOT / "results/dev_selection/dev_tradeoff.png"
 fig.savefig(out, facecolor=SURFACE)

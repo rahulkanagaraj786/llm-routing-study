@@ -70,14 +70,13 @@ results = dict(mode="dry_run" if DRY else "final", study=STUDY, family=family, l
                env=runlog.env_info(), with_arc_agi=WITH_ARC, studies={})
 
 if DRY:
-    # Rehearsal on source-pool development rows only. Folds 0-2 train, 3 calibrate, 4 pseudo-test.
-    tab, folds = S.load_selection_dev("final_eval_dry_run")
+    # Rehearsal on development rows only (all seven benchmarks). Folds 0-2 train, 3 calibrate, 4 pseudo-test.
+    tab, folds = S.load_rq1_dev("final_eval_dry_run")
     rows_all = {r["qid"]: r for r in D.read_paired()}
     def sub(mask): return tab.take(np.flatnonzero(mask)), [rows_all[q] for q in tab.qid[mask]]
     tr, _ = sub(folds <= 2); va, _ = sub(folds == 3)
-    # rehearsal only: there is no coding benchmark in the development rows, so MMLU-Pro stands in
     results["studies"]["rq1"] = final.run_one(family, config, "rq1", tr, va, {"pseudo_test": sub(folds == 4)}, OUT, man,
-                                              mix_targets=("pseudo_test",), mix=("mmlupro", MIX_SHARES))
+                                              mix_targets=("pseudo_test",), mix=(MIX_FOCUS, MIX_SHARES))
 else:
     kw = dict(unlock_final=True)
     rep = dict(unlock_final=True, use_recovered_cost=True)  # HLE cost sensitivity: scoring only

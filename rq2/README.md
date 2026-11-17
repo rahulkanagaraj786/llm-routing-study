@@ -37,8 +37,14 @@ One option, already coded, not agreed:
 - The "fit, freeze the cutoffs, score" step and every measurement (`src/router/final.py`,
   `policy.py`).
 
-Until RQ2 is settled, HLE, LiveCodeBench, AIME and LiveMathBench stay out of the
-development comparison, so that any of the designs above is still possible.
+RQ2 has its own development run, so that its router's settings are chosen without the
+held-out benchmarks:
+
+    python scripts/05_dev_compare.py <model> --source-pool
+
+It uses SimpleQA, GPQA and filtered MMLU-Pro only and writes to
+`results/rq2_dev_selection/<model>/`. Logistic regression's is already there. (RQ1's
+development run uses all seven benchmarks; the two are independent.)
 
 ## When the design is settled
 

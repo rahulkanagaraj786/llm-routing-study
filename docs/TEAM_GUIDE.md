@@ -8,7 +8,7 @@ can be compared directly. You write one model file. Everything else is shared an
 | Part | Owner | Status |
 |---|---|---|
 | Shared pipeline: data, splits, cutoff tuning, evaluation, reports | Rahul | done |
-| Regularized logistic regression (`logistic`) | Rahul | development run done; final test pending |
+| Regularized logistic regression (`logistic`) | Rahul | development run done (`docs/DEV_RESULTS.md`); final test pending |
 | Gradient boosting (`gbm`) | to be assigned | to be written |
 | Fine-tuned text encoder, ModernBERT or similar (`encoder`) | to be assigned | to be written |
 
@@ -90,8 +90,9 @@ python scripts/05_dev_compare.py <name>
 ```
 
 It is resumable (one file per rotation). It trains on three folds, picks the best setting
-and tunes the cutoffs on a fourth, and scores the fifth, five times over. It reads only
-development questions and never the test split.
+and tunes the cutoffs on a fourth, and scores the fifth, five times over. It uses the train
+and validation questions of all seven benchmarks (8,307 questions) and never the test
+split.
 
 Output: `results/dev_selection/<name>/`. Commit that folder.
 

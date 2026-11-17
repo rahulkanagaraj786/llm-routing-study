@@ -59,9 +59,9 @@ OUT = D.ROOT / "results" / ("rq2_dryrun" if DRY else "rq2") / family
 RESULT_FILE = OUT / "final_results_rq2.json"
 if UNLOCK and RESULT_FILE.exists():
     sys.exit(f"{RESULT_FILE.relative_to(D.ROOT)} already exists: this runs once per model.")
-dev_path = D.ROOT / "results" / "dev_selection" / family / "summary.json"
+dev_path = D.ROOT / "results" / "rq2_dev_selection" / family / "summary.json"
 if not dev_path.exists():
-    sys.exit(f"{dev_path.relative_to(D.ROOT)} not found: run  python scripts/05_dev_compare.py {family}  first.")
+    sys.exit(f"{dev_path.relative_to(D.ROOT)} not found: run  python scripts/05_dev_compare.py {family} --source-pool  first.")
 config = json.loads(dev_path.read_text())["final_config"]
 print(f"model: {family}  study: RQ2  settings: {config}  mode: {'DRY RUN' if DRY else 'FINAL'}", flush=True)
 OUT.mkdir(parents=True, exist_ok=True)
