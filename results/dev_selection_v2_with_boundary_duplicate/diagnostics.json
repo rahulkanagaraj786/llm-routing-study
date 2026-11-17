@@ -1,0 +1,95 @@
+{
+ "logistic": {
+  "matched_loss": {
+   "0.5": {
+    "savings": 6.09,
+    "loss": 0.5
+   },
+   "1.0": {
+    "savings": 10.77,
+    "loss": 0.99
+   },
+   "1.5": {
+    "savings": 17.11,
+    "loss": 1.49
+   },
+   "2.0": {
+    "savings": 22.54,
+    "loss": 1.99
+   }
+  },
+  "corr_gain_y": 0.14298297261699072,
+  "r2": 0.02037424417307232,
+  "per_rotation_savings": [
+   25.4,
+   13.1,
+   8.5,
+   14.4,
+   19.6
+  ],
+  "per_rotation_loss": [
+   2.46,
+   0.98,
+   1.42,
+   2.13,
+   1.43
+  ]
+ },
+ "forest": {
+  "matched_loss": {
+   "0.5": {
+    "savings": 5.15,
+    "loss": 0.5
+   },
+   "1.0": {
+    "savings": 8.89,
+    "loss": 0.99
+   },
+   "1.5": {
+    "savings": 12.4,
+    "loss": 1.49
+   },
+   "2.0": {
+    "savings": 15.67,
+    "loss": 1.99
+   }
+  },
+  "corr_gain_y": 0.11905190727938104,
+  "r2": 0.0114801599666281,
+  "per_rotation_savings": [
+   15.8,
+   9.0,
+   9.8,
+   11.7,
+   8.2
+  ],
+  "per_rotation_loss": [
+   1.85,
+   1.15,
+   1.51,
+   1.24,
+   0.98
+  ]
+ },
+ "logistic_minus_forest_at_1pp": {
+  "diff_loss_pp_ci95": [
+   -0.08953027885130324,
+   0.7801556860909351
+  ],
+  "diff_savings_pct_ci95": [
+   3.7775729114803234,
+   6.805859972884308
+  ]
+ },
+ "ceiling": {
+  "savings": 70.5201942091994,
+  "loss": -5.779117177805359
+ },
+ "var_y": 0.23563238239695505,
+ "y_counts": {
+  "-1": 326,
+  "0": 4202,
+  "1": 1113
+ },
+ "note": "Post-hoc diagnostics on pooled out-of-fold gains (cutoff chosen on the same pooled data). Development rows only. Not used for selection."
+}

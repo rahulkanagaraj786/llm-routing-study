@@ -1,0 +1,151 @@
+{
+  "family": "logistic",
+  "protocol_sha256": "8e5a3fa8eadba937115b8c20197947fd2aacfedb07e27c6b238c588870657cc1",
+  "env": {
+    "timestamp": "2026-11-15T20:48:09-08:00",
+    "python": "3.13.9",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "cpu": "Apple M2 Pro",
+    "cpu_count": "10",
+    "ram_gb": 16.0,
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "sklearn": "1.8.0",
+      "threadpoolctl": "3.6.0",
+      "torch": "2.15.0",
+      "transformers": "5.23.0",
+      "tokenizers": "0.23.3"
+    },
+    "git_commit": "HEAD",
+    "git_dirty": true,
+    "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
+    "manifest_sha256": "0f05816182c1b1b17e0e21496f3c897ffe33b1c0e6f34a4a1b733e8cfd52a69c"
+  },
+  "n_questions": 6011,
+  "grid": [
+    {
+      "C": 0.1,
+      "use_stats": false
+    },
+    {
+      "C": 0.3,
+      "use_stats": false
+    },
+    {
+      "C": 1.0,
+      "use_stats": false
+    },
+    {
+      "C": 3.0,
+      "use_stats": false
+    },
+    {
+      "C": 10.0,
+      "use_stats": false
+    },
+    {
+      "C": 0.1,
+      "use_stats": true
+    },
+    {
+      "C": 0.3,
+      "use_stats": true
+    },
+    {
+      "C": 1.0,
+      "use_stats": true
+    },
+    {
+      "C": 3.0,
+      "use_stats": true
+    },
+    {
+      "C": 10.0,
+      "use_stats": true
+    }
+  ],
+  "final_config": {
+    "C": 0.3,
+    "use_stats": true
+  },
+  "mean_cal_mse_by_config": {
+    "{\"C\": 0.1, \"use_stats\": false}": 0.22149322388259823,
+    "{\"C\": 0.3, \"use_stats\": false}": 0.22091574785030915,
+    "{\"C\": 1.0, \"use_stats\": false}": 0.22247691775682132,
+    "{\"C\": 3.0, \"use_stats\": false}": 0.22915759932274068,
+    "{\"C\": 10.0, \"use_stats\": false}": 0.24380077365048441,
+    "{\"C\": 0.1, \"use_stats\": true}": 0.2203471261261644,
+    "{\"C\": 0.3, \"use_stats\": true}": 0.22001940832207828,
+    "{\"C\": 1.0, \"use_stats\": true}": 0.22179739973984663,
+    "{\"C\": 3.0, \"use_stats\": true}": 0.22847776488029542,
+    "{\"C\": 10.0, \"use_stats\": true}": 0.24301667421923717
+  },
+  "chosen_config_per_rotation": [
+    {
+      "C": 0.3,
+      "use_stats": true
+    },
+    {
+      "C": 0.1,
+      "use_stats": true
+    },
+    {
+      "C": 0.1,
+      "use_stats": true
+    },
+    {
+      "C": 0.3,
+      "use_stats": false
+    },
+    {
+      "C": 1.0,
+      "use_stats": false
+    }
+  ],
+  "fit_seconds_per_rotation": [
+    12.029800918418914,
+    11.805895622819662,
+    12.116750043351203,
+    11.785807334352285,
+    11.567234457004815
+  ],
+  "chosen_fit_seconds": [
+    1.3732081246562302,
+    1.2370862080715597,
+    1.2061487920582294,
+    0.6534784589894116,
+    0.7111928332597017
+  ],
+  "predict_seconds_per_question": 8.935221256078567e-05,
+  "cutoffs_per_rotation": [
+    {
+      "0": 0.02216139857362105,
+      "1": 0.07349612896026833,
+      "2": 0.11111596460803994
+    },
+    {
+      "0": 0.029367074072244384,
+      "1": 0.06822976791020773,
+      "2": 0.090442753716192
+    },
+    {
+      "0": 0.02461509380336627,
+      "1": 0.060425220061092536,
+      "2": 0.06946509126090177
+    },
+    {
+      "0": 0.016733308984253098,
+      "1": 0.08118918141849107,
+      "2": 0.12059949720862417
+    },
+    {
+      "0": 0.05304294084409415,
+      "1": 0.07482779033317256,
+      "2": 0.09081088025634422
+    }
+  ],
+  "mean_cal_advantage_mse_chosen": 0.21934923701823478
+}

@@ -1,0 +1,338 @@
+{
+  "protocol_sha256": "0e9f4b67f5309eb7ed7dc5e17a89c4c63b5617bc9144357b29b0e64e46bcfeb7",
+  "env": {
+    "timestamp": "2026-11-16T20:03:06-08:00",
+    "python": "3.13.9",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "cpu": "Apple M2 Pro",
+    "cpu_count": "10",
+    "ram_gb": 16.0,
+    "device": null,
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "sklearn": "1.8.0",
+      "threadpoolctl": "3.6.0",
+      "torch": "2.15.0",
+      "transformers": "5.23.0",
+      "tokenizers": "0.23.3"
+    },
+    "git_commit": "4256df7b7932d4fddc3fcab8eb6c973f846466d5",
+    "git_dirty": true,
+    "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
+    "manifest_sha256": "0f05816182c1b1b17e0e21496f3c897ffe33b1c0e6f34a4a1b733e8cfd52a69c"
+  },
+  "n_questions": 5640,
+  "candidates": {
+    "logistic": {
+      "final_config": {
+        "C": 0.3,
+        "use_stats": true
+      },
+      "predict_ms_per_question": 0.089801550286781,
+      "total_fit_seconds": 55.84875349793583,
+      "mean_cal_advantage_mse": 0.2298802297275746,
+      "oof_advantage_mse": 0.23068770526835936,
+      "device": "cpu",
+      "allowances": {
+        "0": {
+          "n": 5640,
+          "accuracy": 0.6218085106382979,
+          "cost": 74.60281635,
+          "gross_savings_pct": 3.7345036547732247,
+          "accuracy_loss_pp": 0.23049645390070816,
+          "cheap_fraction": 0.053723404255319185,
+          "always_strong_accuracy": 0.624113475177305,
+          "always_strong_cost": 77.4969425,
+          "always_cheap_accuracy": 0.48439716312056735,
+          "always_cheap_cost": 10.188125499999998,
+          "always_cheap_savings_pct": 86.8535129627856,
+          "always_cheap_loss_pp": 13.971631205673763,
+          "per_benchmark": {
+            "gpqa": {
+              "n": 158,
+              "accuracy": 0.8354430379746836,
+              "cost": 6.0863447,
+              "gross_savings_pct": 3.7255257247957196,
+              "accuracy_loss_pp": 0.6329113924050667,
+              "cheap_fraction": 0.03164556962025311,
+              "always_strong_accuracy": 0.8417721518987342,
+              "always_strong_cost": 6.3218675,
+              "always_cheap_accuracy": 0.6645569620253164,
+              "always_cheap_cost": 2.1100604,
+              "always_cheap_savings_pct": 66.62283099100068,
+              "always_cheap_loss_pp": 17.721518987341778
+            },
+            "mmlupro": {
+              "n": 2023,
+              "accuracy": 0.8581314878892734,
+              "cost": 23.46611195,
+              "gross_savings_pct": 5.955532279890175,
+              "accuracy_loss_pp": 0.34602076124566894,
+              "cheap_fraction": 0.11220958971824024,
+              "always_strong_accuracy": 0.8615916955017301,
+              "always_strong_cost": 24.952145,
+              "always_cheap_accuracy": 0.7928818586258033,
+              "always_cheap_cost": 7.5393986,
+              "always_cheap_savings_pct": 69.78456721856978,
+              "always_cheap_loss_pp": 6.87098368759268
+            },
+            "simpleqa": {
+              "n": 3459,
+              "accuracy": 0.47383636889274355,
+              "cost": 45.0503597,
+              "gross_savings_pct": 2.536771900872581,
+              "accuracy_loss_pp": 0.14455044810638973,
+              "cheap_fraction": 0.020526163631107264,
+              "always_strong_accuracy": 0.47528187337380745,
+              "always_strong_cost": 46.222930000000005,
+              "always_cheap_accuracy": 0.29575021682567215,
+              "always_cheap_cost": 0.5386664999999999,
+              "always_cheap_savings_pct": 98.83463358986546,
+              "always_cheap_loss_pp": 17.95316565481353
+            }
+          },
+          "equal_benchmark_average": {
+            "n_benchmarks": 3,
+            "gross_savings_pct": 4.072609968519491,
+            "accuracy_loss_pp": 0.3744942005857084,
+            "accuracy": 0.7224702982522335
+          },
+          "bootstrap": {
+            "n_boot": 2000,
+            "seed": 221,
+            "n_groups": 5487,
+            "gross_savings_pct_ci95": [
+              2.941022913723261,
+              4.648790845592838
+            ],
+            "accuracy_loss_pp_ci95": [
+              0.0,
+              0.46059071075500113
+            ],
+            "prob_loss_within": {
+              "0pp": 0.0305,
+              "1pp": 1.0,
+              "2pp": 1.0
+            }
+          }
+        },
+        "1": {
+          "n": 5640,
+          "accuracy": 0.6092198581560284,
+          "cost": 66.5473556,
+          "gross_savings_pct": 14.1290566398797,
+          "accuracy_loss_pp": 1.4893617021276562,
+          "cheap_fraction": 0.23865248226950353,
+          "always_strong_accuracy": 0.624113475177305,
+          "always_strong_cost": 77.4969425,
+          "always_cheap_accuracy": 0.48439716312056735,
+          "always_cheap_cost": 10.188125499999998,
+          "always_cheap_savings_pct": 86.8535129627856,
+          "always_cheap_loss_pp": 13.971631205673763,
+          "per_benchmark": {
+            "gpqa": {
+              "n": 158,
+              "accuracy": 0.8291139240506329,
+              "cost": 5.7618560500000005,
+              "gross_savings_pct": 8.858323114174716,
+              "accuracy_loss_pp": 1.2658227848101333,
+              "cheap_fraction": 0.069620253164557,
+              "always_strong_accuracy": 0.8417721518987342,
+              "always_strong_cost": 6.3218675,
+              "always_cheap_accuracy": 0.6645569620253164,
+              "always_cheap_cost": 2.1100604,
+              "always_cheap_savings_pct": 66.62283099100068,
+              "always_cheap_loss_pp": 17.721518987341778
+            },
+            "mmlupro": {
+              "n": 2023,
+              "accuracy": 0.8269896193771626,
+              "cost": 17.1096949,
+              "gross_savings_pct": 31.429963636392788,
+              "accuracy_loss_pp": 3.460207612456745,
+              "cheap_fraction": 0.5837864557587741,
+              "always_strong_accuracy": 0.8615916955017301,
+              "always_strong_cost": 24.952145,
+              "always_cheap_accuracy": 0.7928818586258033,
+              "always_cheap_cost": 7.5393986,
+              "always_cheap_savings_pct": 69.78456721856978,
+              "always_cheap_loss_pp": 6.87098368759268
+            },
+            "simpleqa": {
+              "n": 3459,
+              "accuracy": 0.47181266261925414,
+              "cost": 43.67580465,
+              "gross_savings_pct": 5.510523348476615,
+              "accuracy_loss_pp": 0.3469210754553309,
+              "cheap_fraction": 0.044521538016767837,
+              "always_strong_accuracy": 0.47528187337380745,
+              "always_strong_cost": 46.222930000000005,
+              "always_cheap_accuracy": 0.29575021682567215,
+              "always_cheap_cost": 0.5386664999999999,
+              "always_cheap_savings_pct": 98.83463358986546,
+              "always_cheap_loss_pp": 17.95316565481353
+            }
+          },
+          "equal_benchmark_average": {
+            "n_benchmarks": 3,
+            "gross_savings_pct": 15.266270033014708,
+            "accuracy_loss_pp": 1.6909838242407365,
+            "accuracy": 0.7093054020156832
+          },
+          "bootstrap": {
+            "n_boot": 2000,
+            "seed": 221,
+            "n_groups": 5487,
+            "gross_savings_pct_ci95": [
+              12.623090893515796,
+              15.623818741421065
+            ],
+            "accuracy_loss_pp_ci95": [
+              1.0306442683993036,
+              1.9483251418894718
+            ],
+            "prob_loss_within": {
+              "0pp": 0.0,
+              "1pp": 0.0185,
+              "2pp": 0.984
+            }
+          }
+        },
+        "2": {
+          "n": 5640,
+          "accuracy": 0.601063829787234,
+          "cost": 57.80344219999999,
+          "gross_savings_pct": 25.411970672262342,
+          "accuracy_loss_pp": 2.3049645390070927,
+          "cheap_fraction": 0.36843971631205674,
+          "always_strong_accuracy": 0.624113475177305,
+          "always_strong_cost": 77.4969425,
+          "always_cheap_accuracy": 0.48439716312056735,
+          "always_cheap_cost": 10.188125499999998,
+          "always_cheap_savings_pct": 86.8535129627856,
+          "always_cheap_loss_pp": 13.971631205673763,
+          "per_benchmark": {
+            "gpqa": {
+              "n": 158,
+              "accuracy": 0.8227848101265823,
+              "cost": 5.1080478000000005,
+              "gross_savings_pct": 19.200334394860363,
+              "accuracy_loss_pp": 1.898734177215189,
+              "cheap_fraction": 0.25316455696202533,
+              "always_strong_accuracy": 0.8417721518987342,
+              "always_strong_cost": 6.3218675,
+              "always_cheap_accuracy": 0.6645569620253164,
+              "always_cheap_cost": 2.1100604,
+              "always_cheap_savings_pct": 66.62283099100068,
+              "always_cheap_loss_pp": 17.721518987341778
+            },
+            "mmlupro": {
+              "n": 2023,
+              "accuracy": 0.8121601581809195,
+              "cost": 12.166863249999999,
+              "gross_savings_pct": 51.23920909404783,
+              "accuracy_loss_pp": 4.943153732081063,
+              "cheap_fraction": 0.828966880869995,
+              "always_strong_accuracy": 0.8615916955017301,
+              "always_strong_cost": 24.952145,
+              "always_cheap_accuracy": 0.7928818586258033,
+              "always_cheap_cost": 7.5393986,
+              "always_cheap_savings_pct": 69.78456721856978,
+              "always_cheap_loss_pp": 6.87098368759268
+            },
+            "simpleqa": {
+              "n": 3459,
+              "accuracy": 0.46747614917606245,
+              "cost": 40.52853115,
+              "gross_savings_pct": 12.319424255450716,
+              "accuracy_loss_pp": 0.7805724197745001,
+              "cheap_fraction": 0.10436542353281297,
+              "always_strong_accuracy": 0.47528187337380745,
+              "always_strong_cost": 46.222930000000005,
+              "always_cheap_accuracy": 0.29575021682567215,
+              "always_cheap_cost": 0.5386664999999999,
+              "always_cheap_savings_pct": 98.83463358986546,
+              "always_cheap_loss_pp": 17.95316565481353
+            }
+          },
+          "equal_benchmark_average": {
+            "n_benchmarks": 3,
+            "gross_savings_pct": 27.586322581452965,
+            "accuracy_loss_pp": 2.5408201096902507,
+            "accuracy": 0.7008070391611881
+          },
+          "bootstrap": {
+            "n_boot": 2000,
+            "seed": 221,
+            "n_groups": 5487,
+            "gross_savings_pct_ci95": [
+              23.580811807549374,
+              27.052858039783548
+            ],
+            "accuracy_loss_pp_ci95": [
+              1.6984612752585082,
+              2.8892662192775744
+            ],
+            "prob_loss_within": {
+              "0pp": 0.0,
+              "1pp": 0.0005,
+              "2pp": 0.1565
+            }
+          }
+        }
+      }
+    }
+  },
+  "deferred_candidates": [
+    "gbm",
+    "encoder"
+  ],
+  "dropped_candidates": [],
+  "candidate_protocol_hashes": {
+    "logistic": "0e9f4b67f5309eb7ed7dc5e17a89c4c63b5617bc9144357b29b0e64e46bcfeb7"
+  },
+  "baselines": {
+    "always_gpt5": {
+      "accuracy": 0.624113475177305,
+      "cost": 77.4969425
+    },
+    "always_flash": {
+      "accuracy": 0.48439716312056735,
+      "cost": 10.188125499999998,
+      "gross_savings_pct": 86.8535129627856,
+      "accuracy_loss_pp": 13.971631205673763
+    },
+    "y_counts": {
+      "-1": 325,
+      "0": 4202,
+      "1": 1113
+    }
+  },
+  "pairwise_at_primary": {},
+  "selection": {
+    "primary_allowance_pp": 1.0,
+    "qualify_tolerance_pp": 0.5,
+    "min_improvement_pp": 1.0,
+    "savings": {
+      "logistic": 14.1290566398797
+    },
+    "loss": {
+      "logistic": 1.4893617021276562
+    },
+    "qualified": [
+      "logistic"
+    ],
+    "strict_highest_savings": "logistic",
+    "selected": "logistic",
+    "steps": [
+      "start with the simplest qualified router: logistic"
+    ],
+    "rules_agree": true,
+    "selected_config": {
+      "C": 0.3,
+      "use_stats": true
+    }
+  }
+}

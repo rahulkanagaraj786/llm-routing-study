@@ -1,0 +1,255 @@
+{
+ "logistic": {
+  "matched_loss": {
+   "0.5": {
+    "savings": 6.06,
+    "loss": 0.5
+   },
+   "1.0": {
+    "savings": 10.82,
+    "loss": 0.99
+   },
+   "1.5": {
+    "savings": 16.36,
+    "loss": 1.49
+   },
+   "2.0": {
+    "savings": 22.61,
+    "loss": 1.99
+   }
+  },
+  "corr_gain_y": 0.14238778377101283,
+  "r2": 0.02020093135871348,
+  "per_rotation_savings": [
+   17.8,
+   13.1,
+   7.9,
+   14.4,
+   17.2
+  ],
+  "per_rotation_loss": [
+   1.41,
+   0.98,
+   1.42,
+   2.13,
+   1.52
+  ],
+  "within_benchmark_shuffle": {
+   "0": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 3.7345036547732247,
+     "accuracy_loss_pp": 0.23049645390070816
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 3.892263926444577,
+     "accuracy_loss_pp": 0.5168528368794341
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      3.2869008783798135,
+      4.55594244089047
+     ],
+     "accuracy_loss_pp": [
+      0.28368794326241176,
+      0.762411347517733
+     ]
+    },
+    "accuracy_advantage_pp": 0.2863563829787259,
+    "savings_advantage_pct": -0.1577602716713522,
+    "share_of_shuffles_at_least_as_accurate": 0.0075,
+    "share_of_shuffles_saving_at_least_as_much": 0.69
+   },
+   "1": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 14.1290566398797,
+     "accuracy_loss_pp": 1.4893617021276562
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 16.116971530167138,
+     "accuracy_loss_pp": 1.9624911347517742
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      15.12816287236106,
+      17.13169898444703
+     ],
+     "accuracy_loss_pp": [
+      1.5957446808510634,
+      2.3226950354609976
+     ]
+    },
+    "accuracy_advantage_pp": 0.473129432624118,
+    "savings_advantage_pct": -1.9879148902874384,
+    "share_of_shuffles_at_least_as_accurate": 0.0065,
+    "share_of_shuffles_saving_at_least_as_much": 1.0
+   },
+   "2": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 25.411970672262342,
+     "accuracy_loss_pp": 2.3049645390070927
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 26.158756520233037,
+     "accuracy_loss_pp": 3.320035460992909
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      25.20475552148395,
+      27.081275129015562
+     ],
+     "accuracy_loss_pp": [
+      2.890070921985821,
+      3.7234042553191515
+     ]
+    },
+    "accuracy_advantage_pp": 1.0150709219858163,
+    "savings_advantage_pct": -0.7467858479706955,
+    "share_of_shuffles_at_least_as_accurate": 0.0,
+    "share_of_shuffles_saving_at_least_as_much": 0.942
+   }
+  }
+ },
+ "forest": {
+  "matched_loss": {
+   "0.5": {
+    "savings": 6.28,
+    "loss": 0.5
+   },
+   "1.0": {
+    "savings": 8.65,
+    "loss": 0.99
+   },
+   "1.5": {
+    "savings": 13.1,
+    "loss": 1.49
+   },
+   "2.0": {
+    "savings": 17.41,
+    "loss": 1.99
+   }
+  },
+  "corr_gain_y": 0.12088957942861794,
+  "r2": 0.01202202453191914,
+  "per_rotation_savings": [
+   14.6,
+   9.0,
+   7.5,
+   10.6,
+   8.9
+  ],
+  "per_rotation_loss": [
+   1.58,
+   1.15,
+   1.15,
+   0.98,
+   1.16
+  ],
+  "within_benchmark_shuffle": {
+   "0": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 1.4947081944555407,
+     "accuracy_loss_pp": 0.017730496453904898
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 1.7833905109869288,
+     "accuracy_loss_pp": 0.21848404255319256
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      1.3559167334246631,
+      2.2576283961138253
+     ],
+     "accuracy_loss_pp": [
+      0.05319148936170359,
+      0.39007092198581894
+     ]
+    },
+    "accuracy_advantage_pp": 0.20075354609928767,
+    "savings_advantage_pct": -0.2886823165313881,
+    "share_of_shuffles_at_least_as_accurate": 0.0095,
+    "share_of_shuffles_saving_at_least_as_much": 0.8905
+   },
+   "1": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 10.185955465275287,
+     "accuracy_loss_pp": 1.2056737588652444
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 12.096512795649964,
+     "accuracy_loss_pp": 1.5313475177304976
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      11.101192824478192,
+      13.06526299892412
+     ],
+     "accuracy_loss_pp": [
+      1.152482269503552,
+      1.89716312056738
+     ]
+    },
+    "accuracy_advantage_pp": 0.3256737588652532,
+    "savings_advantage_pct": -1.9105573303746777,
+    "share_of_shuffles_at_least_as_accurate": 0.052,
+    "share_of_shuffles_saving_at_least_as_much": 1.0
+   },
+   "2": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 17.457821900522074,
+     "accuracy_loss_pp": 1.9326241134751787
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 19.477576261347338,
+     "accuracy_loss_pp": 2.520097517730498
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      18.491969355758776,
+      20.458236450747712
+     ],
+     "accuracy_loss_pp": [
+      2.1099290780141833,
+      2.9432624113475137
+     ]
+    },
+    "accuracy_advantage_pp": 0.5874734042553191,
+    "savings_advantage_pct": -2.0197543608252637,
+    "share_of_shuffles_at_least_as_accurate": 0.0025,
+    "share_of_shuffles_saving_at_least_as_much": 1.0
+   }
+  }
+ },
+ "logistic_minus_forest_at_1pp": {
+  "diff_loss_pp_ci95": [
+   -0.15986287921120723,
+   0.7263129013630155
+  ],
+  "diff_savings_pct_ci95": [
+   2.427760690328368,
+   5.409357201534028
+  ]
+ },
+ "ceiling": {
+  "savings": 70.52256068037781,
+  "loss": -5.762411347517727
+ },
+ "var_y": 0.2354438911523565,
+ "y_counts": {
+  "-1": 325,
+  "0": 4202,
+  "1": 1113
+ },
+ "note": "Post-hoc diagnostics on pooled out-of-fold gains and decisions. Development rows only. Not used for selection."
+}

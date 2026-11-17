@@ -1,0 +1,159 @@
+{
+  "family": "forest",
+  "protocol_sha256": "43695492f3c1a70f74cf7f69d5a1815e9a09586677a66a303cead9bde900da0a",
+  "env": {
+    "timestamp": "2026-11-16T01:51:04-08:00",
+    "python": "3.13.9",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "cpu": "Apple M2 Pro",
+    "cpu_count": "10",
+    "ram_gb": 16.0,
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "sklearn": "1.8.0",
+      "threadpoolctl": "3.6.0",
+      "torch": "2.15.0",
+      "transformers": "5.23.0",
+      "tokenizers": "0.23.3"
+    },
+    "git_commit": "HEAD",
+    "git_dirty": true,
+    "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
+    "manifest_sha256": "0f05816182c1b1b17e0e21496f3c897ffe33b1c0e6f34a4a1b733e8cfd52a69c"
+  },
+  "n_questions": 5641,
+  "grid": [
+    {
+      "n_estimators": 160,
+      "max_depth": 20,
+      "min_samples_leaf": 10,
+      "max_features": 0.1,
+      "use_stats": false
+    },
+    {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 5,
+      "max_features": 0.1,
+      "use_stats": true
+    },
+    {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 5,
+      "max_features": 0.3,
+      "use_stats": true
+    },
+    {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 20,
+      "max_features": 0.1,
+      "use_stats": true
+    },
+    {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 20,
+      "max_features": 0.3,
+      "use_stats": true
+    }
+  ],
+  "final_config": {
+    "max_depth": null,
+    "max_features": 0.1,
+    "min_samples_leaf": 20,
+    "n_estimators": 300,
+    "use_stats": true
+  },
+  "mean_cal_mse_by_config": {
+    "{\"max_depth\": 20, \"max_features\": 0.1, \"min_samples_leaf\": 10, \"n_estimators\": 160, \"use_stats\": false}": 0.23398868066081188,
+    "{\"max_depth\": null, \"max_features\": 0.1, \"min_samples_leaf\": 5, \"n_estimators\": 300, \"use_stats\": true}": 0.2379380588307499,
+    "{\"max_depth\": null, \"max_features\": 0.3, \"min_samples_leaf\": 5, \"n_estimators\": 300, \"use_stats\": true}": 0.2396655930996892,
+    "{\"max_depth\": null, \"max_features\": 0.1, \"min_samples_leaf\": 20, \"n_estimators\": 300, \"use_stats\": true}": 0.2326570902416619,
+    "{\"max_depth\": null, \"max_features\": 0.3, \"min_samples_leaf\": 20, \"n_estimators\": 300, \"use_stats\": true}": 0.2338679624954964
+  },
+  "chosen_config_per_rotation": [
+    {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 20,
+      "max_features": 0.1,
+      "use_stats": true
+    },
+    {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 20,
+      "max_features": 0.1,
+      "use_stats": true
+    },
+    {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 20,
+      "max_features": 0.1,
+      "use_stats": true
+    },
+    {
+      "n_estimators": 160,
+      "max_depth": 20,
+      "min_samples_leaf": 10,
+      "max_features": 0.1,
+      "use_stats": false
+    },
+    {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 20,
+      "max_features": 0.1,
+      "use_stats": true
+    }
+  ],
+  "fit_seconds_per_rotation": [
+    14.315642206463963,
+    13.648041914682835,
+    14.255211625248194,
+    14.201748623978347,
+    14.525498166680336
+  ],
+  "chosen_fit_seconds": [
+    1.6438781251199543,
+    1.6305451658554375,
+    1.6824522907845676,
+    0.9945930000394583,
+    1.6452937088906765
+  ],
+  "predict_seconds_per_question": 0.00013586392072015857,
+  "cutoffs_per_rotation": [
+    {
+      "0": 0.04233027400263066,
+      "1": 0.0855792521645238,
+      "2": 0.09583787626793486
+    },
+    {
+      "0": -0.11171531807353813,
+      "1": 0.06277134302243031,
+      "2": 0.09637047729613456
+    },
+    {
+      "0": -0.045548804823758435,
+      "1": 0.057575147215408864,
+      "2": 0.07240904369231613
+    },
+    {
+      "0": -0.0016597135167214516,
+      "1": 0.048593262435208104,
+      "2": 0.07781444705568408
+    },
+    {
+      "0": 0.009369550867068756,
+      "1": 0.05386164901649208,
+      "2": 0.08123393847934973
+    }
+  ],
+  "mean_cal_advantage_mse_chosen": 0.232570905327565
+}
