@@ -8,7 +8,7 @@ can be compared directly. You write one model file. Everything else is shared an
 | Part | Owner | Status |
 |---|---|---|
 | Shared pipeline: data, splits, cutoff tuning, evaluation, reports | Rahul | done |
-| Regularized logistic regression (`logistic`) | Rahul | development run and RQ1 test done (`docs/DEV_RESULTS.md`, `docs/RQ1_RESULTS.md`) |
+| Regularized logistic regression (`logistic`) | Rahul | development run and RQ1 test done |
 | Gradient boosting (`gbm`) | to be assigned | to be written |
 | Fine-tuned text encoder, ModernBERT or similar (`encoder`) | to be assigned | to be written |
 

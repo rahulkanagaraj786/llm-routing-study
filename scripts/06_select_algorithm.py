@@ -109,7 +109,7 @@ name = "selection_partial.json" if partial else "selection.json"
 
 # ---- console report ----
 b = res["baselines"]
-print(f"RQ1 development rows, all seven benchmarks: n = {len(tab)}   (protocol {res['protocol_sha256'][:12]})")
+print(f"RQ1 development rows, all seven benchmarks: n = {len(tab)}   (protocol {(res['protocol_sha256'] or 'not recorded')[:12]})")
 print(f"always GPT-5: accuracy {100*b['always_gpt5']['accuracy']:.2f}%  cost ${b['always_gpt5']['cost']:.2f}")
 print(f"always Flash: accuracy {100*b['always_flash']['accuracy']:.2f}%  cost ${b['always_flash']['cost']:.2f}  savings {b['always_flash']['gross_savings_pct']:.1f}%  loss {b['always_flash']['accuracy_loss_pp']:.2f} pp")
 print(f"\n{'candidate':11s} {'allow':>5s} {'savings %':>9s} {'95% CI':>15s} {'loss pp':>8s} {'95% CI':>15s} {'to Flash':>8s} {'macro sav':>9s} {'macro loss':>10s}")

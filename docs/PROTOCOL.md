@@ -469,3 +469,8 @@ Status: no router from the revised protocol has been evaluated on the locked spl
     were byte-identical, and run 4 reproduced their 0, 1 and 2 point results exactly. No
     further test reads are planned for logistic regression.
 
+14. 2026-11-17, robustness fix with no effect on results. `runlog.protocol_sha256()` now
+    returns nothing instead of failing when `docs/PROTOCOL.md` is absent, so the shared
+    scripts run on a copy of the repository that does not include this document. Where the
+    file exists the behaviour is unchanged. No result was recomputed.
+
