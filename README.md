@@ -25,6 +25,9 @@ advantage is above a cutoff. Everything is offline: nothing here calls an LLM.
 
 If you are adding or running a model, start with `docs/TEAM_GUIDE.md`.
 
+Results so far: `docs/RQ1_RESULTS.md` (logistic regression on the locked test split) and
+`docs/DEV_RESULTS.md` (its development run).
+
 ## Layout
 
 ```
@@ -41,7 +44,7 @@ rq2/                           separate pipeline for RQ2, on hold
 manifests/                     split manifest and its hashes
 data/                          instructions for building the data (not stored here)
 tests/                         checks for the evaluation code and the data guards
-docs/                          team guide, protocol, data audit, EDA
+docs/                          team guide, protocol, data audit, EDA, results
 ```
 
 ## Setup
