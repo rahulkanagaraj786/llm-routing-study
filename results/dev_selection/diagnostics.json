@@ -1,0 +1,127 @@
+{
+ "logistic": {
+  "matched_loss": {
+   "0.5": {
+    "savings": 2.96,
+    "loss": 0.49
+   },
+   "1.0": {
+    "savings": 6.22,
+    "loss": 1.0
+   },
+   "1.5": {
+    "savings": 9.09,
+    "loss": 1.49
+   },
+   "2.0": {
+    "savings": 11.7,
+    "loss": 1.99
+   }
+  },
+  "corr_gain_y": 0.1564147602051441,
+  "r2": 0.02442160832627105,
+  "per_rotation_savings": [
+   5.1,
+   6.4,
+   6.1,
+   7.9,
+   6.7
+  ],
+  "per_rotation_loss": [
+   0.48,
+   0.85,
+   1.32,
+   1.93,
+   0.84
+  ],
+  "within_benchmark_shuffle": {
+   "0": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 0.9482048062193438,
+     "accuracy_loss_pp": 0.08426628144937442
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 0.8861159433918084,
+     "accuracy_loss_pp": 0.1989105573612581
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      0.634653188156166,
+      1.1566067487245844
+     ],
+     "accuracy_loss_pp": [
+      0.08426628144937442,
+      0.312989045383405
+     ]
+    },
+    "accuracy_advantage_pp": 0.11464427591188367,
+    "savings_advantage_pct": 0.06208886282753534,
+    "share_of_shuffles_at_least_as_accurate": 0.035,
+    "share_of_shuffles_saving_at_least_as_much": 0.3215
+   },
+   "1": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 6.418442439806327,
+     "accuracy_loss_pp": 1.0834236186348822
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 7.337398190751019,
+     "accuracy_loss_pp": 1.6524497411821324
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      6.795128191804671,
+      7.8801257958416295
+     ],
+     "accuracy_loss_pp": [
+      1.3843746238112353,
+      1.938124473335734
+     ]
+    },
+    "accuracy_advantage_pp": 0.5690261225472502,
+    "savings_advantage_pct": -0.9189557509446917,
+    "share_of_shuffles_at_least_as_accurate": 0.0,
+    "share_of_shuffles_saving_at_least_as_much": 1.0
+   },
+   "2": {
+    "n_perm": 2000,
+    "seed": 221,
+    "router": {
+     "gross_savings_pct": 12.839749943382028,
+     "accuracy_loss_pp": 2.3594558805826393
+    },
+    "shuffled_mean": {
+     "gross_savings_pct": 13.75716819606272,
+     "accuracy_loss_pp": 3.119164560009627
+    },
+    "shuffled_range95": {
+     "gross_savings_pct": [
+      12.964257915464412,
+      14.538812041671386
+     ],
+     "accuracy_loss_pp": [
+      2.79252437703142,
+      3.4431804502226964
+     ]
+    },
+    "accuracy_advantage_pp": 0.7597086794269878,
+    "savings_advantage_pct": -0.917418252680692,
+    "share_of_shuffles_at_least_as_accurate": 0.0,
+    "share_of_shuffles_saving_at_least_as_much": 0.99
+   }
+  }
+ },
+ "ceiling": {
+  "savings": 53.35719829968236,
+  "loss": -4.851330203442883
+ },
+ "always_flash": {
+  "savings": 70.78891984771595,
+  "loss": 15.44480558565065
+ },
+ "note": "Post-hoc diagnostics on pooled out-of-fold gains and decisions. RQ1 development rows (all seven benchmarks). Not used for selection."
+}
