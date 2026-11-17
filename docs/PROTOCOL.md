@@ -260,7 +260,7 @@ diagnostic and the workload-mix sensitivity check (both defined in section 9).
 
 > **On hold (2026-11-16).** The team has not yet decided which RQ2 experiments to run. The
 > design below is one candidate and may change. Nothing in it is run by the current
-> scripts; a draft implementation is parked in `archive/rq2_transfer_draft/`. Until RQ2 is
+> scripts; it has its own pipeline in `rq2/`, which refuses to run while on hold. Until RQ2 is
 > settled, the three benchmarks named here stay out of model development, so that every
 > option remains open.
 
@@ -411,7 +411,7 @@ Status: no router from the revised protocol has been evaluated on the locked spl
    No router from the revised protocol has been evaluated on the locked splits.
 
 8. 2026-11-16, RQ2 on hold. The team is focusing on RQ1 and will decide the RQ2
-   experiments later. The final-evaluation script now covers RQ1 only; the RQ2 code is
-   parked as a draft. HLE, LiveCodeBench, AIME and LiveMathBench remain excluded from the
+   experiments later. The final-evaluation script now covers RQ1 only; RQ2 has a separate
+   pipeline in `rq2/` that is disabled until the design is agreed. HLE, LiveCodeBench, AIME and LiveMathBench remain excluded from the
    development comparison in the meantime. No router from the revised protocol has been
    evaluated on the locked splits.

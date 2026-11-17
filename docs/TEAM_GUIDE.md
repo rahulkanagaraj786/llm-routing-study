@@ -132,11 +132,12 @@ does that do to accuracy?
 - Baselines on the same questions: always GPT-5 and always Flash.
 
 RQ2 (unseen kinds of questions) is not part of this yet. The team is still deciding which
-experiments to run for it, and it will get its own script.
+experiments to run for it. It has its own pipeline in `rq2/`, which is switched off until
+the design is agreed; see `rq2/README.md` for the open questions.
 
 ## Do not change
 
-- `src/router/data.py`, `splits.py`, `policy.py`, and anything in `manifests/`.
+- `src/router/data.py`, `splits.py`, `policy.py`, `final.py`, and anything in `manifests/`.
 - The numbered scripts, except to fix a bug the whole team agrees on.
 - Another person's model file or results folder.
 

@@ -23,7 +23,7 @@ repository.
 | Logistic regression (reference model) | development run done |
 | Gradient boosting, fine-tuned text encoder | to be written by their owners (`docs/TEAM_GUIDE.md`) |
 | Final evaluation, RQ1 | script and reporting ready; no router from the revised protocol has been evaluated on the locked splits |
-| RQ2 | design on hold; a draft is parked in `archive/rq2_transfer_draft/` |
+| RQ2 | design on hold; separate pipeline in `rq2/`, disabled until the team agrees the experiments |
 
 Read in this order:
 0. `docs/TEAM_GUIDE.md`: if you are adding or running a model, start here.
@@ -41,6 +41,8 @@ src/router/base.py         the contract every model follows (fit, predict_gain)
 src/router/registry.py     the list of models and their owners
 src/router/models.py       shared text features; logistic regression (the reference model)
 src/router/template_model.py   skeleton to copy for a new model
+src/router/final.py        the shared "fit, freeze cutoffs, score" step
+rq2/                       separate pipeline for RQ2, on hold
 scripts/                   numbered in run order, 00 to 09
 manifests/                 split manifest and its hashes
 results/audit              audit numbers, token lengths
