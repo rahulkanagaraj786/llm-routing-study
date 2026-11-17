@@ -10,7 +10,8 @@ repository.
 
 - **RQ1.** How much can a router save compared with always using GPT-5, and what does
   that do to accuracy?
-- **RQ2.** Does that trade-off hold on benchmarks the router never saw?
+- **RQ2.** Does that trade-off hold on benchmarks the router never saw? (Design still
+  being decided; the current code covers RQ1.)
 
 ## Where things stand
 
@@ -21,7 +22,8 @@ repository.
 | Shared pipeline: loader, cutoff tuning, evaluation, reports | done |
 | Logistic regression (reference model) | development run done |
 | Gradient boosting, fine-tuned text encoder | to be written by their owners (`docs/TEAM_GUIDE.md`) |
-| Final evaluation (RQ1 and RQ2) | script and reporting ready, **on hold**; no router from the revised protocol has been evaluated on the locked splits |
+| Final evaluation, RQ1 | script and reporting ready; no router from the revised protocol has been evaluated on the locked splits |
+| RQ2 | design on hold; a draft is parked in `archive/rq2_transfer_draft/` |
 
 Read in this order:
 0. `docs/TEAM_GUIDE.md`: if you are adding or running a model, start here.
@@ -72,7 +74,7 @@ loaders refuse to work if it or the data file changes.
 
 ## Running a model
 
-Every model goes through the same three commands. `<model>` is a name from
+Every model goes through the same commands. `<model>` is a name from
 `src/router/registry.py`, for example `logistic`.
 
 ```bash
@@ -86,9 +88,8 @@ python scripts/09_report_final.py <model>                # tables and figures
 - The development comparison uses only train and validation questions of the source pool:
   SimpleQA, GPQA, and MMLU-Pro without its math and computer-science questions and without
   one question that duplicates an HLE item.
-- The final evaluation covers RQ1 (all seven benchmarks, locked test split) and RQ2 (a
-  router trained on the source pool only, scored on its own test rows and on
-  LiveCodeBench, AIME + LiveMathBench, and HLE).
+- The final evaluation answers RQ1: train on the train split of all seven benchmarks, tune
+  cutoffs on the validation split, score the locked test split once.
 - `python scripts/06_select_algorithm.py` compares the models on development results and
   names the primary one.
 

@@ -1,24 +1,21 @@
-"""Final evaluation of ONE model: main study (RQ1) and transfer to held-out benchmarks (RQ2).
+"""Final evaluation for RQ1 (the main study), for ONE model.
 
-  python scripts/07_final_eval.py <model> --plan           # row counts of every fit and target; reads no outcomes
+  python scripts/07_final_eval.py <model> --plan           # row counts; reads no outcomes
   python scripts/07_final_eval.py <model> --dry-run        # rehearsal on development rows only
-  python scripts/07_final_eval.py <model> --unlock-final   # the real thing: ONCE per model, cannot be repeated
+  python scripts/07_final_eval.py <model> --unlock-final   # the real thing: ONCE per model
 
 <model> is a name from src/router/registry.py. The model's settings are taken from its own
 development run (results/dev_selection/<model>/summary.json), so that run must exist first.
 
-RQ1: router trained on the train split of all seven benchmarks, cutoffs tuned on the
-     validation split, scored once on the locked test split.
-RQ2: router trained on the source pool only (SimpleQA, GPQA, MMLU-Pro without math and
-     computer science), cutoffs tuned on the source pool's validation split, then frozen and
-     scored on the locked source test (reference) and separately on LiveCodeBench,
-     AIME + LiveMathBench, and HLE.
+What it does: trains the router on the train split of all seven benchmarks, tunes the
+cutoffs for 0, 1 and 2 points on the validation split, freezes them, then scores the locked
+test split once. It also reports the within-benchmark shuffle diagnostic, the workload-mix
+check, and the same test with repaired HLE costs (docs/PROTOCOL.md sections 7 and 9).
 
-Every target also gets the within-benchmark shuffle diagnostic; the RQ1 locked test gets the
-workload-mix sensitivity check (docs/PROTOCOL.md section 9). Wherever HLE is evaluated, the
-same frozen router is also scored on the sample with repaired HLE costs.
+RQ2 (transfer to unseen benchmarks) is not in this script. Its design is still being decided.
 
-Output: results/final/<model>/   Option: --with-arc-agi adds the optional ARC-AGI check.
+Output: results/final/<model>/final_results_rq1.json, predictions, cutoffs and the fitted model.
+Option: --with-arc-agi adds the optional ARC-AGI check.
 """
 import sys, json, time
 from pathlib import Path
@@ -37,17 +34,8 @@ WITH_ARC = "--with-arc-agi" in args
 MIX_FOCUS, MIX_SHARES = "livecodebench", (0.10, 0.25, 0.50)  # workload-mix sensitivity, RQ1 only
 if DRY + UNLOCK + PLAN != 1:
     sys.exit("choose exactly one of --plan, --dry-run or --unlock-final")
+STUDY = "rq1"
 CORPUS = tuple(D.CORPUS_BENCHMARKS)
-POOL = tuple(D.SELECTION_POOL)
-not_in_pool = lambda r: not S.in_source_pool(r)
-# Transfer to held-out benchmarks, all scored with the one frozen source-pool router.
-TRANSFER_TARGETS = {
-    "code": dict(priority="primary transfer", benchmarks=("livecodebench",)),
-    "math": dict(priority="secondary transfer", benchmarks=("aime", "livemathbench")),
-    "hle": dict(priority="secondary transfer", benchmarks=("hle",)),
-}
-ALL_SPLITS = ("train", "val", "test")
-
 if PLAN:
     c = S.plan_counts
     tot = lambda d: f"{sum(d.values()):5d}  {d}"
@@ -58,18 +46,12 @@ if PLAN:
     print("  test, HLE costs repaired", tot(c(splits=("test",), benchmarks=CORPUS, use_recovered_cost=True)))
     if WITH_ARC:
         print("  optional ARC-AGI", tot(c(splits=("fresh_sealed",), benchmarks=("arc-agi",))))
-    print("RQ2 transfer (one router trained on the source pool only)")
-    print("  fit       ", tot(c(splits=("train",), benchmarks=POOL, exclude=not_in_pool)))
-    print("  cutoffs   ", tot(c(splits=("val",), benchmarks=POOL, exclude=not_in_pool)))
-    print("  reference: source-pool locked test", tot(c(splits=("test",), benchmarks=POOL, exclude=not_in_pool)))
-    for name, t in TRANSFER_TARGETS.items():
-        print(f"  target {name} ({t['priority']})", tot(c(splits=ALL_SPLITS, benchmarks=t["benchmarks"])))
-    print("  target hle, costs repaired", tot(c(splits=ALL_SPLITS, benchmarks=("hle",), use_recovered_cost=True)))
     sys.exit(0)
 
 OUT = D.ROOT / "results" / ("final_dryrun" if DRY else "final") / family
-if UNLOCK and (OUT / "final_results.json").exists():
-    sys.exit(f"{(OUT / 'final_results.json').relative_to(D.ROOT)} already exists: the final evaluation runs once per model. "
+RESULT_FILE = OUT / f"final_results_{STUDY}.json"
+if UNLOCK and RESULT_FILE.exists():
+    sys.exit(f"{RESULT_FILE.relative_to(D.ROOT)} already exists: the final evaluation runs once per model. "
              "Do not rerun it to compare alternatives.")
 dev_path = D.ROOT / "results" / "dev_selection" / family / "summary.json"
 if not dev_path.exists():
@@ -77,7 +59,7 @@ if not dev_path.exists():
              "The final evaluation uses the settings chosen there.")
 config = json.loads(dev_path.read_text())["final_config"]
 sel_path = D.ROOT / "results/dev_selection/selection.json"
-print(f"model: {family}  settings: {config}  mode: {'DRY RUN' if DRY else 'FINAL'}", flush=True)
+print(f"model: {family}  study: RQ1  settings: {config}  mode: {'DRY RUN' if DRY else 'FINAL'}", flush=True)
 OUT.mkdir(parents=True, exist_ok=True)
 man = S.read_manifest()
 
@@ -141,7 +123,7 @@ def run_one(label, tr, va, targets: dict, mix_targets=()):
     return out
 
 
-results = dict(mode="dry_run" if DRY else "final", family=family, label=registry.label(family), config=config,
+results = dict(mode="dry_run" if DRY else "final", study=STUDY, family=family, label=registry.label(family), config=config,
                dev_summary_sha256=D.sha256_file(dev_path), protocol_sha256=runlog.protocol_sha256(),
                selection_sha256=D.sha256_file(sel_path) if sel_path.exists() else None,
                env=runlog.env_info(), with_arc_agi=WITH_ARC, studies={})
@@ -154,16 +136,9 @@ if DRY:
     tr, _ = sub(folds <= 2); va, _ = sub(folds == 3)
     MIX_FOCUS = "mmlupro"  # rehearsal only: there is no coding benchmark in the development rows
     results["studies"]["rq1"] = run_one("rq1", tr, va, {"pseudo_test": sub(folds == 4)}, mix_targets=("pseudo_test",))
-    # transfer rehearsal: pretend GPQA is a held-out benchmark
-    notg = tab.benchmark != "gpqa"
-    tr, _ = sub((folds <= 2) & notg); va, _ = sub((folds == 3) & notg)
-    results["studies"]["rq2_transfer_rehearsal"] = run_one("rq2_transfer_rehearsal", tr, va,
-                                                           {"pseudo_reference": sub((folds == 4) & notg), "gpqa_as_holdout": sub(tab.benchmark == "gpqa")})
 else:
     kw = dict(unlock_final=True)
     rep = dict(unlock_final=True, use_recovered_cost=True)  # HLE cost sensitivity: scoring only
-
-    # ---- RQ1: main study on all seven benchmarks ----
     tr, _ = S.load_rows("final:rq1:train", splits=("train",), benchmarks=CORPUS, **kw)
     va, _ = S.load_rows("final:rq1:val", splits=("val",), benchmarks=CORPUS, **kw)
     targets = {"locked_test": S.load_rows("final:rq1:test", splits=("test",), benchmarks=CORPUS, **kw),
@@ -172,18 +147,5 @@ else:
         targets["optional_arc_agi"] = S.load_rows("final:optional:arc", splits=("fresh_sealed",), benchmarks=("arc-agi",), **kw)
     results["studies"]["rq1"] = dict(run_one("rq1", tr, va, targets, mix_targets=("locked_test",)), priority="main study")
 
-    # ---- RQ2: one frozen source-pool router, scored on each held-out benchmark ----
-    # The source pool's train and validation rows are development data: no unlock is used to read them.
-    tr, _ = S.load_rows("final:rq2:train", splits=("train",), benchmarks=POOL, exclude=not_in_pool)
-    va, _ = S.load_rows("final:rq2:val", splits=("val",), benchmarks=POOL, exclude=not_in_pool)
-    held_out = {b for t in TRANSFER_TARGETS.values() for b in t["benchmarks"]}
-    assert not (set(tr.benchmark.tolist()) | set(va.benchmark.tolist())) & held_out
-    targets = {"source_pool_locked_test": S.load_rows("final:rq2:pool_test", splits=("test",), benchmarks=POOL, exclude=not_in_pool, **kw)}
-    for name, t in TRANSFER_TARGETS.items():
-        targets[name] = S.load_rows(f"final:rq2:target:{name}", splits=ALL_SPLITS, benchmarks=t["benchmarks"], **kw)
-    targets["hle_costs_repaired"] = S.load_rows("final:rq2:target:hle_repaired", splits=ALL_SPLITS, benchmarks=("hle",), **rep)
-    results["studies"]["rq2_transfer"] = dict(run_one("rq2_transfer", tr, va, targets),
-                                              priority={n: t["priority"] for n, t in TRANSFER_TARGETS.items()})
-
-(OUT / "final_results.json").write_text(json.dumps(results, indent=2))
-print("wrote", (OUT / "final_results.json").relative_to(D.ROOT))
+RESULT_FILE.write_text(json.dumps(results, indent=2))
+print("wrote", RESULT_FILE.relative_to(D.ROOT))

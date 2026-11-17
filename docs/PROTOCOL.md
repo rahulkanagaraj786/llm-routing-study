@@ -258,6 +258,12 @@ diagnostic and the workload-mix sensitivity check (both defined in section 9).
 
 ## 8. Transfer to held-out benchmarks, RQ2 (not run yet)
 
+> **On hold (2026-11-16).** The team has not yet decided which RQ2 experiments to run. The
+> design below is one candidate and may change. Nothing in it is run by the current
+> scripts; a draft implementation is parked in `archive/rq2_transfer_draft/`. Until RQ2 is
+> settled, the three benchmarks named here stay out of model development, so that every
+> option remains open.
+
 Claim being tested: transfer to held-out coding and math benchmarks. The claim is about
 benchmarks the router never saw, not about training data free of related material.
 
@@ -403,3 +409,9 @@ Status: no router from the revised protocol has been evaluated on the locked spl
    argument and write to per-model folders. The logistic regression development results
    were regenerated with the reorganised code and are identical to the previous ones.
    No router from the revised protocol has been evaluated on the locked splits.
+
+8. 2026-11-16, RQ2 on hold. The team is focusing on RQ1 and will decide the RQ2
+   experiments later. The final-evaluation script now covers RQ1 only; the RQ2 code is
+   parked as a draft. HLE, LiveCodeBench, AIME and LiveMathBench remain excluded from the
+   development comparison in the meantime. No router from the revised protocol has been
+   evaluated on the locked splits.

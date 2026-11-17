@@ -105,7 +105,8 @@ python scripts/09_report_final.py <name> --dry-run   # tables and figures from t
 
 ### Step 6. Run the final evaluation, once
 
-Only after your development results are committed and the team has agreed to go ahead:
+This is the RQ1 test. Only after your development results are committed and the team has
+agreed to go ahead:
 
 ```bash
 python scripts/07_final_eval.py <name> --unlock-final
@@ -122,12 +123,16 @@ folder of tables and figures. Commit it.
 
 ## What the final evaluation does for every model
 
-- **RQ1:** trains on the train split of all seven benchmarks, tunes cutoffs on the
-  validation split, scores the locked test split.
-- **RQ2:** trains on the source pool only (SimpleQA, GPQA, MMLU-Pro without math and
-  computer science), tunes cutoffs on its validation rows, then scores that pool's test
-  rows (the reference) and LiveCodeBench, AIME + LiveMathBench, and HLE separately.
+It answers RQ1: how much does the router save compared with always using GPT-5, and what
+does that do to accuracy?
+
+- Trains on the train split of all seven benchmarks.
+- Tunes the cutoffs for 0, 1 and 2 points on the validation split, then freezes them.
+- Scores the locked test split once.
 - Baselines on the same questions: always GPT-5 and always Flash.
+
+RQ2 (unseen kinds of questions) is not part of this yet. The team is still deciding which
+experiments to run for it, and it will get its own script.
 
 ## Do not change
 
@@ -156,5 +161,6 @@ everyone's numbers.
 
 Once every model has development results, Rahul runs `scripts/06_select_algorithm.py`. It
 applies the rule in `docs/PROTOCOL.md` section 6 to the development results only and names
-the primary model. Test results play no part in that choice. The report then presents all
-three models' test results, with the primary one leading.
+the primary model. Test results play no part in that choice, and the primary model is
+never switched after test numbers are seen. The report then presents all three models'
+test results, with the primary one leading.
