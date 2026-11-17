@@ -1,6 +1,0 @@
-model: logistic  study: RQ1  settings: {'C': 0.3, 'use_stats': True}  mode: FINAL
-[rq1] fit on 6216 rows, calibrate on 2091 rows
-  locked_test: n=2060 | 1 pp: savings 5.72% loss 1.17 pp to-Flash 19.1%
-  locked_test_hle_costs_repaired: n=2167 | 1 pp: savings 5.01% loss 1.11 pp to-Flash 18.3%
-wrote results/final/logistic/final_results_rq1.json
-.venv/bin/python scripts/07_final_eval.py logistic --unlock-final  12.65s user 1.39s system 91% cpu 15.332 total

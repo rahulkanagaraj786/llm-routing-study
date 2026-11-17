@@ -8,10 +8,10 @@
     "use_stats": true
   },
   "dev_summary_sha256": "dfd85cbbd105ca75ad2e109a25279823075c4d971a0639ca45dee2faa2394f03",
-  "protocol_sha256": "2ad7424d44a7f39a9987f0ed9dba847507ef2a1e8f7dd5a8f4af3cfed694012f",
+  "protocol_sha256": "01c33d041730fa35b65f351c22e6084d49ad25c266fb5309b330f9c2ca6c1c7a",
   "selection_sha256": "f2cc45a2647c764ff749d771b1cd0dc3f7994a7bfff08f8117711ec2dfe8b654",
   "env": {
-    "timestamp": "2026-11-16T20:43:32-08:00",
+    "timestamp": "2026-11-16T21:45:16-08:00",
     "python": "3.13.9",
     "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "machine": "arm64",
@@ -28,7 +28,7 @@
       "transformers": "5.23.0",
       "tokenizers": "0.23.3"
     },
-    "git_commit": "7bd7a49f5e15dd7c00fcb296b3e3dc71721d60a8",
+    "git_commit": "b5e711063e57620ea4feb6d38b1aad5cdc598ebb",
     "git_dirty": true,
     "paired_sha256": "b0c551f44e3870d8ee791e43549affd89fc9c642e4fcd586d2962d43d7ca29c4",
     "manifest_sha256": "0f05816182c1b1b17e0e21496f3c897ffe33b1c0e6f34a4a1b733e8cfd52a69c"
@@ -39,7 +39,7 @@
       "label": "rq1",
       "n_train": 6216,
       "n_calibration": 2091,
-      "fit_seconds": 3.6030801660381258,
+      "fit_seconds": 3.703930082730949,
       "cutoffs": {
         "0": {
           "allowance_pp": 0.0,
@@ -1993,7 +1993,7 @@
               "cheap_fraction": 1.0
             }
           ],
-          "predict_ms_per_question": 0.18580885925013751
+          "predict_ms_per_question": 0.19043066348989032
         },
         "locked_test_hle_costs_repaired": {
           "label": "rq1__locked_test_hle_costs_repaired",
@@ -3727,7 +3727,7 @@
               "cheap_fraction": 1.0
             }
           ],
-          "predict_ms_per_question": 0.19599667380262642
+          "predict_ms_per_question": 0.19026132529136439
         }
       },
       "priority": "main study"
