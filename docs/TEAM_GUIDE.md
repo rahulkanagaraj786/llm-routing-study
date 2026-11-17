@@ -119,7 +119,7 @@ python scripts/09_report_final.py <name>
 - After this, nothing about your model may change. A result you tuned after seeing the
   test is no longer a test result.
 
-Output: `results/final/<name>/` with `final_results.json`, predictions, and a `report/`
+Output: `results/final/<name>/` with `final_results_rq1.json`, predictions, and a `report/`
 folder of tables and figures. Commit it.
 
 ## What the final evaluation does for every model
