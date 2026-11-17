@@ -1,4 +1,4 @@
-"""CPU candidates: regularized multinomial logistic regression and random forest.
+"""Shared text features, and the reference model: regularized multinomial logistic regression.
 
 Both take prompt text only. Every learned preprocessing step (vocabulary, IDF,
 scaling) is fit on the training prompts passed to `fit` and nothing else.
@@ -101,7 +101,10 @@ class LogisticRouter(Router):
 
 class ForestRouter(Router):
     """Random forest regressor on Y in {-1, 0, +1}: estimates E[Y | prompt] directly
-    (squared-error trees, as in the pilot), not class probabilities."""
+    (squared-error trees, as in the pilot), not class probabilities.
+
+    No longer a candidate (it is not in registry.py). Kept so the archived forest results
+    can be reproduced, and as a second example of a model that follows the contract."""
     family = "forest"
 
     def __init__(self, n_estimators: int = 300, max_depth=None, min_samples_leaf: int = 10,
