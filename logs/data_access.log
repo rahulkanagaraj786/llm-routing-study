@@ -97,3 +97,7 @@
 2026-11-16T20:43:34	final:rq1:val	splits=val;benchmarks=simpleqa,mmlupro,gpqa,hle,livecodebench,aime,livemathbench;unlock_final=True	2091
 2026-11-16T20:43:35	final:rq1:test	splits=test;benchmarks=simpleqa,mmlupro,gpqa,hle,livecodebench,aime,livemathbench;unlock_final=True	2060
 2026-11-16T20:43:37	final:rq1:test:hle_repaired	splits=test;benchmarks=simpleqa,mmlupro,gpqa,hle,livecodebench,aime,livemathbench;unlock_final=True	2167
+2026-11-16T21:25:05	final:rq1:train	splits=train;benchmarks=simpleqa,mmlupro,gpqa,hle,livecodebench,aime,livemathbench;unlock_final=True	6216
+2026-11-16T21:25:06	final:rq1:val	splits=val;benchmarks=simpleqa,mmlupro,gpqa,hle,livecodebench,aime,livemathbench;unlock_final=True	2091
+2026-11-16T21:25:07	final:rq1:test	splits=test;benchmarks=simpleqa,mmlupro,gpqa,hle,livecodebench,aime,livemathbench;unlock_final=True	2060
+2026-11-16T21:25:08	final:rq1:test:hle_repaired	splits=test;benchmarks=simpleqa,mmlupro,gpqa,hle,livecodebench,aime,livemathbench;unlock_final=True	2167

@@ -439,3 +439,10 @@ Status: no router from the revised protocol has been evaluated on the locked spl
     development run. Results are in `results/final/logistic/` and `docs/RQ1_RESULTS.md`.
     From this point nothing about logistic regression, the splits, the cutoff rule or the
     measurements may change. The other two models have not been tested.
+
+11. 2026-11-16, reproducibility check. Logistic regression's RQ1 test was repeated from a
+    clean state with identical settings (results removed, caches cleared). Cutoffs and
+    per-question predictions were byte-identical to the first run, and every reported
+    value matched. The first run remains the result of record. No setting was changed, so
+    this is a repeat of the same evaluation, not a new one.
+
