@@ -10,7 +10,12 @@ import numpy as np
 
 from .data import Outcomes
 
-ALLOWANCES_PP = (0.0, 1.0, 2.0)
+ALLOWANCES_PP = (0.0, 1.0, 2.0, 3.0, 5.0)
+# 0, 1 and 2 were fixed before any test. 3 and 5 were added on 2026-11-16, after logistic
+# regression's first test result was known (docs/PROTOCOL.md, log entry 12).
+PRE_DECLARED_PP = (0.0, 1.0, 2.0)
+KEYS = tuple(f"{a:g}" for a in ALLOWANCES_PP)            # ("0", "1", "2", "3", "5")
+ADDED_LATER_KEYS = tuple(f"{a:g}" for a in ALLOWANCES_PP if a not in PRE_DECLARED_PP)
 PRIMARY_ALLOWANCE_PP = 1.0
 _EPS = 1e-12
 

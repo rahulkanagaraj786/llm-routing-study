@@ -187,8 +187,8 @@ def in_source_pool(r: dict) -> bool:
 
 
 def load_selection_dev(purpose: str, filtered: bool = True) -> tuple[D.Table, np.ndarray]:
-    """Development rows (train+val) of the source pool with their CV fold. This is the ONLY
-    outcome data algorithm selection may read.
+    """Development rows (train+val) of the source pool with their CV fold. Used by the RQ2
+    pipeline, whose router must never see the held-out benchmarks. (RQ1 uses load_rq1_dev.)
 
     filtered=True (current protocol): SimpleQA, GPQA, MMLU-Pro minus math and computer science.
     filtered=False reproduces the first selection run of 2026-11-15 (all of MMLU-Pro)."""
@@ -199,6 +199,18 @@ def load_selection_dev(purpose: str, filtered: bool = True) -> tuple[D.Table, np
     rows.sort(key=lambda r: r["qid"])
     folds = np.array([int(man[r["qid"]]["cv_fold"]) for r in rows])
     _log_access(purpose, "source_pool_dev_filtered" if filtered else "selection_pool_dev_unfiltered", len(rows))
+    return D.to_table(rows), folds
+
+
+def load_rq1_dev(purpose: str) -> tuple[D.Table, np.ndarray]:
+    """Development rows for RQ1: eligible train+validation questions of ALL seven corpus
+    benchmarks, with their CV fold. Never includes the locked test split."""
+    man = read_manifest()
+    rows = [r for r in D.read_paired()
+            if r["eligible"] and r["role"] != "fresh" and man[r["qid"]]["split"] in ("train", "val")]
+    rows.sort(key=lambda r: r["qid"])
+    folds = np.array([int(man[r["qid"]]["cv_fold"]) for r in rows])
+    _log_access(purpose, "rq1_dev_all_benchmarks", len(rows))
     return D.to_table(rows), folds
 
 

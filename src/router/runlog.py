@@ -38,5 +38,7 @@ def env_info(device: str | None = None) -> dict:
     )
 
 
-def protocol_sha256() -> str:
-    return D.sha256_file(D.ROOT / "docs" / "PROTOCOL.md")
+def protocol_sha256() -> str | None:
+    """Hash of docs/PROTOCOL.md as it stood when a result was produced (None if the file is absent)."""
+    path = D.ROOT / "docs" / "PROTOCOL.md"
+    return D.sha256_file(path) if path.exists() else None
