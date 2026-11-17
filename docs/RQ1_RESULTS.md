@@ -146,7 +146,8 @@ effectively the same. Serving costs (an always-on machine, added delay) were not
 - Tuned for 2 points, it cut the bill by 10.3% and lost 1.99 points.
 - With looser limits added afterwards: 16.1% saved for 3.20 points, 25.8% for 5.10 points.
 - The saving comes almost entirely from sending MMLU-Pro questions to Flash.
-- Per point of accuracy given up, it saves about as much as always using Flash.
+- Per point of accuracy given up, it saves slightly more than always using Flash up to about
+  6 points of loss; beyond that, less.
 - Development and test agree: the development run predicted 6.4% at 1.08 points.
 
 ### What this result does not cover
