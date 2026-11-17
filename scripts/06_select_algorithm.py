@@ -35,7 +35,7 @@ for fam in REQUIRED:
         continue
     rows = list(csv.DictReader(open(f)))
     assert len(rows) == len(tab) and {r["qid"] for r in rows} == set(pos), f"{fam}: predictions do not cover the selection pool"
-    d = {a: np.zeros(len(tab), dtype=bool) for a in ("0", "1", "2")}
+    d = {a: np.zeros(len(tab), dtype=bool) for a in P.KEYS}
     g = np.zeros(len(tab))
     for r in rows:
         i = pos[r["qid"]]
@@ -61,7 +61,7 @@ for fam in avail:
              total_fit_seconds=float(sum(summaries[fam]["fit_seconds_per_rotation"])),
              mean_cal_advantage_mse=summaries[fam]["mean_cal_advantage_mse_chosen"],
              oof_advantage_mse=float(np.mean((gains[fam] - out.y) ** 2)), device=summaries[fam]["env"]["device"], allowances={})
-    for a in ("0", "1", "2"):
+    for a in P.KEYS:
         d = decisions[fam][a]
         m = P.evaluate(d, out)
         m.update(P.evaluate_by_benchmark(d, out, tab.benchmark))
@@ -114,7 +114,7 @@ print(f"always GPT-5: accuracy {100*b['always_gpt5']['accuracy']:.2f}%  cost ${b
 print(f"always Flash: accuracy {100*b['always_flash']['accuracy']:.2f}%  cost ${b['always_flash']['cost']:.2f}  savings {b['always_flash']['gross_savings_pct']:.1f}%  loss {b['always_flash']['accuracy_loss_pp']:.2f} pp")
 print(f"\n{'candidate':11s} {'allow':>5s} {'savings %':>9s} {'95% CI':>15s} {'loss pp':>8s} {'95% CI':>15s} {'to Flash':>8s} {'macro sav':>9s} {'macro loss':>10s}")
 for fam in avail:
-    for al in ("0", "1", "2"):
+    for al in P.KEYS:
         m = res["candidates"][fam]["allowances"][al]; bs = m["bootstrap"]; eq = m["equal_benchmark_average"]
         print(f"{fam:11s} {al+' pp':>5s} {m['gross_savings_pct']:9.2f} [{bs['gross_savings_pct_ci95'][0]:5.2f},{bs['gross_savings_pct_ci95'][1]:6.2f}] {m['accuracy_loss_pp']:8.2f} "
               f"[{bs['accuracy_loss_pp_ci95'][0]:5.2f},{bs['accuracy_loss_pp_ci95'][1]:6.2f}] {100*m['cheap_fraction']:7.1f}% {eq['gross_savings_pct']:9.2f} {eq['accuracy_loss_pp']:10.2f}")

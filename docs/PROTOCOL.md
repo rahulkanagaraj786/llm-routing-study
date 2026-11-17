@@ -201,7 +201,7 @@ three folds.
 1. Fit every grid configuration on the fit folds.
 2. Choose the configuration with the lowest calibration-fold squared error between gain
    and Y ("advantage MSE", a proper score for E[Y | x]). Cost is not used here.
-3. With that configuration, choose cutoffs for 0, 1 and 2 pp on the calibration fold
+3. With that configuration, choose cutoffs for 0, 1 and 2 pp (and 3 and 5 pp, log entry 12) on the calibration fold
    (minimum recorded cost subject to accuracy ≥ always-GPT-5 accuracy − allowance; ties
    → higher accuracy → higher cutoff). Cutoffs are midpoints between adjacent gains.
 4. Apply the frozen cutoffs to the evaluation fold.
@@ -246,7 +246,7 @@ retuned afterwards.
 ## 7. Main study, RQ1 (not run yet)
 
 Fit the selected algorithm and frozen configuration on the train split of all seven
-benchmarks (6,216), choose cutoffs for 0, 1, 2 pp on the validation split (2,091), freeze,
+benchmarks (6,216), choose cutoffs for 0, 1, 2, 3, 5 pp on the validation split (2,091), freeze,
 then evaluate once on the locked test split (2,060) with `scripts/07_final_eval.py
 <model> --unlock-final`. Baselines: always GPT-5 and always Flash on the same questions.
 
@@ -447,4 +447,15 @@ Status: no router from the revised protocol has been evaluated on the locked spl
     of record; it differs from the first only in run metadata (timings, timestamp, the
     hash of this document). No setting was changed, so these are repeats of the same
     evaluation, not new ones.
+
+12. 2026-11-16, two more accuracy limits. Limits of 3 and 5 points were added to the
+    original 0, 1 and 2, to show how the trade-off continues for a company willing to give
+    up more accuracy. They were added AFTER logistic regression's RQ1 test result at 0, 1
+    and 2 points had been seen, so for logistic regression they are not pre-declared: they
+    are reported and labelled as added afterwards. They are tuned and scored exactly like
+    the others (cutoff chosen on validation, frozen, scored on the test). For gradient
+    boosting and the text encoder, which have not been tested, all five limits are declared
+    in advance. The 1-point limit remains the primary one and the selection rule is
+    unchanged. Logistic regression's development run and test are regenerated so that all
+    five limits come from the same code; its 0, 1 and 2 results must come out unchanged.
 

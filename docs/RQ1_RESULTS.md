@@ -30,7 +30,14 @@ development run: C = 0.3 with the simple prompt statistics.
 | Router, tuned for 0 pp | 61.80% | $61.23 | 0.1% (0.0 to 0.2) | 0.05 (0.00 to 0.15) | 0.4% |
 | **Router, tuned for 1 pp** | **60.68%** | **$57.79** | **5.7% (4.7 to 6.9)** | **1.17 (0.49 to 1.84)** | **19.1%** |
 | Router, tuned for 2 pp | 59.85% | $54.96 | 10.3% (8.8 to 12.1) | 1.99 (1.12 to 2.85) | 30.3% |
+| Router, tuned for 3 pp (added later) | 58.64% | $51.42 | 16.1% (13.9 to 18.5) | 3.20 (2.15 to 4.26) | 40.5% |
+| Router, tuned for 5 pp (added later) | 56.75% | $45.46 | 25.8% (22.8 to 29.2) | 5.10 (3.77 to 6.45) | 53.8% |
 | Always Flash | 45.87% | $14.85 | 75.8% | 15.97 | 100% |
+
+The 0, 1 and 2 point limits were fixed before any test. The 3 and 5 point limits were added
+after the first test result was known, to show how the trade-off continues for a company
+willing to give up more accuracy (protocol log entry 12). They were tuned on validation and
+scored exactly like the others, and adding them left the 0, 1 and 2 results unchanged.
 
 ![Trade-off on the locked test](../results/final/logistic/report/fig1_rq1_tradeoff.png)
 
@@ -41,6 +48,8 @@ development run: C = 0.3 with the simple prompt statistics.
 | 0 pp | 0.00 | 0.05 |
 | 1 pp | 0.96 | 1.17 |
 | 2 pp | 1.96 | 1.99 |
+| 3 pp (added later) | 2.97 | 3.20 |
+| 5 pp (added later) | 4.97 | 5.10 |
 
 The targets were close but not guaranteed. At the 1-point target the test loss was 1.17,
 and its interval (0.49 to 1.84) includes values well above 1. In the bootstrap, the loss
@@ -73,6 +82,8 @@ math. Nearly all of the pooled accuracy loss falls on MMLU-Pro, which loses 3.8 
 |---|---:|
 | Router, tuned for 1 pp | 4.9% |
 | Router, tuned for 2 pp | 5.2% |
+| Router, tuned for 3 pp | 5.0% |
+| Router, tuned for 5 pp | 5.1% |
 | Always Flash | 4.7% |
 
 On the test split the router buys about the same saving per point of accuracy as always
@@ -90,9 +101,12 @@ Shuffling the router's choices inside each benchmark, keeping the number sent to
 |---|---|---|---:|---:|
 | 1 pp | 5.7% / 1.17 pp | 7.5% / 1.58 pp (1.07 to 2.14) | +0.42 pp | 7.6% |
 | 2 pp | 10.3% / 1.99 pp | 13.2% / 2.80 pp (2.18 to 3.45) | +0.81 pp | 0.5% |
+| 3 pp | 16.1% / 3.20 pp | 20.3% / 4.22 pp (3.50 to 4.95) | +1.01 pp | 0.4% |
+| 5 pp | 25.8% / 5.10 pp | 30.2% / 6.53 pp (5.68 to 7.38) | +1.43 pp | 0.1% |
 
-The router is somewhat more accurate than policies with the same per-benchmark routing
-rates, clearly so at the 2-point target and only suggestively at 1 point. It also saves
+The router is more accurate than policies with the same per-benchmark routing rates, and
+the advantage grows as more questions are sent to Flash: only suggestive at 1 point,
+clear from 2 points on. It also saves
 less than they do, because the questions it chooses to send to Flash are cheaper ones.
 
 ### If the workload had more coding
@@ -100,11 +114,11 @@ less than they do, because the questions it chooses to send to Flash are cheaper
 Same frozen decisions, questions reweighted so that LiveCodeBench makes up a larger share
 (it is 10.2% of the test split):
 
-| Coding share | Bill saved (1 pp target) | Accuracy lost, pp |
+| Coding share | Saved / lost at 1 pp target | Saved / lost at 5 pp target |
 |---|---:|---:|
-| 10% | 5.7% | 1.17 |
-| 25% | 4.2% | 0.97 |
-| 50% | 2.3% | 0.65 |
+| 10% | 5.7% / 1.17 | 26.0% / 5.11 |
+| 25% | 4.2% / 0.97 | 19.2% / 4.34 |
+| 50% | 2.3% / 0.65 | 10.9% / 3.05 |
 
 The router keeps coding questions on GPT-5, so the more coding there is, the less it saves.
 
@@ -126,6 +140,7 @@ effectively the same. Serving costs (an always-on machine, added delay) were not
 
 - Tuned for a 1-point loss, the router cut the bill by 5.7% and lost 1.17 points.
 - Tuned for 2 points, it cut the bill by 10.3% and lost 1.99 points.
+- With looser limits added afterwards: 16.1% saved for 3.20 points, 25.8% for 5.10 points.
 - The saving comes almost entirely from sending MMLU-Pro questions to Flash.
 - Per point of accuracy given up, it saves about as much as always using Flash.
 - Development and test agree: the development run predicted 6.4% at 1.08 points.

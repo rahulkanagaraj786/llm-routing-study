@@ -13,3 +13,4 @@
 2026-11-16T20:45:09-0800	entry 10 (logistic RQ1 test run) logged	96d8f6b29900d3c28f3524aad5442b5332eed6211eb06a4c443773482f8e3591
 2026-11-16T21:25:26-0800	entry 11 (reproducibility check) logged	1ebd19e1d77e9981c142bb40282d79c3a7e6d8632c1e047597327dbf4279e700
 2026-11-16T21:45:12-0800	entry 11 updated (latest clean-state run kept as record)	01c33d041730fa35b65f351c22e6084d49ad25c266fb5309b330f9c2ca6c1c7a
+2026-11-16T21:47:18-0800	entry 12 (limits 3 and 5 added after the first logistic test) logged before rerunning	fe6fb1cee44adfeb428d24fe0ae501bf638143d04e9af1358143c6eed2ae86ec

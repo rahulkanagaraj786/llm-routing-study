@@ -28,7 +28,7 @@ for fam, (color, label) in SERIES.items():
     if not f.exists():
         continue
     rows = list(csv.DictReader(open(f)))
-    g = np.zeros(len(tab)); d = {a: np.zeros(len(tab), bool) for a in ("0", "1", "2")}
+    g = np.zeros(len(tab)); d = {a: np.zeros(len(tab), bool) for a in P.KEYS}
     for r in rows:
         g[pos[r["qid"]]] = float(r["gain"])
         for a in d:

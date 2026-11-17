@@ -23,7 +23,7 @@ before writing yours.
    the data and which questions are used          one file: src/router/<your model>.py
    the train / validation / test split, 5 folds     - fit(prompts, y, ...)
    the label Y and the "question text only" rule     - predict_gain(prompts)
-   how the cutoff is tuned (0, 1, 2 points)        your list of settings to try
+   how the cutoff is tuned (0, 1, 2, 3, 5 points)  your list of settings to try
    how savings and accuracy loss are measured      your entry in src/router/registry.py
    the scripts that run all of this                your results folder
 ```
@@ -128,7 +128,8 @@ It answers RQ1: how much does the router save compared with always using GPT-5, 
 does that do to accuracy?
 
 - Trains on the train split of all seven benchmarks.
-- Tunes the cutoffs for 0, 1 and 2 points on the validation split, then freezes them.
+- Tunes the cutoffs for 0, 1, 2, 3 and 5 points on the validation split, then freezes them.
+  The 1-point limit is the primary one; all five are declared in advance for your model.
 - Scores the locked test split once.
 - Baselines on the same questions: always GPT-5 and always Flash.
 

@@ -40,6 +40,11 @@ Cutoff tuned for a target on one fold, then applied to a fold the router never s
 | 0 pp | 1.0% (0.6 to 1.3) | 0.08 (−0.02 to 0.19) | 2.1% |
 | **1 pp** | **6.4% (5.7 to 7.2)** | **1.08 (0.74 to 1.41)** | 20.5% |
 | 2 pp | 12.8% (11.8 to 13.9) | 2.36 (1.89 to 2.84) | 33.3% |
+| 3 pp (added later) | 17.5% (16.2 to 18.8) | 3.35 (2.80 to 3.91) | 40.7% |
+| 5 pp (added later) | 26.6% (25.0 to 28.3) | 5.47 (4.79 to 6.19) | 54.0% |
+
+The 3 and 5 point rows were added after logistic regression's first test (protocol log
+entry 12). For the other two models all five are declared in advance.
 
 Intervals are paired bootstraps over questions with decisions fixed. They do not include
 variability from refitting or from choosing cutoffs.

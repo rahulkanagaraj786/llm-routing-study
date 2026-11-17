@@ -64,6 +64,9 @@ def ci(b, key):
 
 
 rq1 = R["studies"]["rq1"]
+KEYS = tuple(rq1["cutoffs"].keys())                 # every limit that was run, e.g. ("0", "1", "2", "3", "5")
+LATER = {"3", "5"} & set(KEYS)                       # added after logistic regression's first test (protocol log 12)
+note = lambda a: " (added later)" if a in LATER else ""
 rq1_name = "locked_test" if "locked_test" in rq1["targets"] else next(iter(rq1["targets"]))
 T1 = rq1["targets"][rq1_name]
 rq2_key = next((k for k in R["studies"] if k.startswith("rq2_transfer")), None)
@@ -85,16 +88,19 @@ w(f"Router trained on {rq1['n_train']:,} questions, cutoffs tuned on {rq1['n_cal
 w("| Policy | Accuracy | Recorded cost | Gross savings (95% CI) | Accuracy loss, pp (95% CI) | Sent to Flash | Within allowance |")
 w("|---|---:|---:|---:|---:|---:|---|")
 w(f"| Always GPT-5 | {100*m1['always_strong_accuracy']:.2f}% | ${m1['always_strong_cost']:.2f} | 0% | 0 | 0% | |")
-for a in ("0", "1", "2"):
+for a in KEYS:
     m = T1["allowances"][a]
-    w(f"| Router, {a} pp allowance | {100*m['accuracy']:.2f}% | ${m['cost']:.2f} | {m['gross_savings_pct']:.1f}% ({ci(m['bootstrap'], 'gross_savings_pct_ci95')}) | "
+    w(f"| Router, {a} pp allowance{note(a)} | {100*m['accuracy']:.2f}% | ${m['cost']:.2f} | {m['gross_savings_pct']:.1f}% ({ci(m['bootstrap'], 'gross_savings_pct_ci95')}) | "
       f"{m['accuracy_loss_pp']:.2f} ({ci(m['bootstrap'], 'accuracy_loss_pp_ci95')}) | {100*m['cheap_fraction']:.1f}% | {'yes' if m['within_allowance'] else 'no'} |")
 w(f"| Always Flash | {100*m1['always_cheap_accuracy']:.2f}% | ${m1['always_cheap_cost']:.2f} | {m1['always_cheap_savings_pct']:.1f}% | {m1['always_cheap_loss_pp']:.2f} | 100% | |")
 w("")
+if LATER:
+    w("The 0, 1 and 2 point limits were fixed before any test. The 3 and 5 point limits were added after logistic "
+      "regression's first test result was known; they are tuned and scored the same way.\n")
 w("### Validation (where the cutoff was chosen) versus test\n")
 w("| Allowance | Validation savings | Validation loss, pp | Test savings | Test loss, pp |")
 w("|---|---:|---:|---:|---:|")
-for a in ("0", "1", "2"):
+for a in KEYS:
     c, m = rq1["calibration_metrics"][a], T1["allowances"][a]
     w(f"| {a} pp | {c['gross_savings_pct']:.1f}% | {c['accuracy_loss_pp']:.2f} | {m['gross_savings_pct']:.1f}% | {m['accuracy_loss_pp']:.2f} |")
 w("")
@@ -118,7 +124,7 @@ if rq2:
     w("| Target | n | GPT-5 accuracy | Flash accuracy | Allowance | Sent to Flash | Gross savings (95% CI) | Accuracy loss, pp (95% CI) | Within allowance |")
     w("|---|---:|---:|---:|---|---:|---:|---:|---|")
     for name, t in rq2["targets"].items():
-        for a in ("0", "1", "2"):
+        for a in KEYS:
             m = t["allowances"][a]
             lead = f"| {TARGET_NAMES.get(name, name)} | {t['n']:,} | {100*m['always_strong_accuracy']:.1f}% | {100*m['always_cheap_accuracy']:.1f}% " if a == "0" else "| | | | "
             w(lead + f"| {a} pp | {100*m['cheap_fraction']:.1f}% | {m['gross_savings_pct']:.1f}% ({ci(m['bootstrap'], 'gross_savings_pct_ci95')}) | "
@@ -133,7 +139,7 @@ if rq2:
     w("")
 
 def shuffle_rows(study_label, tname, t):
-    for a in ("0", "1", "2"):
+    for a in KEYS:
         x = t["allowances"][a].get("within_benchmark_shuffle")
         if not x:
             continue
@@ -161,7 +167,7 @@ if "workload_mix" in m1:
     w(f"| {focus} share | Allowance | Gross savings | Accuracy loss, pp | Always-GPT-5 accuracy | Always-Flash savings | Always-Flash loss, pp |")
     w("|---|---|---:|---:|---:|---:|---:|")
     for i, sh in enumerate(m1["workload_mix"]):
-        for a in ("0", "1", "2"):
+        for a in KEYS:
             x = T1["allowances"][a]["workload_mix"][i]
             w(f"| {100*x['share']:.0f}% | {a} pp | {x['gross_savings_pct']:.1f}% | {x['accuracy_loss_pp']:.2f} | {100*x['always_strong_accuracy']:.1f}% | {x['always_cheap_savings_pct']:.1f}% | {x['always_cheap_loss_pp']:.2f} |")
     w("")
@@ -172,13 +178,13 @@ w("|---|---|---|---:|---:|---:|")
 for study, tname, label in (("rq1", "locked_test_hle_costs_repaired", "HLE costs repaired"), (rq2_key, "hle_costs_repaired", "HLE costs repaired")):
     t = R["studies"].get(study, {}).get("targets", {}).get(tname) if study else None
     if t:
-        for a in ("0", "1", "2"):
+        for a in KEYS:
             m = t["allowances"][a]
             w(f"| {label} | {'RQ1 locked test' if study == 'rq1' else 'RQ2 HLE target'} | {a} pp | {m['gross_savings_pct']:.1f}% | {m['accuracy_loss_pp']:.2f} | {t['n']:,} |")
 for study, tname, label in (("rq1", rq1_name, "RQ1 " + rq1_name.replace("_", " ")), (rq2_key, "code", "RQ2 LiveCodeBench")):
     t = R["studies"].get(study, {}).get("targets", {}).get(tname) if study else None
     if t and "list_price_sensitivity" in t["allowances"]["1"]:
-        for a in ("0", "1", "2"):
+        for a in KEYS:
             m = t["allowances"][a]
             w(f"| Costs at list prices | {label} | {a} pp | {m['list_price_sensitivity']['gross_savings_pct']:.1f}% (recorded costs: {m['gross_savings_pct']:.1f}%) | {m['accuracy_loss_pp']:.2f} | {t['n']:,} |")
 w("")
@@ -210,23 +216,23 @@ a1.set_ylabel("Gross API cost saved vs always GPT-5 (%)")
 a1.set_xlim(min(-0.5, min(x) - 0.3), max(x) * 1.04); a1.set_ylim(min(0, min(y)) - 2, max(y) * 1.14)
 clean(a1)
 
-ZOOM = 3.5
+ZOOM = 6.0
 zx = [p for p in zip(x, y) if p[0] <= ZOOM]
 a2.plot([p[0] for p in zx], [p[1] for p in zx], color=BLUE, lw=2, solid_capstyle="round", solid_joinstyle="round", zorder=3)
-for a in (1, 2):
-    a2.axvline(a, color=GRID, lw=1, zorder=1)
-for a in ("0", "1", "2"):
+for a in KEYS[1:]:
+    a2.axvline(float(a), color=GRID, lw=1, zorder=1)
+for a in KEYS:
     m = T1["allowances"][a]
     a2.plot(m["accuracy_loss_pp"], m["gross_savings_pct"], "o", ms=10, color=BLUE, mec=SURFACE, mew=2, zorder=5)
     a2.annotate(f"{a} pp", (m["accuracy_loss_pp"], m["gross_savings_pct"]), xytext=(10, -6), textcoords="offset points",
                 fontsize=10, color=INK, va="top")
 key = "Frozen cutoffs (allowance: result on test)\n" + "\n".join(
-    f"{a} pp:  saves {T1['allowances'][a]['gross_savings_pct']:.1f}%, loses {T1['allowances'][a]['accuracy_loss_pp']:.2f} pp" for a in ("0", "1", "2"))
+    f"{a} pp:  saves {T1['allowances'][a]['gross_savings_pct']:.1f}%, loses {T1['allowances'][a]['accuracy_loss_pp']:.2f} pp" for a in KEYS)
 a2.text(0.03, 0.97, key, transform=a2.transAxes, fontsize=9.5, color=INK, va="top", ha="left", linespacing=1.5,
         bbox=dict(facecolor=SURFACE, edgecolor="none", pad=3))
 a2.set_xlim(min(-0.3, min(p[0] for p in zx) - 0.1), ZOOM)
 a2.set_ylim(min(0, min(p[1] for p in zx)) - 1, max(p[1] for p in zx) * 1.3 + 1)
-a2.set_title("Zoom on the 0–3.5 pp region, with the three frozen cutoffs", loc="left", fontsize=11, color=INK)
+a2.set_title("Zoom on the 0–6 pp region, with the frozen cutoffs", loc="left", fontsize=11, color=INK)
 a2.set_xlabel("Accuracy loss vs always GPT-5 (percentage points)")
 clean(a2)
 fig.suptitle(f"RQ1: cost–accuracy trade-off on the locked test split (n = {T1['n']:,})", x=0.01, ha="left", fontsize=13.5, color=INK)
@@ -263,8 +269,8 @@ fig.savefig(OUT / "fig2_rq1_by_benchmark.png"); plt.close(fig)
 # =====================================================================================
 # Figure 3: allowance versus what actually happened (validation vs test)
 # =====================================================================================
-fig, ax = plt.subplots(figsize=(8.6, 4.4), dpi=200)
-ys = {"0": 2, "1": 1, "2": 0}
+fig, ax = plt.subplots(figsize=(9.6, 0.95 * len(KEYS) + 2.0), dpi=200)
+ys = {a: len(KEYS) - 1 - i for i, a in enumerate(KEYS)}
 for a, yy in ys.items():
     c, m = rq1["calibration_metrics"][a], T1["allowances"][a]
     lo, hi = m["bootstrap"]["accuracy_loss_pp_ci95"]
@@ -274,14 +280,14 @@ for a, yy in ys.items():
     ax.plot(c["accuracy_loss_pp"], yy + 0.12, "o", ms=10, color=ORANGE, mec=SURFACE, mew=2, zorder=4, label="Validation, where the cutoff was chosen" if a == "0" else None)
     ax.text(hi + 0.06, yy - 0.1, f"{m['accuracy_loss_pp']:.2f} pp", va="center", fontsize=9.5, color=INK)
 ax.plot([], [], color=INK, lw=1.5, label="Allowance")
-ax.set_yticks(list(ys.values())); ax.set_yticklabels([f"{a} pp allowance" for a in ys], fontsize=10.5, color=INK)
-ax.set_ylim(-0.6, 2.6)
+ax.set_yticks(list(ys.values())); ax.set_yticklabels([f"{a} pp allowance{note(a)}" for a in ys], fontsize=10.5, color=INK)
+ax.set_ylim(-0.6, len(KEYS) - 0.4)
 ax.set_xlabel("Actual accuracy loss vs always GPT-5 (percentage points)")
 ax.set_title("Does the accuracy-loss allowance hold on new questions?", loc="left", fontsize=13, color=INK, pad=28)
 ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncol=3, frameon=False, fontsize=9, labelcolor=INK, handletextpad=0.4, columnspacing=1.2)
 clean(ax, "x"); ax.spines["left"].set_visible(False)
 footer(fig, f"Router: {ALG}. RQ1, locked test split (n = {T1['n']:,}); validation n = {rq1['n_calibration']:,}.")
-fig.subplots_adjust(left=0.17, right=0.95, top=0.8, bottom=0.2)
+fig.subplots_adjust(left=0.29, right=0.95, top=0.84, bottom=0.14)
 fig.savefig(OUT / "fig3_allowance_check.png"); plt.close(fig)
 
 # =====================================================================================
