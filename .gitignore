@@ -16,3 +16,5 @@ outputs/
 
 # per-machine run logs
 logs/
+results/final_dryrun/
+results/rq2_dryrun/
