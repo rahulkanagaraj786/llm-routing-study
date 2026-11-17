@@ -1,18 +1,18 @@
 """Apply the pre-specified selection rule (docs/PROTOCOL.md, section 6) to the pooled
 out-of-fold decisions of each candidate.
 
-  python scripts/06_select_algorithm.py                     # needs all three candidates
-  python scripts/06_select_algorithm.py --defer modernbert  # provisional: select among the others, final run stays blocked
-  python scripts/06_select_algorithm.py --drop modernbert   # team decision that the candidate will not be run (CPU-only comparison)
+  python scripts/06_select_algorithm.py                 # needs the development results of every model in the registry
+  python scripts/06_select_algorithm.py --defer gbm     # provisional: compare the others while one is still pending
+  python scripts/06_select_algorithm.py --drop encoder  # team decision that a model will not be run
   python scripts/06_select_algorithm.py --partial           # descriptive table for those available; no winner
 """
 import sys, json, csv
 from pathlib import Path
 import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from router import splits as S, policy as P, runlog
+from router import splits as S, policy as P, runlog, registry
 
-ORDER = ["logistic", "forest", "modernbert"]  # simplest router first
+ORDER = registry.names()  # simplest router first
 QUALIFY_TOLERANCE_PP = 0.5
 MIN_IMPROVEMENT_PP = 1.0  # a more complex router must save at least this much more (protocol section 6)
 partial = "--partial" in sys.argv

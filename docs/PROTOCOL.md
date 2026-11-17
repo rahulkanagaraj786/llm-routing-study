@@ -47,6 +47,16 @@ Later changes go in the deviation log at the end, with a reason.
 | GPT-5 label | "LLMRouterBench gpt-5; reasoning effort was not recorded for the study benchmarks." |
 | Status wording | "No router from the revised protocol has been evaluated on the locked splits." This acknowledges that the pilot and the corpus audit did touch those questions |
 
+### Team decisions recorded on 2026-11-16, roles
+
+| Item | Decision |
+|---|---|
+| Model pair | GPT-5 and Gemini 2.5 Flash, unchanged |
+| Candidate models | Regularized logistic regression, gradient boosting, and a fine-tuned text encoder (ModernBERT or similar). Random forest is no longer a candidate; its development runs are kept as a record |
+| Owners | One owner per model. Each owner writes their own model code against the shared contract (`src/router/base.py`) and runs it through the shared scripts (`docs/TEAM_GUIDE.md`) |
+| Shared pipeline | Data, splits, cutoff tuning, evaluation and reporting are common to all models and are not changed per model |
+| Testing | Every candidate is evaluated on the locked splits, once, with the settings fixed by its own development run |
+
 ## 2. Data
 
 Source: `NPULH/LLMRouterBench` at revision `0e5af1b8…`, `bench-release.tar.gz`
@@ -152,6 +162,17 @@ Notes:
   selection pool 512 tokens truncates 0% of SimpleQA, 3.3% of MMLU-Pro, 3.5% of GPQA.
 - Seeds: 221 for the forest and ModernBERT. One seed each; seed variance is not estimated.
 
+Candidates from 2026-11-16 (this replaces the table above):
+
+| Candidate (`name`) | Owner | Search grid | Status |
+|---|---|---|---|
+| Regularized logistic regression (`logistic`) | Rahul | C ∈ {0.1, 0.3, 1, 3, 10} × statistics {off, on} = 10 | development run done |
+| Gradient boosting (`gbm`) | to be assigned | to be declared here by the owner before the first full run | to be written |
+| Fine-tuned text encoder (`encoder`) | to be assigned | to be declared here by the owner before the first full run | to be written |
+
+Each owner writes the grid into this table before their first full development run and
+does not change it afterwards.
+
 ## 6. Algorithm selection (source pool only)
 
 Data: the train+val rows of the source pool, 5,640 questions (SimpleQA 3,459, filtered
@@ -204,20 +225,11 @@ Selection rule (1 pp allowance):
    have changed the outcome: both more complex routers saved less than logistic
    regression. It applies to any later rerun of the selection.
 
-Deferred candidate. ModernBERT was not refitted on the source pool: the refit on this
-Mac was stopped after one epoch of its first fit, before it produced any prediction, and
-the team deferred it to a GPU. Applying the rule to logistic regression and random forest
-alone gives a provisional result only (`selection.json` records ModernBERT as deferred).
-The team decided to wait: the selection becomes final when the GPU run exists and the
-rule is applied to all three candidates. That run follows this section unchanged, except
-that on a CUDA device it uses 1,024 tokens, batches of 16 and mixed precision.
-`scripts/07_final_eval.py --unlock-final` refuses to run while a candidate is deferred.
-Its budget is fixed: 1,024 tokens, learning rates 2e-5 and 5e-5 (chosen in rotation 0),
-one seed, the same folds. If no GPU run happens, the team records that with
-`scripts/06_select_algorithm.py --drop modernbert`; the comparison is then reported as
-CPU-only and the two-candidate result becomes the selection.
-ModernBERT's only completed comparison so far is the first run on the unfiltered pool
-(archived), where it did not beat logistic regression.
+Pending candidates. A model that has no development results yet is passed to
+`scripts/06_select_algorithm.py` with `--defer`; the result is then provisional. The
+selection becomes final when every candidate in `src/router/registry.py` has development
+results, or the team records with `--drop` that one will not be run. The first ModernBERT
+run on the unfiltered pool (archived) is pilot evidence only.
 
 The selected family's configuration for all later fits is the one with the lowest mean
 calibration MSE across rotations (for ModernBERT, the rotation-0 choice). Nothing is
@@ -228,8 +240,14 @@ retuned afterwards.
 Fit the selected algorithm and frozen configuration on the train split of all seven
 benchmarks (6,216), choose cutoffs for 0, 1, 2 pp on the validation split (2,091), freeze,
 then evaluate once on the locked test split (2,060) with `scripts/07_final_eval.py
---unlock-final`. Baselines: always GPT-5 and always Flash on the same questions. Only the
-selected algorithm is evaluated on the test split.
+<model> --unlock-final`. Baselines: always GPT-5 and always Flash on the same questions.
+
+Every candidate is evaluated this way, once, by its owner, using the settings chosen in
+its own development run. A model's development results must be committed before its
+final evaluation, and nothing about the model may change afterwards. The selection rule
+of section 6 names the primary model from development results only; test results play no
+part in that choice. The report leads with the primary model and shows the others
+alongside.
 
 HLE cost sensitivity (required): the same fitted router and the same frozen cutoffs are
 scored a second time on the locked test split with the 499 repaired HLE rows admitted
@@ -375,3 +393,13 @@ Status: no router from the revised protocol has been evaluated on the locked spl
    test as a reference target. (c) Within-benchmark shuffle diagnostic and workload-mix
    sensitivity added, both computed from frozen decisions. (d) ModernBERT budget and the
    CPU-only fallback fixed. (e) Selection rule confirmed unchanged; no safety margin.
+
+7. 2026-11-16, roles and candidates. (a) Random forest dropped as a candidate and
+   replaced by gradient boosting; the encoder candidate may be ModernBERT or a similar
+   model. (b) Each model has one owner who writes its code against a shared contract.
+   (c) Every candidate, not only the selected one, is evaluated on the locked splits,
+   once, with settings fixed by its development run; the choice of primary model still
+   uses development results only. (d) The shared scripts now take the model name as an
+   argument and write to per-model folders. The logistic regression development results
+   were regenerated with the reorganised code and are identical to the previous ones.
+   No router from the revised protocol has been evaluated on the locked splits.

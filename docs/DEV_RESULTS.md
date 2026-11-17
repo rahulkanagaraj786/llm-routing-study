@@ -7,6 +7,12 @@ removed because it duplicates an HLE item (5,640 questions).
 No router from the revised protocol has been evaluated on the locked splits. These are
 development estimates, not final results.
 
+Note (2026-11-16): the team has since changed the candidate list to logistic regression,
+gradient boosting and a fine-tuned text encoder, each with its own owner. Random forest
+is no longer a candidate. The comparison below, between logistic regression and random
+forest, is kept as a record of what was run; the forest's result files are in
+`results/dev_selection_archive_forest/`. The logistic regression numbers are current.
+
 Source files: `results/dev_selection/selection.json`, per-candidate
 `oof_predictions.csv` and `summary.json`, `diagnostics.json`, `dev_tradeoff.png`.
 Procedure: `docs/PROTOCOL.md` section 6.

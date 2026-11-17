@@ -1,4 +1,9 @@
-"""ModernBERT candidate: fine-tuned encoder + three-class head.
+"""Fine-tuned text encoder + three-class head. Default encoder: ModernBERT-base.
+
+To try a different encoder (for example "distilbert-base-uncased" or
+"microsoft/deberta-v3-small"), pass model_name and revision in the config or change the two
+constants below. Pin the revision, and note that max_length cannot exceed what the encoder
+supports (512 tokens for BERT-style models).
 
 Labels: Y=-1 -> class 0, Y=0 -> class 1, Y=+1 -> class 2 (fixed order, saved with the model).
 gain = P(class 2) - P(class 0). Inputs are prompts only.
@@ -12,12 +17,14 @@ from pathlib import Path
 
 import numpy as np
 
+from .base import Router
+
 MODEL_NAME = "answerdotai/ModernBERT-base"
 MODEL_REVISION = "8949b909ec900327062f0ebf497f51aef5e6f0c8"  # pinned Hugging Face commit
 LABEL_MAP = {-1: 0, 0: 1, 1: 2}
 SEED = 221
 
-DEFAULTS = dict(lr=3e-5, max_epochs=3, batch_size=16, max_length=1024, weight_decay=0.01, warmup_frac=0.1,
+DEFAULTS = dict(model_name=MODEL_NAME, revision=MODEL_REVISION, lr=3e-5, max_epochs=3, batch_size=16, max_length=1024, weight_decay=0.01, warmup_frac=0.1,
                 patience=1, grad_accum=1, token_budget=None)
 # Declared search grid (learning rate only; epochs are chosen by early stopping).
 MODERNBERT_GRID = [dict(lr=2e-5), dict(lr=5e-5)]
@@ -39,13 +46,32 @@ def pick_device():
     return torch.device("cpu")
 
 
-class ModernBertRouter:
+def device_defaults() -> dict:
+    """Batch and length settings for the machine this runs on."""
+    return dict(REMOTE_GPU if pick_device().type == "cuda" else LOCAL_MPS)
+
+
+class ModernBertRouter(Router):
     family = "modernbert"
 
     def __init__(self, **config):
-        self.config = {**DEFAULTS, **config}
+        super().__init__(**{**DEFAULTS, **device_defaults(), **config})
         self.history: list[dict] = []
         self.device = None
+
+    def extra_info(self) -> dict:
+        return dict(history=self.history, best_epoch=getattr(self, "best_epoch", None), device=str(self.device),
+                    truncation_rate_fit=getattr(self, "train_truncation_rate", None), full_config=self.config)
+
+    def release(self) -> None:
+        import gc
+        import torch
+        self.model = None
+        gc.collect()
+        if torch.backends.mps.is_available():
+            torch.mps.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     # ---- data helpers -------------------------------------------------
     def _load(self):
@@ -54,9 +80,10 @@ class ModernBertRouter:
         torch.manual_seed(SEED)
         np.random.seed(SEED)
         self.device = pick_device()
-        self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, revision=MODEL_REVISION)
+        name, rev = self.config["model_name"], self.config["revision"]
+        self.tokenizer = AutoTokenizer.from_pretrained(name, revision=rev)
         self.model = AutoModelForSequenceClassification.from_pretrained(
-            MODEL_NAME, revision=MODEL_REVISION, num_labels=3)
+            name, revision=rev, num_labels=3)
         self.model.to(self.device)
 
     def _encode(self, prompts):
@@ -112,10 +139,12 @@ class ModernBertRouter:
         return contextlib.nullcontext()
 
     # ---- training -----------------------------------------------------
-    def fit(self, prompts, y, val_prompts, val_y, max_steps: int | None = None, log=print):
+    def fit(self, prompts, y, val_prompts=None, val_y=None, max_steps: int | None = None, log=print):
         """Train with cross-entropy; after each epoch score the validation prompts and keep the
         epoch with the lowest squared error between gain and Y (early stopping, patience from config)."""
         import torch
+        if val_prompts is None:
+            raise ValueError("this model needs validation prompts for early stopping")
         t0 = time.perf_counter()
         self._load()
         c = self.config
@@ -228,6 +257,6 @@ class ModernBertRouter:
         self.model.save_pretrained(path)
         self.tokenizer.save_pretrained(path)
         (path / "router_meta.json").write_text(json.dumps(dict(
-            base_model=MODEL_NAME, revision=MODEL_REVISION, label_map={str(k): v for k, v in LABEL_MAP.items()},
+            base_model=self.config["model_name"], revision=self.config["revision"], label_map={str(k): v for k, v in LABEL_MAP.items()},
             gain="softmax(logits)[2] - softmax(logits)[0]", config=self.config, history=self.history,
             best_epoch=getattr(self, "best_epoch", None), device=str(self.device)), indent=2))

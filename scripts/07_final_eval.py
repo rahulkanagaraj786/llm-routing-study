@@ -1,36 +1,37 @@
-"""Main study (RQ1) and transfer to held-out benchmarks (RQ2). docs/PROTOCOL.md sections 7-8.
+"""Final evaluation of ONE model: main study (RQ1) and transfer to held-out benchmarks (RQ2).
 
-RQ1: one router trained on the train split of all seven benchmarks, cutoffs tuned on the
+  python scripts/07_final_eval.py <model> --plan           # row counts of every fit and target; reads no outcomes
+  python scripts/07_final_eval.py <model> --dry-run        # rehearsal on development rows only
+  python scripts/07_final_eval.py <model> --unlock-final   # the real thing: ONCE per model, cannot be repeated
+
+<model> is a name from src/router/registry.py. The model's settings are taken from its own
+development run (results/dev_selection/<model>/summary.json), so that run must exist first.
+
+RQ1: router trained on the train split of all seven benchmarks, cutoffs tuned on the
      validation split, scored once on the locked test split.
-RQ2: one router trained on the source pool only (SimpleQA, GPQA, MMLU-Pro without math and
+RQ2: router trained on the source pool only (SimpleQA, GPQA, MMLU-Pro without math and
      computer science), cutoffs tuned on the source pool's validation split, then frozen and
      scored on the locked source test (reference) and separately on LiveCodeBench,
      AIME + LiveMathBench, and HLE.
 
 Every target also gets the within-benchmark shuffle diagnostic; the RQ1 locked test gets the
-workload-mix sensitivity check (docs/PROTOCOL.md section 9).
+workload-mix sensitivity check (docs/PROTOCOL.md section 9). Wherever HLE is evaluated, the
+same frozen router is also scored on the sample with repaired HLE costs.
 
-  python scripts/07_final_eval.py --plan           # row counts of every fit and target; reads no outcomes
-  python scripts/07_final_eval.py --dry-run        # rehearsal on source-pool development rows only
-  python scripts/07_final_eval.py --unlock-final   # the one-time evaluation on sealed data
-
-The real run reads results/dev_selection/selection.json for the algorithm and frozen
-configuration, refuses to run twice, and logs every sealed-data access.
-
-Main results use the pilot eligibility rule. Wherever HLE is evaluated, the same fitted
-router and frozen cutoffs are also scored on the sample with repaired HLE costs (required
-sensitivity check; nothing is refitted for it).
-
-Options: --family NAME (dry run only)
-         --with-arc-agi   optional check on ARC-AGI v1 (unused benchmark from the same archive)
+Output: results/final/<model>/   Option: --with-arc-agi adds the optional ARC-AGI check.
 """
 import sys, json, time
 from pathlib import Path
 import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from router import data as D, splits as S, policy as P, models as M, runlog
+from router import data as D, splits as S, policy as P, registry, runlog
 
 args = sys.argv[1:]
+pos_args = [a for a in args if not a.startswith("--")]
+if len(pos_args) != 1:
+    sys.exit(__doc__)
+family = pos_args[0]
+registry.check(family)
 DRY, UNLOCK, PLAN = "--dry-run" in args, "--unlock-final" in args, "--plan" in args
 WITH_ARC = "--with-arc-agi" in args
 MIX_FOCUS, MIX_SHARES = "livecodebench", (0.10, 0.25, 0.50)  # workload-mix sensitivity, RQ1 only
@@ -66,39 +67,23 @@ if PLAN:
     print("  target hle, costs repaired", tot(c(splits=ALL_SPLITS, benchmarks=("hle",), use_recovered_cost=True)))
     sys.exit(0)
 
-OUT = D.ROOT / "results" / ("final_dryrun" if DRY else "final")
+OUT = D.ROOT / "results" / ("final_dryrun" if DRY else "final") / family
 if UNLOCK and (OUT / "final_results.json").exists():
-    sys.exit("results/final/final_results.json already exists: the final evaluation is one-time. Do not rerun it to compare alternatives.")
-
+    sys.exit(f"{(OUT / 'final_results.json').relative_to(D.ROOT)} already exists: the final evaluation runs once per model. "
+             "Do not rerun it to compare alternatives.")
+dev_path = D.ROOT / "results" / "dev_selection" / family / "summary.json"
+if not dev_path.exists():
+    sys.exit(f"{dev_path.relative_to(D.ROOT)} not found: run  python scripts/05_dev_compare.py {family}  first. "
+             "The final evaluation uses the settings chosen there.")
+config = json.loads(dev_path.read_text())["final_config"]
 sel_path = D.ROOT / "results/dev_selection/selection.json"
-if DRY and "--family" in args:
-    family = args[args.index("--family") + 1]
-    config = json.loads((D.ROOT / f"results/dev_selection/{family}/summary.json").read_text())["final_config"]
-else:
-    if not sel_path.exists():
-        sys.exit("results/dev_selection/selection.json not found: run the development comparison and selection first")
-    sel_file = json.loads(sel_path.read_text())
-    if UNLOCK and sel_file["protocol_sha256"] != runlog.protocol_sha256():
-        print("note: docs/PROTOCOL.md has changed since the selection was made; both hashes are recorded", flush=True)
-    if UNLOCK and sel_file.get("deferred_candidates"):
-        sys.exit(f"selection.json is provisional: {sel_file['deferred_candidates']} deferred. "
-                 "Run the deferred candidate and scripts/06_select_algorithm.py (without --defer) first.")
-    sel = sel_file["selection"]
-    family, config = sel["selected"], sel["selected_config"]
-print(f"algorithm: {family}  config: {config}  mode: {'DRY RUN' if DRY else 'FINAL'}", flush=True)
+print(f"model: {family}  settings: {config}  mode: {'DRY RUN' if DRY else 'FINAL'}", flush=True)
 OUT.mkdir(parents=True, exist_ok=True)
 man = S.read_manifest()
 
 
 def fit_router(tr: D.Table, va: D.Table):
-    if family == "modernbert":
-        from router import modernbert as MB
-        dev = MB.pick_device().type
-        r = MB.ModernBertRouter(**{**(MB.REMOTE_GPU if dev == "cuda" else MB.LOCAL_MPS), **config})
-        r.fit(tr.prompts, tr.outcomes.y, va.prompts, va.outcomes.y, log=lambda s: print(s, flush=True))
-    else:
-        r = M.make(family, config).fit(tr.prompts, tr.outcomes.y)
-    return r
+    return registry.make(family, config).fit(tr.prompts, tr.outcomes.y, va.prompts, va.outcomes.y)
 
 
 def list_price_outcomes(rows) -> D.Outcomes | None:
@@ -141,11 +126,7 @@ def run_one(label, tr, va, targets: dict, mix_targets=()):
     g_va = r.predict_gain(va.prompts)
     cutoffs = {f"{a:g}": P.select_cutoff(g_va, va.outcomes, a) for a in P.ALLOWANCES_PP}
     (OUT / f"cutoffs_{label}.json").write_text(json.dumps(cutoffs, indent=2))  # frozen before any target is scored
-    if family == "modernbert":
-        r.save(OUT / label / "model")
-    else:
-        import joblib
-        (OUT / label).mkdir(exist_ok=True); joblib.dump(r, OUT / label / "router.joblib")
+    r.save(OUT / label / "model")
     cal = {a: P.evaluate(P.route_strong(g_va, c["cutoff"]), va.outcomes) for a, c in cutoffs.items()}
     out = dict(label=label, n_train=len(tr), n_calibration=len(va), fit_seconds=r.fit_seconds, cutoffs=cutoffs,
                calibration_metrics=cal, train_benchmarks=sorted(set(tr.benchmark.tolist())),
@@ -160,7 +141,8 @@ def run_one(label, tr, va, targets: dict, mix_targets=()):
     return out
 
 
-results = dict(mode="dry_run" if DRY else "final", family=family, config=config, protocol_sha256=runlog.protocol_sha256(),
+results = dict(mode="dry_run" if DRY else "final", family=family, label=registry.label(family), config=config,
+               dev_summary_sha256=D.sha256_file(dev_path), protocol_sha256=runlog.protocol_sha256(),
                selection_sha256=D.sha256_file(sel_path) if sel_path.exists() else None,
                env=runlog.env_info(), with_arc_agi=WITH_ARC, studies={})
 

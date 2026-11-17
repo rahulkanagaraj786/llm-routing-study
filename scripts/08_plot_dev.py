@@ -9,7 +9,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from router import splits as S, policy as P
 
 SURFACE, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
-SERIES = {"logistic": ("#2a78d6", "Logistic regression"), "forest": ("#eb6834", "Random forest"), "modernbert": ("#1baf7a", "ModernBERT")}
+from router import registry
+_PALETTE = ["#2a78d6", "#eb6834", "#1baf7a"]  # validated together for up to three series
+SERIES = {f: (_PALETTE[i], registry.label(f)) for i, f in enumerate(registry.names()[:3])}
 BASE = S.D.ROOT / "results/dev_selection"
 tab, _ = S.load_selection_dev("plot_dev")
 pos = {q: i for i, q in enumerate(tab.qid)}

@@ -14,6 +14,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression
 
+from .base import Router
+
 SEED = 221
 _CODE = re.compile(r"```|\bdef \w+\(|\bclass \w+|\bimport \w+|#include|\breturn\b|;\s*\n")
 _CHOICES = re.compile(r"(?m)^\s*\(?[A-J][\.\)]\s")
@@ -70,14 +72,18 @@ class TextFeatures:
         return X
 
 
-class LogisticRouter:
-    """Three-class multinomial logistic regression; gain = P(Y=+1) - P(Y=-1)."""
+class LogisticRouter(Router):
+    """Three-class multinomial logistic regression; gain = P(Y=+1) - P(Y=-1).
+    C is the inverse strength of the ridge (L2) penalty: smaller C = stronger penalty."""
     family = "logistic"
 
     def __init__(self, C: float = 1.0, use_stats: bool = False):
-        self.config = dict(C=C, use_stats=use_stats)
+        super().__init__(C=C, use_stats=use_stats)
 
-    def fit(self, prompts, y):
+    def extra_info(self) -> dict:
+        return dict(n_iter=self.n_iter, n_terms=self.features.n_terms)
+
+    def fit(self, prompts, y, val_prompts=None, val_y=None):
         t0 = time.perf_counter()
         self.features = TextFeatures(use_stats=self.config["use_stats"]).fit(prompts)
         self.model = LogisticRegression(C=self.config["C"], max_iter=5000).fit(self.features.transform(prompts), y)
@@ -93,18 +99,18 @@ class LogisticRouter:
         return np.asarray(pos - neg, dtype=float)
 
 
-class ForestRouter:
+class ForestRouter(Router):
     """Random forest regressor on Y in {-1, 0, +1}: estimates E[Y | prompt] directly
     (squared-error trees, as in the pilot), not class probabilities."""
     family = "forest"
 
     def __init__(self, n_estimators: int = 300, max_depth=None, min_samples_leaf: int = 10,
                  max_features: float = 0.1, use_stats: bool = False, n_jobs: int = 8):
-        self.config = dict(n_estimators=n_estimators, max_depth=max_depth, min_samples_leaf=min_samples_leaf,
-                           max_features=max_features, use_stats=use_stats)
+        super().__init__(n_estimators=n_estimators, max_depth=max_depth, min_samples_leaf=min_samples_leaf,
+                         max_features=max_features, use_stats=use_stats)
         self.n_jobs = n_jobs
 
-    def fit(self, prompts, y):
+    def fit(self, prompts, y, val_prompts=None, val_y=None):
         t0 = time.perf_counter()
         self.features = TextFeatures(use_stats=self.config["use_stats"]).fit(prompts)
         c = self.config
@@ -126,11 +132,3 @@ FOREST_GRID = (
     + [dict(n_estimators=300, max_depth=None, min_samples_leaf=leaf, max_features=mf, use_stats=True)
        for leaf in (5, 20) for mf in (0.1, 0.3)]
 )
-
-
-def make(family: str, config: dict):
-    if family == "logistic":
-        return LogisticRouter(**config)
-    if family == "forest":
-        return ForestRouter(**config)
-    raise ValueError(family)

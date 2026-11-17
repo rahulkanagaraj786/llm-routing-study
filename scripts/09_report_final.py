@@ -1,7 +1,7 @@
-"""Turn final_results.json into tables and figures for the report and slides.
+"""Turn one model's final_results.json into tables and figures for the report and slides.
 
-  python scripts/09_report_final.py             # results/final
-  python scripts/09_report_final.py --dry-run   # results/final_dryrun (development rehearsal)
+  python scripts/09_report_final.py <model>             # results/final/<model>
+  python scripts/09_report_final.py <model> --dry-run   # results/final_dryrun/<model> (development rehearsal)
 
 Reads only the saved results file. It does not load data, fit models, or touch sealed rows.
 Writes  <results dir>/report/tables.md  and PNG figures in  <results dir>/report/ .
@@ -14,7 +14,10 @@ import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parents[1]
 DRY = "--dry-run" in sys.argv
-BASE = ROOT / "results" / ("final_dryrun" if DRY else "final")
+_pos = [a for a in sys.argv[1:] if not a.startswith("--")]
+if len(_pos) != 1:
+    sys.exit(__doc__)
+BASE = ROOT / "results" / ("final_dryrun" if DRY else "final") / _pos[0]
 OUT = BASE / "report"
 OUT.mkdir(parents=True, exist_ok=True)
 R = json.loads((BASE / "final_results.json").read_text())
@@ -30,7 +33,7 @@ NAMES = {"simpleqa": "SimpleQA", "mmlupro": "MMLU-Pro", "gpqa": "GPQA", "hle": "
 TARGET_NAMES = {"source_pool_locked_test": "Source pool test (same types as training)", "pseudo_reference": "Rehearsal: same types",
                 "code": "LiveCodeBench (coding)", "math": "AIME + LiveMathBench (math)", "hle": "HLE",
                 "hle_costs_repaired": "HLE, repaired costs", "gpqa_as_holdout": "Rehearsal: GPQA held out"}
-ALG = {"logistic": "logistic regression", "forest": "random forest", "modernbert": "ModernBERT"}[R["family"]]
+ALG = R.get("label", R["family"]).lower()
 TAG = "DEVELOPMENT REHEARSAL, not a result" if DRY else ""
 
 
