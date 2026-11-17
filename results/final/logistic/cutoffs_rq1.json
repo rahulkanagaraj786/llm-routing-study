@@ -1,0 +1,26 @@
+{
+  "0": {
+    "allowance_pp": 0.0,
+    "cutoff": 0.009325129273717477,
+    "n_calibration": 2091,
+    "calibration_accuracy": 0.6059301769488283,
+    "calibration_cost": 61.48885020000001,
+    "calibration_cheap_fraction": 0.005738880918220947
+  },
+  "1": {
+    "allowance_pp": 1.0,
+    "cutoff": 0.06994141350202421,
+    "n_calibration": 2091,
+    "calibration_accuracy": 0.59636537541846,
+    "calibration_cost": 58.10516675000001,
+    "calibration_cheap_fraction": 0.19607843137254902
+  },
+  "2": {
+    "allowance_pp": 2.0,
+    "cutoff": 0.09302470505944155,
+    "n_calibration": 2091,
+    "calibration_accuracy": 0.5863223338115734,
+    "calibration_cost": 55.75839645000001,
+    "calibration_cheap_fraction": 0.29220468675274985
+  }
+}

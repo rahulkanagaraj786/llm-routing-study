@@ -20,7 +20,7 @@ repository.
 | Data audit, paired table rebuilt from the raw release | done |
 | Split manifest, locked test split, sealed held-out benchmarks | done, frozen |
 | Shared pipeline: loader, cutoff tuning, evaluation, reports | done |
-| Logistic regression (reference model) | development run done |
+| Logistic regression (reference model) | development run and RQ1 test done (`docs/RQ1_RESULTS.md`) |
 | Gradient boosting, fine-tuned text encoder | to be written by their owners (`docs/TEAM_GUIDE.md`) |
 | Final evaluation, RQ1 | script and reporting ready; no router from the revised protocol has been evaluated on the locked splits |
 | RQ2 | design on hold; separate pipeline in `rq2/`, disabled until the team agrees the experiments |
@@ -30,6 +30,7 @@ Read in this order:
 1. `docs/PROTOCOL.md`: the evaluation design, the selection rule, and every change to it.
 2. `docs/DATA_AUDIT.md`: what the data is and its known problems.
 3. `docs/DEV_RESULTS.md`: development results so far (logistic regression).
+4. `docs/RQ1_RESULTS.md`: RQ1 test results, one section per model.
 
 ## Layout
 

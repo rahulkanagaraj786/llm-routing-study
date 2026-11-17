@@ -61,9 +61,9 @@ variability from refitting or from choosing cutoffs.
 ### What this shows
 
 1. **Routing saves a modest share of the bill.** About 6% at about 1 point of accuracy
-   loss. A router with no skill, sliding along the straight line between always GPT-5 and
-   always Flash, would save about 4.6% at 1 point. A router that knew the outcome would
-   save 53% and gain 4.9 points (a ceiling for context, not a baseline).
+   loss, which is 5.9% of the bill per point given up; always using Flash saves 4.6% per
+   point. A router that knew the outcome would save 53% and gain 4.9 points (a ceiling for
+   context, not a baseline).
 2. **The target was roughly met here, but not reliably.** The pooled loss at the 1-point
    target was 1.08, and across the five folds it ranged from 0.48 to 1.93. At the 2-point
    target it was 2.36.

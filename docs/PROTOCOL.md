@@ -433,3 +433,9 @@ Status: no router from the revised protocol has been evaluated on the locked spl
    HLE. Decided before any model was evaluated on the locked splits, and before the other
    two models were written. Logistic regression's development run is redone on the new
    set; its source-pool results are moved, not discarded.
+
+10. 2026-11-16, first final evaluation. Logistic regression's RQ1 test was run once, at
+    the team's instruction, from commit `7bd7a49` with the settings fixed by its
+    development run. Results are in `results/final/logistic/` and `docs/RQ1_RESULTS.md`.
+    From this point nothing about logistic regression, the splits, the cutoff rule or the
+    measurements may change. The other two models have not been tested.
