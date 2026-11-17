@@ -22,7 +22,7 @@ repository.
 | Shared pipeline: loader, cutoff tuning, evaluation, reports | done |
 | Logistic regression (reference model) | development run and RQ1 test done (`docs/RQ1_RESULTS.md`) |
 | Gradient boosting, fine-tuned text encoder | to be written by their owners (`docs/TEAM_GUIDE.md`) |
-| Final evaluation, RQ1 | script and reporting ready; no router from the revised protocol has been evaluated on the locked splits |
+| Final evaluation, RQ1 | logistic regression tested; the other two models pending |
 | RQ2 | design on hold; separate pipeline in `rq2/`, disabled until the team agrees the experiments |
 
 Read in this order:
@@ -101,6 +101,7 @@ python scripts/09_report_final.py <model>                # tables and figures
 - Routers receive prompt text only. Scores and costs live in a separate object.
 - `router.splits.load_rows` refuses sealed rows without `unlock_final=True`, and every
   data access is logged in `logs/data_access.log`.
-- Algorithm selection and tuning read only development rows of the source pool.
+- Model settings and the choice of final model use development rows only (train and
+  validation); the test split is read only by the final evaluation.
 - The final evaluation runs once per model and refuses to run a second time.
 - Baselines are always GPT-5 and always Flash. There is no random-routing baseline.
