@@ -458,4 +458,14 @@ Status: no router from the revised protocol has been evaluated on the locked spl
     in advance. The 1-point limit remains the primary one and the selection rule is
     unchanged. Logistic regression's development run and test are regenerated so that all
     five limits come from the same code; its 0, 1 and 2 results must come out unchanged.
+    Done the same day: after the rerun, the development gains and decisions, and the test
+    cutoffs and results at 0, 1 and 2 points, were identical to the previous record.
+
+13. 2026-11-17, test reads for logistic regression. `logs/data_access.log` shows four reads
+    of the locked test split for logistic regression, all with the same model settings:
+    (1) the first run (entry 10); (2) a repeat from a clean state (entry 11); (3) a second
+    clean-state repeat, kept at the team's request as the record (entry 11); (4) the rerun
+    that added the 3 and 5 point limits (entry 12), which is the current record. Runs 1 to 3
+    were byte-identical, and run 4 reproduced their 0, 1 and 2 point results exactly. No
+    further test reads are planned for logistic regression.
 

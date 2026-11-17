@@ -14,3 +14,4 @@
 2026-11-16T21:25:26-0800	entry 11 (reproducibility check) logged	1ebd19e1d77e9981c142bb40282d79c3a7e6d8632c1e047597327dbf4279e700
 2026-11-16T21:45:12-0800	entry 11 updated (latest clean-state run kept as record)	01c33d041730fa35b65f351c22e6084d49ad25c266fb5309b330f9c2ca6c1c7a
 2026-11-16T21:47:18-0800	entry 12 (limits 3 and 5 added after the first logistic test) logged before rerunning	fe6fb1cee44adfeb428d24fe0ae501bf638143d04e9af1358143c6eed2ae86ec
+2026-11-17T01:15:04-0800	entry 12 closed, entry 13 (four test reads accounted for) logged	c7f76b450000893504a9e71ddf51d1db36fd0427fc071494aa5e4c41fd2fbdab

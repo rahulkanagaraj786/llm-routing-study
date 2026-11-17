@@ -86,10 +86,14 @@ math. Nearly all of the pooled accuracy loss falls on MMLU-Pro, which loses 3.8 
 | Router, tuned for 5 pp | 5.1% |
 | Always Flash | 4.7% |
 
-On the test split the router buys about the same saving per point of accuracy as always
-using Flash does. Its curve stays within about 2 points of savings of the straight line
-between the two baselines across the whole range. The router's value on this test is that
-it lets you choose a small accuracy loss; it does not make each point of accuracy much
+At the five tuned limits (0 to 5 points) the router buys slightly more saving per point of
+accuracy than always using Flash does, about 5% of the bill per point against 4.7%. Read
+off the full test curve, it sits up to about 2 points of savings above the straight line
+between the two baselines at small losses, crosses it near 6 points of loss, and falls
+below it at large losses (about 1.7 points under at 10 points of loss, about 5 under at
+12). So the router is only useful for small accuracy losses; past roughly 6 points, simply
+mixing GPT-5 and Flash in fixed proportions would save more. Its value on this test is that
+it lets you choose a small accuracy loss, not that it makes each point of accuracy much
 cheaper to give up.
 
 ### Is the router more than benchmark recognition?
