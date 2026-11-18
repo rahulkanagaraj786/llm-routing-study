@@ -168,10 +168,21 @@ Candidates from 2026-11-16 (this replaces the table above):
 |---|---|---|---|
 | Regularized logistic regression (`logistic`) | Rahul | C ∈ {0.1, 0.3, 1, 3, 10} × statistics {off, on} = 10 | development run done |
 | Gradient boosting (`gbm`) | to be assigned | to be declared here by the owner before the first full run | to be written |
-| Fine-tuned text encoder (`encoder`) | to be assigned | to be declared here by the owner before the first full run | to be written |
+| Fine-tuned text encoder (`encoder`) | Priyanka | learning rate ∈ {2e-5, 5e-5} = 2, chosen in rotation 0 and reused (see below) | written, not run |
 
 Each owner writes the grid into this table before their first full development run and
 does not change it afterwards.
+
+Fixed settings of the text encoder (`src/router/encoder.py`), declared before its first run:
+`answerdotai/ModernBERT-base` at revision `8949b909ec900327062f0ebf497f51aef5e6f0c8`, encoder
+and three-class head fine-tuned together with cross-entropy, gain = P(+1) − P(−1). Prompts
+truncated to 1,024 tokens; batches of 16 prompts padded to the longest in the batch (a batch
+that runs out of GPU memory is split in half with gradients accumulated, so the update is the
+same); AdamW, weight decay 0.01 (none on biases and norms), 10% linear warm-up then linear
+decay, gradient clipping at 1.0; at most 3 epochs with early stopping on the calibration fold
+(patience 1, best epoch kept); bf16 mixed precision on a CUDA GPU, fp32 elsewhere; seed 221,
+one seed. Run on the course GPU server (`msbc`). GPU kernels are not bit-for-bit
+deterministic, so a rerun can differ slightly in the last digits.
 
 ## 6. Development comparison and algorithm selection
 

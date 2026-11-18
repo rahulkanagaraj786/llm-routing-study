@@ -20,8 +20,8 @@ FAMILIES = {
         order=1, label="Gradient boosting", owner="to be assigned",
         cls=None, grid=None, tune_every_rotation=True),            # e.g. "router.gbm:GradientBoostingRouter", "router.gbm:GBM_GRID"
     "encoder": dict(
-        order=2, label="Fine-tuned text encoder (ModernBERT or similar)", owner="to be assigned",
-        cls=None, grid=None, tune_every_rotation=False),           # e.g. "router.encoder:EncoderRouter", "router.encoder:ENCODER_GRID"
+        order=2, label="Fine-tuned text encoder (ModernBERT-base)", owner="Priyanka",
+        cls="router.encoder:EncoderRouter", grid="router.encoder:ENCODER_GRID", tune_every_rotation=False),
 }
 
 
