@@ -167,7 +167,7 @@ Candidates from 2026-11-16 (this replaces the table above):
 | Candidate (`name`) | Owner | Search grid | Status |
 |---|---|---|---|
 | Regularized logistic regression (`logistic`) | Rahul | C ∈ {0.1, 0.3, 1, 3, 10} × statistics {off, on} = 10 | development run done |
-| Gradient boosting (`gbm`) | to be assigned | to be declared here by the owner before the first full run | to be written |
+| Gradient boosting (`gbm`) | Pravalhika Kurapati | max_depth ∈ {3, 5} × learning_rate ∈ {0.05, 0.1} × statistics {off, on} = 8; fixed n_estimators=200, min_samples_leaf=20, subsample=0.8, max_features="sqrt", seed 221 | development run done |
 | Fine-tuned text encoder (`encoder`) | to be assigned | to be declared here by the owner before the first full run | to be written |
 
 Each owner writes the grid into this table before their first full development run and
