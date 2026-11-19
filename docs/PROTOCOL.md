@@ -167,7 +167,7 @@ Candidates from 2026-11-16 (this replaces the table above):
 | Candidate (`name`) | Owner | Search grid | Status |
 |---|---|---|---|
 | Regularized logistic regression (`logistic`) | Rahul | C ∈ {0.1, 0.3, 1, 3, 10} × statistics {off, on} = 10 | development run done |
-| Gradient boosting (`gbm`) | Pravalhika Kurapati | max_depth ∈ {3, 5} × learning_rate ∈ {0.05, 0.1} × statistics {off, on} = 8; fixed n_estimators=200, min_samples_leaf=20, subsample=0.8, max_features="sqrt", seed 221 | development run done |
+| Gradient boosting (`gbm`) | Pravalhika Kurapati | max_depth ∈ {3, 5} × learning_rate ∈ {0.05, 0.1} × statistics {off, on} = 8; fixed n_estimators=200, min_samples_leaf=20, subsample=0.8, max_features="sqrt", seed 221 | development run and RQ1 test done (log entry 18) |
 | Fine-tuned text encoder (`encoder`) | Priyanka | learning rate ∈ {2e-5, 5e-5} = 2, chosen in rotation 0 and reused (see below) | development run and RQ1 test done (log entries 16 and 17) |
 
 Each owner writes the grid into this table before their first full development run and
@@ -527,3 +527,13 @@ Status: no router from the revised protocol has been evaluated on the locked spl
     limits (0, 1, 2, 3 and 5 points) were declared before this test. Results:
     `results/final/encoder/` and `docs/RQ1_RESULTS.md`. From this point nothing about the
     text encoder may change. Gradient boosting has not been tested.
+
+18. 2026-11-19, gradient boosting RQ1 final evaluation. Run once by its owner from commit
+    `42f0a8a` with the settings fixed by its development run (max_depth = 3,
+    learning_rate = 0.05, without the simple prompt statistics), after a dry run on
+    development questions and with the team's go-ahead to unlock. Its result file records
+    two reads of the locked test split, both in this one run (the main test and the HLE
+    repaired-cost check), and no earlier gradient-boosting reads of the test on that
+    machine. All five accuracy limits (0, 1, 2, 3 and 5 points) were declared before this
+    test. Results: `results/final/gbm/` and `docs/RQ1_RESULTS.md`. From this point nothing
+    about gradient boosting may change.
