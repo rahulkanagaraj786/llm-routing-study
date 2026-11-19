@@ -1,0 +1,11 @@
+rotation 0: fitting gbm {'max_depth': 5, 'learning_rate': 0.1, 'use_stats': True} on 4989 rows
+  cal_advantage_mse 0.23509  fit 3.3s
+rotation 1: fitting gbm {'max_depth': 5, 'learning_rate': 0.1, 'use_stats': True} on 4996 rows
+  cal_advantage_mse 0.21852  fit 3.4s
+rotation 2: fitting gbm {'max_depth': 5, 'learning_rate': 0.1, 'use_stats': True} on 4983 rows
+  cal_advantage_mse 0.22808  fit 3.3s
+rotation 3: fitting gbm {'max_depth': 5, 'learning_rate': 0.1, 'use_stats': True} on 4980 rows
+  cal_advantage_mse 0.22684  fit 3.3s
+rotation 4: fitting gbm {'max_depth': 5, 'learning_rate': 0.1, 'use_stats': True} on 4973 rows
+  cal_advantage_mse 0.22040  fit 3.2s
+wrote results/dev_selection/gbm/oof_predictions.csv and summary.json | final config {'learning_rate': 0.1, 'max_depth': 5, 'use_stats': True}
