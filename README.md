@@ -21,15 +21,16 @@ repository.
 | Split manifest, locked test split, sealed held-out benchmarks | done, frozen |
 | Shared pipeline: loader, cutoff tuning, evaluation, reports | done |
 | Logistic regression (reference model) | development run and RQ1 test done (`docs/RQ1_RESULTS.md`) |
-| Gradient boosting, fine-tuned text encoder | to be written by their owners (`docs/TEAM_GUIDE.md`) |
-| Final evaluation, RQ1 | logistic regression tested; the other two models pending |
+| Gradient boosting (Pravalhika) | development run done; RQ1 test not run yet |
+| Fine-tuned text encoder, ModernBERT-base (Priyanka) | development run and RQ1 test done, on a Colab T4 GPU |
+| Final evaluation, RQ1 | logistic regression and the encoder tested; gradient boosting pending |
 | RQ2 | design on hold; separate pipeline in `rq2/`, disabled until the team agrees the experiments |
 
 Read in this order:
 0. `docs/TEAM_GUIDE.md`: if you are adding or running a model, start here.
 1. `docs/PROTOCOL.md`: the evaluation design, the selection rule, and every change to it.
 2. `docs/DATA_AUDIT.md`: what the data is and its known problems.
-3. `docs/DEV_RESULTS.md`: development results so far (logistic regression).
+3. `docs/DEV_RESULTS.md`: development results of all three models.
 4. `docs/RQ1_RESULTS.md`: RQ1 test results, one section per model.
 
 ## Layout

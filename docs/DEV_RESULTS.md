@@ -15,8 +15,8 @@ Procedure: `docs/PROTOCOL.md` section 6. How to produce these for another model:
 | Model | Owner | Development run |
 |---|---|---|
 | Regularized logistic regression | Rahul | done, below |
-| Gradient boosting | to be assigned | not yet written |
-| Fine-tuned text encoder | to be assigned | not yet written |
+| Gradient boosting | Pravalhika Kurapati | done, below |
+| Fine-tuned text encoder (ModernBERT-base) | Priyanka | done, below |
 
 The final model is named from this table once all three have development results. Test
 results play no part in that choice.
@@ -102,6 +102,113 @@ Fifty fits in about two minutes on a laptop CPU. Prediction takes about 0.17 ms 
 question, so the router's own cost is negligible next to an average GPT-5 call of about
 $0.029 on these questions. Savings above are gross (API cost only).
 
+## Gradient boosting
+
+Settings chosen: max_depth = 3, learning_rate = 0.05, without the simple prompt statistics
+(lowest mean calibration MSE across the five rotations). Same TF-IDF features as logistic
+regression. The head is a three-class gradient boosting classifier; gain is P(+1) − P(−1).
+
+Cutoff tuned for a target on one fold, then applied to a fold the router never saw:
+
+| Target loss | Gross savings (95% CI) | Actual loss, pp (95% CI) | Sent to Flash |
+|---|---:|---:|---:|
+| 0 pp | 0.6% (0.4 to 0.8) | 0.07 (−0.05 to 0.19) | 3.1% |
+| **1 pp** | **4.7% (4.2 to 5.3)** | **1.12 (0.81 to 1.43)** | 18.2% |
+| 2 pp | 12.8% (11.7 to 13.9) | 2.62 (2.16 to 3.08) | 33.8% |
+| 3 pp | 17.7% (16.3 to 19.0) | 3.35 (2.81 to 3.90) | 40.2% |
+| 5 pp | 27.3% (25.7 to 29.0) | 4.89 (4.21 to 5.53) | 51.7% |
+
+All five targets were declared in advance for this model.
+
+Intervals are paired bootstraps over questions with decisions fixed. They do not include
+variability from refitting or from choosing cutoffs.
+
+![Development trade-off](../results/dev_selection/dev_tradeoff.png)
+
+### By benchmark at the 1 pp target
+
+| Benchmark | Questions | Sent to Flash | Gross savings | Accuracy loss, pp |
+|---|---:|---:|---:|---:|
+| SimpleQA | 3,459 | 1.2% | 1.6% | 0.26 |
+| MMLU-Pro | 2,394 | 57.9% | 29.8% | 3.13 |
+| HLE | 1,312 | 1.2% | 0.6% | 0.23 |
+| LiveCodeBench | 844 | 2.8% | 0.4% | 0.24 |
+| GPQA | 158 | 9.5% | 9.3% | 0.63 |
+| LiveMathBench | 93 | 31.2% | 17.3% | 2.15 |
+| AIME | 47 | 8.5% | 1.8% | 2.13 |
+
+### What this shows
+
+1. **Routing saves a modest share of the bill, less than logistic on the same questions.**
+   About 4.7% at about 1 point of accuracy loss (logistic was 6.4% at 1.1 points). That is
+   4.2% of the bill per point given up; always using Flash saves 4.6% per point. A router
+   that knew the outcome would save 53% and gain 4.9 points (a ceiling for context, not a
+   baseline).
+2. **The target was roughly met here, but not reliably.** The pooled loss at the 1-point
+   target was 1.12, and across the five folds it ranged from 0.73 to 1.44. At the 2-point
+   target it was 2.62.
+3. **Almost all of the saving comes from MMLU-Pro.** The router sends 58% of MMLU-Pro to
+   Flash, about 3% of LiveCodeBench, and about 1% of SimpleQA and HLE. MMLU-Pro alone
+   loses 3.1 points; the pooled target does not protect a single benchmark. Unlike logistic,
+   it also sends a large share of LiveMathBench to Flash (31%).
+4. **Coding is mostly left with GPT-5.** The router sends 2.8% of LiveCodeBench to Flash
+   (logistic sent almost none).
+5. **The router does pick better individual questions.** Shuffling its choices inside
+   each benchmark, keeping the number sent to Flash, gives a 1.33-point loss on average
+   (range 1.11 to 1.58) against the router's 1.12. Only 4% of 2,000 shuffles were as
+   accurate. The shuffles save more (6.3% against 4.7%).
+6. **The signal is weak overall.** Predicted gain correlates 0.15 with the outcome and
+   explains 2.2% of its variance.
+7. **Provisional selection still prefers logistic.** Both models meet the development loss
+   check. With the encoder deferred, GBM saves about 1.7 points less than logistic at 1 pp
+   (90% CI about −2.3 to −1.2), so it does not replace logistic under the selection rule.
+   Final choice waits until the encoder has development results too.
+
+### Retrospective view at equal loss
+
+Read off the pooled out-of-fold predictions afterwards. This describes the curve; it is
+not what a tuned cutoff achieved, and it is slightly optimistic.
+
+| Actual loss | Gross savings |
+|---|---:|
+| 0.5 pp | 2.2% |
+| 1.0 pp | 4.3% |
+| 1.5 pp | 6.3% |
+| 2.0 pp | 8.5% |
+
+### Compute
+
+Forty fits in about two minutes on a laptop CPU. Prediction takes about 0.13 ms per
+question, so the router's own cost is negligible next to an average GPT-5 call of about
+$0.029 on these questions. Savings above are gross (API cost only).
+
+## Fine-tuned text encoder (ModernBERT-base)
+
+Date: 2026-11-18. ModernBERT-base with a three-class head, fine-tuned end to end
+(`src/router/encoder.py`): prompts up to 1,024 tokens, batches of 16 grouped by length,
+up to 3 epochs with the calibration fold scored four times per epoch and the best snapshot
+kept, fp16 mixed precision, seed 221. Run on a Google Colab Tesla T4 GPU.
+
+Settings chosen: learning rate 2e-5. Both learning rates were fitted in rotation 0 and the
+better one was reused in rotations 1 to 4 (six fine-tunes in total).
+
+| Rotation | Learning rates tried | Calibration error (chosen) | Best point (epoch) | Fit time |
+|---|---|---:|---:|---:|
+| 0 | 2e-5 (0.2295), 5e-5 (0.2305) | 0.2295 | 1.5 | 5.9 min each |
+| 1 | 2e-5 | 0.2165 | 2.0 | 7.3 min |
+| 2 | 2e-5 | 0.2257 | 0.5 | 3.3 min |
+| 3 | 2e-5 | 0.2226 | 0.5 | 3.4 min |
+| 4 | 2e-5 | 0.2134 | 1.25 | 5.3 min |
+| **Mean** | | **0.2215** | | |
+
+The mean calibration error is the same as logistic regression's (0.2215 against 0.2215 to
+four decimals). About 1% of training prompts were longer than 1,024 tokens and were
+truncated. Prediction takes about 6.6 ms per question on the T4.
+
+The out-of-fold savings and losses at each target, and the comparison with logistic
+regression under the selection rule, come from `scripts/06_select_algorithm.py`, which has
+not been run with the encoder yet.
+
 ## How this differs from earlier runs
 
 Earlier development runs used three benchmarks only (SimpleQA, GPQA, filtered MMLU-Pro) and
@@ -113,5 +220,6 @@ RQ2 pipeline's development run (`results/rq2_dev_selection/`, written up in
 
 ## Not done
 
-- No model has been evaluated on the locked test split.
-- Gradient boosting and the text encoder have no development results yet.
+- Logistic regression and the text encoder have since been evaluated on the locked test
+  split (`docs/RQ1_RESULTS.md`). Gradient boosting has not been tested.
+- The selection rule has not yet been applied with all three models' development results.

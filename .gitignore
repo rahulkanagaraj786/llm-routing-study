@@ -6,6 +6,7 @@ __pycache__/
 # raw archive and the rebuilt table are large and reproducible (see README)
 data/raw/
 data/processed/paired_v2.jsonl.gz
+data/processed/paired_v2.jsonl
 
 # the zip duplicates the extracted handoff folder
 Handoff/Router_Development_Comparison.zip

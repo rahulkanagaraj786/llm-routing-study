@@ -17,11 +17,12 @@ FAMILIES = {
         order=0, label="Regularized logistic regression", owner="Rahul",
         cls="router.models:LogisticRouter", grid="router.models:LOGISTIC_GRID", tune_every_rotation=True),
     "gbm": dict(
-        order=1, label="Gradient boosting", owner="to be assigned",
-        cls=None, grid=None, tune_every_rotation=True),            # e.g. "router.gbm:GradientBoostingRouter", "router.gbm:GBM_GRID"
+        order=1, label="Gradient boosting", owner="Pravalhika Kurapati",
+        cls="router.gbm:GradientBoostingRouter", grid="router.gbm:GBM_GRID",
+        tune_every_rotation=True),
     "encoder": dict(
-        order=2, label="Fine-tuned text encoder (ModernBERT or similar)", owner="to be assigned",
-        cls=None, grid=None, tune_every_rotation=False),           # e.g. "router.encoder:EncoderRouter", "router.encoder:ENCODER_GRID"
+        order=2, label="Fine-tuned text encoder (ModernBERT-base)", owner="Priyanka",
+        cls="router.encoder:EncoderRouter", grid="router.encoder:ENCODER_GRID", tune_every_rotation=False),
 }
 
 
