@@ -97,6 +97,18 @@ def check_points(steps_per_epoch: int, checks_per_epoch: int) -> set[int]:
     return {int(round(steps_per_epoch * j / k)) for j in range(1, k + 1)}
 
 
+_FITS_STARTED = 0  # fine-tunes started in this Python process, for the progress lines
+
+
+def _minutes(seconds: float) -> str:
+    return f"{seconds / 60:.1f} min" if seconds >= 60 else f"{seconds:.0f} s"
+
+
+def _bar(frac: float, width: int = 20) -> str:
+    n = int(round(max(0.0, min(1.0, frac)) * width))
+    return "[" + "#" * n + "." * (width - n) + "]"
+
+
 def _empty_cache(device) -> None:
     import torch
     gc.collect()
@@ -228,8 +240,18 @@ class EncoderRouter(Router):
 
     # ---- contract -----------------------------------------------------------------------
     def fit(self, prompts, y, val_prompts=None, val_y=None):
+        import warnings
+
         import torch
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
+        from transformers.utils import logging as hf_logging
+
+        global _FITS_STARTED
+        _FITS_STARTED += 1
+        fit_no = _FITS_STARTED
+        hf_logging.set_verbosity_error()  # hides the expected "classifier newly initialised" load report
+        # with fp16 loss scaling the first updates can be skipped while the scale settles; harmless
+        warnings.filterwarnings("ignore", message="Detected call of `lr_scheduler.step\\(\\)` before")
 
         t0 = time.perf_counter()
         c = self.config
@@ -271,6 +293,16 @@ class EncoderRouter(Router):
         sched = torch.optim.lr_scheduler.LambdaLR(
             opt, lambda s: (s + 1) / warm if s < warm else max(0.0, (total - s) / max(1, total - warm)))
         checks = check_points(steps_per_epoch, c["checks_per_epoch"]) if val_ids is not None else {steps_per_epoch}
+        # progress line every ENCODER_PROGRESS_SECONDS (default 20 s). If the caller sets
+        # ENCODER_TOTAL_FITS (the notebook does), the line also shows progress over the whole run.
+        import os
+        every_s = float(os.environ.get("ENCODER_PROGRESS_SECONDS", "20"))
+        total_fits = int(os.environ.get("ENCODER_TOTAL_FITS", "0") or 0)
+        last_report = time.perf_counter()
+        print(f"  [fine-tune #{fit_no}{f' of {total_fits}' if total_fits else ''}] lr {c['lr']:g} | {len(ids):,} training questions, "
+              f"{len(val_ids) if val_ids is not None else 0:,} validation | {steps_per_epoch} batches per epoch, "
+              f"up to {c['max_epochs']} epochs | {self.device.type}, {self.precision}", flush=True)
+        t_train = time.perf_counter()
 
         best_mse, best_state, bad, stop = np.inf, None, 0, False
         self.model.train()
@@ -287,6 +319,20 @@ class EncoderRouter(Router):
                 self.scaler.step(opt)
                 self.scaler.update()
                 sched.step()
+                done = (epoch - 1) * steps_per_epoch + b
+                now = time.perf_counter()
+                if now - last_report >= every_s and b not in checks:
+                    last_report = now
+                    spent = now - t_train
+                    frac = done / total
+                    left = spent / done * (total - done)
+                    line = (f"    {_bar(frac)} {100 * frac:3.0f}% of fine-tune | epoch {epoch}/{c['max_epochs']} "
+                            f"batch {b}/{steps_per_epoch} | {_minutes(spent)} elapsed, at most ~{_minutes(left)} left")
+                    if total_fits:
+                        run = min(1.0, (fit_no - 1 + frac) / total_fits)
+                        run_left = left + (total_fits - fit_no) * (spent / frac)
+                        line += f" || whole run {_bar(run, 10)} {100 * run:3.0f}%, at most ~{_minutes(run_left)} left"
+                    print(line, flush=True)
                 if b not in checks:
                     continue
                 rec = dict(epoch=round(epoch - 1 + b / steps_per_epoch, 3), step=(epoch - 1) * steps_per_epoch + b,
@@ -316,6 +362,11 @@ class EncoderRouter(Router):
             self.best_epoch = self.history[-1]["epoch"] if self.history else None
         self.model.eval()
         self.fit_seconds = time.perf_counter() - t0
+        last = self.history[-1]["epoch"] if self.history else 0
+        stopped = f"stopped early at epoch {last:.2f}" if last < c["max_epochs"] else "ran all epochs"
+        print(f"  [fine-tune #{fit_no}{f' of {total_fits}' if total_fits else ''}] done in {_minutes(self.fit_seconds)}: {stopped}, best at epoch "
+              f"{self.best_epoch}" + (f" (val advantage MSE {best_mse:.5f})" if best_state is not None else ""),
+              flush=True)
         return self
 
     def predict_gain(self, prompts) -> np.ndarray:
