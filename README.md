@@ -14,15 +14,15 @@ advantage is above a cutoff. Everything is offline: nothing here calls an LLM.
 
 ## Status
 
-| Step | State |
-|---|---|
-| Paired data table rebuilt from the public release | done |
-| Train / validation / test split, locked test split | done, frozen |
-| Shared pipeline: loading, cutoff tuning, evaluation, reports | done |
-| Regularized logistic regression (reference model) | development run and RQ1 test done |
-| Fine-tuned text encoder (ModernBERT-base) | development run and RQ1 test done |
-| Gradient boosting | to be written by its owner |
-| RQ2 | on hold; separate pipeline in `rq2/`, switched off |
+| Step                                                         | State                                              |
+| ------------------------------------------------------------ | -------------------------------------------------- |
+| Paired data table rebuilt from the public release            | done                                               |
+| Train / validation / test split, locked test split           | done, frozen                                       |
+| Shared pipeline: loading, cutoff tuning, evaluation, reports | done                                               |
+| Regularized logistic regression (reference model)            | development run and RQ1 test done                  |
+| Gradient boosting                                            | development run done                               |
+| Fine-tuned text encoder (ModernBERT-base)                    | development run and RQ1 test done                  |
+| RQ2                                                          | on hold; separate pipeline in `rq2/`, switched off |
 
 If you are adding or running a model, start with `docs/TEAM_GUIDE.md`.
 

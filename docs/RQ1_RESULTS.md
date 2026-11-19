@@ -11,7 +11,7 @@ tuned on the validation split and frozen. Full tables and figures per model are 
 | Model | Owner | RQ1 test |
 |---|---|---|
 | Regularized logistic regression | Rahul | run on 2026-11-16, below |
-| Gradient boosting | to be assigned | pending |
+| Gradient boosting | Pravalhika Kurapati | pending |
 | Fine-tuned text encoder (ModernBERT-base) | Priyanka | run on 2026-11-18, below |
 
 A side-by-side comparison of the two tested models is at the end of this page.
