@@ -16,7 +16,7 @@ Procedure: `docs/PROTOCOL.md` section 6. How to produce these for another model:
 |---|---|---|
 | Regularized logistic regression | Rahul | done, below |
 | Gradient boosting | Pravalhika Kurapati | done, below |
-| Fine-tuned text encoder | to be assigned | not yet written |
+| Fine-tuned text encoder (ModernBERT-base) | Priyanka | done, below |
 
 The final model is named from this table once all three have development results. Test
 results play no part in that choice.
@@ -182,6 +182,33 @@ Forty fits in about two minutes on a laptop CPU. Prediction takes about 0.13 ms 
 question, so the router's own cost is negligible next to an average GPT-5 call of about
 $0.029 on these questions. Savings above are gross (API cost only).
 
+## Fine-tuned text encoder (ModernBERT-base)
+
+Date: 2026-11-18. ModernBERT-base with a three-class head, fine-tuned end to end
+(`src/router/encoder.py`): prompts up to 1,024 tokens, batches of 16 grouped by length,
+up to 3 epochs with the calibration fold scored four times per epoch and the best snapshot
+kept, fp16 mixed precision, seed 221. Run on a Google Colab Tesla T4 GPU.
+
+Settings chosen: learning rate 2e-5. Both learning rates were fitted in rotation 0 and the
+better one was reused in rotations 1 to 4 (six fine-tunes in total).
+
+| Rotation | Learning rates tried | Calibration error (chosen) | Best point (epoch) | Fit time |
+|---|---|---:|---:|---:|
+| 0 | 2e-5 (0.2295), 5e-5 (0.2305) | 0.2295 | 1.5 | 5.9 min each |
+| 1 | 2e-5 | 0.2165 | 2.0 | 7.3 min |
+| 2 | 2e-5 | 0.2257 | 0.5 | 3.3 min |
+| 3 | 2e-5 | 0.2226 | 0.5 | 3.4 min |
+| 4 | 2e-5 | 0.2134 | 1.25 | 5.3 min |
+| **Mean** | | **0.2215** | | |
+
+The mean calibration error is the same as logistic regression's (0.2215 against 0.2215 to
+four decimals). About 1% of training prompts were longer than 1,024 tokens and were
+truncated. Prediction takes about 6.6 ms per question on the T4.
+
+The out-of-fold savings and losses at each target, and the comparison with logistic
+regression under the selection rule, come from `scripts/06_select_algorithm.py`, which has
+not been run with the encoder yet.
+
 ## How this differs from earlier runs
 
 Earlier development runs used three benchmarks only (SimpleQA, GPQA, filtered MMLU-Pro) and
@@ -193,7 +220,6 @@ RQ2 pipeline's development run (`results/rq2_dev_selection/`, written up in
 
 ## Not done
 
-- No model has been evaluated on the locked test split for gradient boosting (logistic's
-  RQ1 test is already recorded in `docs/RQ1_RESULTS.md`).
-- The text encoder has no development results yet.
-- Final algorithm selection waits until all three models have development results.
+- Logistic regression and the text encoder have since been evaluated on the locked test
+  split (`docs/RQ1_RESULTS.md`). Gradient boosting has not been tested.
+- The selection rule has not yet been applied with all three models' development results.

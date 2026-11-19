@@ -10,7 +10,7 @@ can be compared directly. You write one model file. Everything else is shared an
 | Shared pipeline: data, splits, cutoff tuning, evaluation, reports | Rahul | done |
 | Regularized logistic regression (`logistic`) | Rahul | development run and RQ1 test done |
 | Gradient boosting (`gbm`) | Pravalhika Kurapati | development run done |
-| Fine-tuned text encoder, ModernBERT or similar (`encoder`) | to be assigned | to be written |
+| Fine-tuned text encoder, ModernBERT-base (`encoder`) | Priyanka | development run and RQ1 test done |
 
 Logistic regression is the worked example. Read `LogisticRouter` in `src/router/models.py`
 before writing yours.

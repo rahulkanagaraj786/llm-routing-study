@@ -168,10 +168,26 @@ Candidates from 2026-11-16 (this replaces the table above):
 |---|---|---|---|
 | Regularized logistic regression (`logistic`) | Rahul | C ∈ {0.1, 0.3, 1, 3, 10} × statistics {off, on} = 10 | development run done |
 | Gradient boosting (`gbm`) | Pravalhika Kurapati | max_depth ∈ {3, 5} × learning_rate ∈ {0.05, 0.1} × statistics {off, on} = 8; fixed n_estimators=200, min_samples_leaf=20, subsample=0.8, max_features="sqrt", seed 221 | development run done |
-| Fine-tuned text encoder (`encoder`) | to be assigned | to be declared here by the owner before the first full run | to be written |
+| Fine-tuned text encoder (`encoder`) | Priyanka | learning rate ∈ {2e-5, 5e-5} = 2, chosen in rotation 0 and reused (see below) | development run and RQ1 test done (log entries 16 and 17) |
 
 Each owner writes the grid into this table before their first full development run and
 does not change it afterwards.
+
+Settings of the text encoder as used in its development run and RQ1 test
+(`src/router/encoder.py`, `ENCODER_GRID` and constructor defaults). This paragraph replaces
+an earlier version written before those runs; see log entry 16 for what changed and when.
+`answerdotai/ModernBERT-base` at revision `8949b909ec900327062f0ebf497f51aef5e6f0c8`, encoder
+and three-class head fine-tuned together with cross-entropy, gain = P(+1) − P(−1). Prompts
+truncated to 1,024 tokens. Batches of 16 prompts grouped by length (shuffled, cut into
+chunks of 50 batches, sorted by length within a chunk, batch order shuffled), each computed
+in micro-batches of at most 4,096 padded tokens with gradients accumulated, so the update is
+that of the full batch (a micro-batch that still runs out of GPU memory is split in half and
+retried). AdamW, weight decay 0.01 (none on biases and norms), 10% linear warm-up then linear
+decay, gradient clipping at 1.0. Up to 3 epochs; the calibration fold is scored four times
+per epoch, the best snapshot is kept, and training stops after three checks in a row without
+improvement. Mixed precision on CUDA (bf16 where native, fp16 with loss scaling otherwise),
+fp32 elsewhere. Seed 221, one seed. Both runs used a Google Colab Tesla T4 in fp16. GPU
+kernels are not bit-for-bit deterministic, so a rerun can differ slightly in the last digits.
 
 ## 6. Development comparison and algorithm selection
 
@@ -355,7 +371,8 @@ Still open:
 1. LiveCodeBench Flash costs are 20–100% of the price schedule every other file follows
    (total $6.16 recorded vs $8.46 at $0.30/$2.50 per million tokens). Default: recorded
    costs are primary and a list-price sensitivity figure is reported.
-2. Who runs ModernBERT on a GPU, and by when.
+2. ~~Who runs ModernBERT on a GPU, and by when.~~ Resolved 2026-11-18: the text encoder
+   was run by its owner on a Google Colab Tesla T4 (log entries 16 and 17).
 3. The team's go-ahead to run `scripts/07_final_eval.py --unlock-final`.
 
 Status: no router from the revised protocol has been evaluated on the locked splits.
@@ -481,3 +498,32 @@ Status: no router from the revised protocol has been evaluated on the locked spl
     recomputed; logistic regression's existing result file predates this and its reads are
     recorded in entry 13.
 
+16. 2026-11-18, text encoder development run (log times 2026-11-19, UTC). The encoder is
+    ModernBERT-base, as planned on 2026-11-16 (section 1): 1,024 tokens, learning rates
+    2e-5 and 5e-5, one seed, on a GPU. Differences from that plan and how they arose:
+    (a) It ran on Google Colab (Tesla T4, fp16) instead of the course server: the server's
+    GPU driver was too old for the pinned torch build, and most of its GPU nodes were down.
+    (b) Section 5's settings paragraph was first written before any run, but the settings
+    then changed during wiring checks (`--smoke`, a one-in-eight sample that prints one
+    calibration value and writes nothing), which ran out of GPU memory and were slow: the
+    batching became length-grouped batches computed in micro-batches of at most 4,096
+    tokens, fp16 was used on the T4, and the calibration fold is scored four times per epoch
+    with a patience of three checks instead of once per epoch with a patience of one. The
+    paragraph was not updated at the time and is corrected now, after the results. Only
+    smoke-check values on the sample had been seen when these changes were made; no
+    full-run result existed. The learning-rate grid did not change. (c) The full run was
+    interrupted twice and resumed from the saved rotation files; the rotation in progress
+    each time (rotations 3 and 4) was refitted from the start with the same settings, and
+    its partial fits were discarded. Learning rate 2e-5 was chosen in rotation 0
+    (calibration error 0.2295 against 0.2305 for 5e-5). Mean calibration error 0.2215.
+    Results: `results/dev_selection/encoder/`, `docs/DEV_RESULTS.md`. The selection rule
+    (section 6) has not yet been applied to these results.
+
+17. 2026-11-18, text encoder RQ1 final evaluation (log time 2026-11-19 04:42 UTC). Run once
+    by its owner from commit `6442d62` with the settings fixed by its development run
+    (learning rate 2e-5), after a dry run on development questions. Its result file records
+    two reads of the locked test split, both in this one run (the main test and the HLE
+    repaired-cost check), and no earlier encoder reads on that machine. All five accuracy
+    limits (0, 1, 2, 3 and 5 points) were declared before this test. Results:
+    `results/final/encoder/` and `docs/RQ1_RESULTS.md`. From this point nothing about the
+    text encoder may change. Gradient boosting has not been tested.

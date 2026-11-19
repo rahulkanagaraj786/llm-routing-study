@@ -20,13 +20,14 @@ advantage is above a cutoff. Everything is offline: nothing here calls an LLM.
 | Train / validation / test split, locked test split           | done, frozen                                       |
 | Shared pipeline: loading, cutoff tuning, evaluation, reports | done                                               |
 | Regularized logistic regression (reference model)            | development run and RQ1 test done                  |
-| Gradient boosting, fine-tuned text encoder                   | to be written by their owners                      |
+| Gradient boosting                                            | development run done                               |
+| Fine-tuned text encoder (ModernBERT-base)                    | development run and RQ1 test done                  |
 | RQ2                                                          | on hold; separate pipeline in `rq2/`, switched off |
 
 If you are adding or running a model, start with `docs/TEAM_GUIDE.md`.
 
-Results so far: `docs/RQ1_RESULTS.md` (logistic regression on the locked test split) and
-`docs/DEV_RESULTS.md` (its development run).
+Results so far: `docs/RQ1_RESULTS.md` (logistic regression and the text encoder on the locked
+test split, with a side-by-side comparison) and `docs/DEV_RESULTS.md` (their development runs).
 
 ## Layout
 
