@@ -3,21 +3,21 @@
 The whole network (encoder and head) is fine-tuned with cross-entropy on Y + 1 in {0, 1, 2};
 gain = P(Y = +1) - P(Y = -1). Input is the prompt text only.
 
-Settings fixed in advance (docs/PROTOCOL.md, section 5). Only the learning rate is searched;
-everything else is a constructor default and is recorded with every result:
+Training recipe (every setting is a constructor argument and is recorded with the results):
   - answerdotai/ModernBERT-base at a pinned revision; prompts truncated to 1,024 tokens
-  - AdamW, weight decay 0.01, 10% linear warm-up then linear decay, gradient clipping at 1.0
-  - batches of 16 prompts of similar length (length-grouped, batch order shuffled), padded to
-    the longest prompt in the batch
-  - at most 3 epochs; early stopping on the validation questions passed to fit() (patience 1),
-    keeping the weights of the best epoch
-  - bf16 mixed precision on a CUDA GPU with native bf16 (A100, L4, ...), fp32 elsewhere
-    (including the T4, which only emulates bf16); seed 221
+  - AdamW, weight decay 0.01 (none on biases and norms), 10% linear warm-up then linear decay,
+    gradient clipping at 1.0
+  - batches of 16 prompts of similar length (length-grouped, batch order shuffled). A batch is
+    computed in micro-batches of at most 4,096 padded tokens with gradients accumulated, so the
+    update is that of the full batch of 16 while memory stays within a 16 GB GPU
+  - up to 3 epochs; the validation questions passed to fit() are scored 4 times per epoch, the
+    best snapshot is kept, and training stops after 3 checks in a row without improvement
+  - mixed precision on CUDA: bf16 on GPUs that support it natively (A100, L4, H100), fp16 with
+    loss scaling on older ones (T4); fp32 on Apple MPS and CPU. Seed 221.
 
-Device: CUDA if available, then Apple MPS, then CPU. A batch that runs out of GPU memory is
-split in half (gradients are accumulated, so the update is the same) and the split is counted.
-
-Run on the GPU server: see docs/TEAM_GUIDE.md and the encoder notes in docs/PROTOCOL.md.
+Device: CUDA if available, then Apple MPS, then CPU. A micro-batch that still runs out of GPU
+memory in its forward pass is split in half and retried (the update is the same), and the split
+is counted in `oom_splits`.
 """
 from __future__ import annotations
 
@@ -51,7 +51,7 @@ def _is_oom(err: BaseException) -> bool:
 
 def _native_bf16() -> bool:
     """True only on GPUs with real bf16 support (Ampere or newer: A100, L4, H100...). On older
-    cards such as the T4, torch reports bf16 as available but emulates it slowly; use fp32 there."""
+    cards such as the T4, torch reports bf16 as available but emulates it slowly."""
     import torch
     try:
         return bool(torch.cuda.is_bf16_supported(including_emulation=False))
@@ -75,6 +75,28 @@ def length_grouped_batches(lengths, batch_size: int, rng, mega: int = 50) -> lis
     return [batches[i] for i in rng.permutation(len(batches))]
 
 
+def token_chunks(lengths_desc, budget: int, cap: int | None = None) -> list[list[int]]:
+    """Split positions 0..n-1 (lengths sorted longest first) into consecutive groups whose padded
+    size, count x longest length, stays within `budget` tokens (at least one prompt per group)."""
+    parts, cur = [], []
+    for j, L in enumerate(lengths_desc):
+        longest = lengths_desc[cur[0]] if cur else L
+        if cur and ((len(cur) + 1) * longest > budget or (cap and len(cur) >= cap)):
+            parts.append(cur)
+            cur = []
+        cur.append(j)
+    if cur:
+        parts.append(cur)
+    return parts
+
+
+def check_points(steps_per_epoch: int, checks_per_epoch: int) -> set[int]:
+    """Batch numbers (1-based, within an epoch) after which the validation questions are scored.
+    The last batch of the epoch is always one of them."""
+    k = max(1, min(checks_per_epoch, steps_per_epoch))
+    return {int(round(steps_per_epoch * j / k)) for j in range(1, k + 1)}
+
+
 def _empty_cache(device) -> None:
     import torch
     gc.collect()
@@ -88,32 +110,37 @@ class EncoderRouter(Router):
     family = "encoder"
 
     def __init__(self, lr: float = 2e-5, max_length: int = 1024, batch_size: int = 16, max_epochs: int = 3,
-                 patience: int = 1, weight_decay: float = 0.01, warmup_frac: float = 0.1, max_grad_norm: float = 1.0,
-                 bf16: bool = True, group_by_length: bool = True, model_name: str = MODEL_NAME,
-                 revision: str = MODEL_REVISION):
-        super().__init__(lr=lr, max_length=max_length, batch_size=batch_size, max_epochs=max_epochs, patience=patience,
-                         weight_decay=weight_decay, warmup_frac=warmup_frac, max_grad_norm=max_grad_norm, bf16=bf16,
-                         group_by_length=group_by_length, model_name=model_name, revision=revision)
+                 checks_per_epoch: int = 4, patience: int = 3, weight_decay: float = 0.01, warmup_frac: float = 0.1,
+                 max_grad_norm: float = 1.0, mixed_precision: bool = True, group_by_length: bool = True,
+                 max_batch_tokens: int = 4096, model_name: str = MODEL_NAME, revision: str = MODEL_REVISION):
+        super().__init__(lr=lr, max_length=max_length, batch_size=batch_size, max_epochs=max_epochs,
+                         checks_per_epoch=checks_per_epoch, patience=patience, weight_decay=weight_decay,
+                         warmup_frac=warmup_frac, max_grad_norm=max_grad_norm, mixed_precision=mixed_precision,
+                         group_by_length=group_by_length, max_batch_tokens=max_batch_tokens,
+                         model_name=model_name, revision=revision)
         self.model = None
         self.tokenizer = None
+        self.device = None
+        self.scaler = None
+        self._in_backward = False
         self.history: list[dict] = []
         self.best_epoch = None
         self.oom_splits = 0
         self.truncation_rate_fit = None
 
-    # ---- helpers ------------------------------------------------------------------------
-    def _autocast(self):
-        import torch
-        if self.precision == "bf16-mixed":
-            return torch.autocast("cuda", dtype=torch.bfloat16)
-        return contextlib.nullcontext()
-
+    # ---- precision ----------------------------------------------------------------------
     @property
     def precision(self) -> str:
-        if self.device.type == "cuda" and self.config["bf16"] and _native_bf16():
-            return "bf16-mixed"
-        return "fp32"
+        if self.device is None or self.device.type != "cuda" or not self.config["mixed_precision"]:
+            return "fp32"
+        return "bf16-mixed" if _native_bf16() else "fp16-mixed"
 
+    def _autocast(self):
+        import torch
+        dtype = {"bf16-mixed": torch.bfloat16, "fp16-mixed": torch.float16}.get(self.precision)
+        return torch.autocast(self.device.type, dtype=dtype) if dtype is not None else contextlib.nullcontext()
+
+    # ---- helpers ------------------------------------------------------------------------
     def _encode(self, prompts) -> list[list[int]]:
         enc = self.tokenizer([str(p) for p in prompts], truncation=True, max_length=self.config["max_length"],
                              add_special_tokens=True)
@@ -129,48 +156,74 @@ class EncoderRouter(Router):
             mask[i, : len(x)] = 1
         return input_ids.to(self.device), mask.to(self.device)
 
-    def _train_step(self, ids, labels, n_total) -> float:
-        """Forward + backward on one batch; halves it on out-of-memory. Returns summed loss."""
+    def _forward_backward(self, ids, labels, n_total) -> float:
+        """Forward + backward on one micro-batch. The loss is divided by the size of the whole
+        batch, so accumulating micro-batches gives exactly the gradient of the full batch."""
         import torch
-        try:
-            input_ids, mask = self._collate(ids)
-            y = torch.tensor(labels, dtype=torch.long, device=self.device)
-            with self._autocast():
-                logits = self.model(input_ids=input_ids, attention_mask=mask).logits
-            loss = torch.nn.functional.cross_entropy(logits.float(), y, reduction="sum")
-            (loss / n_total).backward()
-            return float(loss.detach())
-        except Exception as err:  # noqa: BLE001 - only out-of-memory is handled
-            if not _is_oom(err) or len(ids) == 1:
-                raise
-            self.oom_splits += 1
-            _empty_cache(self.device)
-            h = len(ids) // 2
-            return (self._train_step(ids[:h], labels[:h], n_total)
-                    + self._train_step(ids[h:], labels[h:], n_total))
+        input_ids, mask = self._collate(ids)
+        y = torch.tensor(labels, dtype=torch.long, device=self.device)
+        with self._autocast():
+            logits = self.model(input_ids=input_ids, attention_mask=mask).logits
+        loss = torch.nn.functional.cross_entropy(logits.float(), y, reduction="sum")
+        self._in_backward = True
+        self.scaler.scale(loss / n_total).backward()
+        self._in_backward = False
+        return float(loss.detach())
 
-    def _gains(self, ids: list[list[int]], batch_size: int = 64) -> np.ndarray:
+    def _train_batch(self, ids, labels) -> float:
+        """One optimiser batch, run as micro-batches of at most `max_batch_tokens` padded tokens.
+        Returns the summed loss."""
+        order = sorted(range(len(ids)), key=lambda i: -len(ids[i]))
+        queue = [[order[j] for j in part]
+                 for part in token_chunks([len(ids[i]) for i in order], self.config["max_batch_tokens"])]
+        total = 0.0
+        while queue:
+            part = queue.pop(0)
+            oom = False
+            try:
+                total += self._forward_backward([ids[i] for i in part], [labels[i] for i in part], len(ids))
+            except Exception as err:  # noqa: BLE001 - only out-of-memory is handled
+                if not _is_oom(err) or len(part) == 1:
+                    raise
+                if self._in_backward:  # some gradients may already be added: the batch cannot be redone
+                    raise RuntimeError("out of GPU memory during the backward pass; lower max_batch_tokens") from err
+                oom = True
+            if oom:  # retried outside the except block, so the failed attempt's memory is released first
+                self.oom_splits += 1
+                _empty_cache(self.device)
+                h = len(part) // 2
+                queue[:0] = [part[:h], part[h:]]
+        return total
+
+    def _gains(self, ids: list[list[int]]) -> np.ndarray:
         import torch
+        was_training = self.model.training
         self.model.eval()
-        order = np.argsort([len(x) for x in ids], kind="stable")  # similar lengths together: less padding
+        order = sorted(range(len(ids)), key=lambda i: -len(ids[i]))  # similar lengths together: less padding
+        budget = 4 * self.config["max_batch_tokens"]  # no gradients kept: larger batches fit
+        queue = [[order[j] for j in part] for part in token_chunks([len(ids[i]) for i in order], budget, cap=128)]
         out = np.zeros(len(ids))
         with torch.no_grad():
-            i = 0
-            while i < len(order):
-                idx = order[i: i + batch_size]
+            while queue:
+                part = queue.pop(0)
+                p, oom = None, False
                 try:
-                    input_ids, mask = self._collate([ids[j] for j in idx])
+                    input_ids, mask = self._collate([ids[j] for j in part])
                     with self._autocast():
                         logits = self.model(input_ids=input_ids, attention_mask=mask).logits
+                    p = torch.softmax(logits.float(), dim=-1).cpu().numpy()
                 except Exception as err:  # noqa: BLE001
-                    if not _is_oom(err) or batch_size == 1:
+                    if not _is_oom(err) or len(part) == 1:
                         raise
+                    oom = True
+                if oom:
                     _empty_cache(self.device)
-                    batch_size = max(1, batch_size // 2)
+                    h = len(part) // 2
+                    queue[:0] = [part[:h], part[h:]]
                     continue
-                p = torch.softmax(logits.float(), dim=-1).cpu().numpy()
-                out[idx] = p[:, 2] - p[:, 0]
-                i += len(idx)
+                out[part] = p[:, 2] - p[:, 0]
+        if was_training:
+            self.model.train()
         return np.clip(out, -1.0, 1.0)
 
     # ---- contract -----------------------------------------------------------------------
@@ -183,6 +236,8 @@ class EncoderRouter(Router):
         torch.manual_seed(SEED)
         np.random.seed(SEED)
         self.device = _device()
+        # loss scaling is only needed for fp16; for bf16 / fp32 the scaler is a no-op
+        self.scaler = torch.amp.GradScaler(self.device.type, enabled=self.precision == "fp16-mixed")
 
         self.tokenizer = AutoTokenizer.from_pretrained(c["model_name"], revision=c["revision"])
         self.model = AutoModelForSequenceClassification.from_pretrained(
@@ -215,41 +270,50 @@ class EncoderRouter(Router):
                                  dict(params=no_decay, weight_decay=0.0)], lr=c["lr"])
         sched = torch.optim.lr_scheduler.LambdaLR(
             opt, lambda s: (s + 1) / warm if s < warm else max(0.0, (total - s) / max(1, total - warm)))
+        checks = check_points(steps_per_epoch, c["checks_per_epoch"]) if val_ids is not None else {steps_per_epoch}
 
-        best_mse, best_state, bad = np.inf, None, 0
+        best_mse, best_state, bad, stop = np.inf, None, 0, False
+        self.model.train()
         for epoch in range(1, c["max_epochs"] + 1):
             te = time.perf_counter()
-            self.model.train()
-            loss_sum, padded = 0.0, 0
-            for idx in epoch_batches(epoch):
+            loss_sum, n_seen, padded = 0.0, 0, 0
+            for b, idx in enumerate(epoch_batches(epoch), start=1):
                 padded += len(idx) * max(lengths[i] for i in idx)
                 opt.zero_grad(set_to_none=True)
-                loss_sum += self._train_step([ids[i] for i in idx], [labels[i] for i in idx], len(idx))
+                loss_sum += self._train_batch([ids[i] for i in idx], [labels[i] for i in idx])
+                n_seen += len(idx)
+                self.scaler.unscale_(opt)
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), c["max_grad_norm"])
-                opt.step()
+                self.scaler.step(opt)
+                self.scaler.update()
                 sched.step()
-            rec = dict(epoch=epoch, train_loss=loss_sum / len(ids), epoch_train_seconds=time.perf_counter() - te,
-                       batches=steps_per_epoch, oom_splits=self.oom_splits,
-                       padding_fraction=1.0 - sum(lengths) / max(1, padded))
-            if val_ids is None:
+                if b not in checks:
+                    continue
+                rec = dict(epoch=round(epoch - 1 + b / steps_per_epoch, 3), step=(epoch - 1) * steps_per_epoch + b,
+                           train_loss=loss_sum / n_seen, seconds=time.perf_counter() - te, oom_splits=self.oom_splits,
+                           padding_fraction=1.0 - sum(lengths) / max(1, padded) if b == steps_per_epoch else None)
+                if val_ids is not None:
+                    mse = float(np.mean((self._gains(val_ids) - val_y) ** 2))
+                    rec["val_advantage_mse"] = mse
+                    improved = mse < best_mse - 1e-12
+                    print(f"    epoch {rec['epoch']:.2f}: train loss {rec['train_loss']:.4f}  val advantage MSE "
+                          f"{mse:.5f}{'  *best' if improved else ''}  ({rec['seconds']:.0f}s, {self.device.type}, "
+                          f"{self.precision})", flush=True)
+                    if improved:
+                        best_mse, bad, self.best_epoch = mse, 0, rec["epoch"]
+                        best_state = {k: v.detach().to("cpu", copy=True) for k, v in self.model.state_dict().items()}
+                    else:
+                        bad += 1
+                        stop = bad >= c["patience"]
                 self.history.append(rec)
-                continue
-            mse = float(np.mean((self._gains(val_ids) - val_y) ** 2))
-            rec["val_advantage_mse"] = mse
-            self.history.append(rec)
-            print(f"    epoch {epoch}: train loss {rec['train_loss']:.4f}  val advantage MSE {mse:.5f}  "
-                  f"({rec['epoch_train_seconds']:.0f}s, {self.device.type})", flush=True)
-            if mse < best_mse - 1e-12:
-                best_mse, bad, self.best_epoch = mse, 0, epoch
-                best_state = {k: v.detach().to("cpu", copy=True) for k, v in self.model.state_dict().items()}
-            else:
-                bad += 1
-                if bad >= c["patience"]:
+                if stop:
                     break
+            if stop:
+                break
         if best_state is not None:
             self.model.load_state_dict(best_state)
         else:
-            self.best_epoch = len(self.history)
+            self.best_epoch = self.history[-1]["epoch"] if self.history else None
         self.model.eval()
         self.fit_seconds = time.perf_counter() - t0
         return self
@@ -260,10 +324,10 @@ class EncoderRouter(Router):
     # ---- optional hooks -----------------------------------------------------------------
     def extra_info(self) -> dict:
         import torch
-        dev = getattr(self, "device", None)
+        dev = self.device
         gpu = torch.cuda.get_device_name(0) if dev is not None and dev.type == "cuda" else None
         return dict(history=self.history, best_epoch=self.best_epoch, device=dev.type if dev else None, gpu=gpu,
-                    precision=self.precision if dev else None, truncation_rate_fit=self.truncation_rate_fit,
+                    precision=self.precision, truncation_rate_fit=self.truncation_rate_fit,
                     oom_splits=self.oom_splits, full_config=dict(self.config))
 
     def save(self, path) -> None:
@@ -273,12 +337,11 @@ class EncoderRouter(Router):
         (path / "router_info.json").write_text(json.dumps(self.extra_info(), indent=2))
 
     def release(self) -> None:
-        dev = getattr(self, "device", None)
+        dev = self.device
         self.model = None
         if dev is not None:
             _empty_cache(dev)
 
 
-# The declared search: learning rate only (docs/PROTOCOL.md, section 5). Fixed before the first
-# full run; do not change after results have been seen.
+# Learning rates to try: the usual low / high pair for fine-tuning BERT-style models.
 ENCODER_GRID = [dict(lr=2e-5), dict(lr=5e-5)]
