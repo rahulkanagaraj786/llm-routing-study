@@ -11,10 +11,10 @@ tuned on the validation split and frozen. Full tables and figures per model are 
 | Model | Owner | RQ1 test |
 |---|---|---|
 | Regularized logistic regression | Rahul | run on 2026-11-16, below |
-| Gradient boosting | Pravalhika Kurapati | pending |
+| Gradient boosting | Pravalhika Kurapati | run on 2026-11-19, below |
 | Fine-tuned text encoder (ModernBERT-base) | Priyanka | run on 2026-11-18, below |
 
-A side-by-side comparison of the two tested models is at the end of this page.
+A side-by-side comparison of the three models is at the end of this page.
 
 The final model is named from the development results of all three
 (`docs/DEV_RESULTS.md`), not from the numbers on this page.
@@ -152,6 +152,127 @@ effectively the same. Serving costs (an always-on machine, added delay) were not
   6 points of loss; beyond that, less.
 - Development and test agree: the development run predicted 6.4% at 1.08 points.
 
+## Gradient boosting
+
+Trained on 6,216 questions, cutoffs tuned on 2,091 validation questions. Settings from the
+development run: max_depth = 3, learning_rate = 0.05, without the simple prompt statistics.
+Same TF-IDF features as logistic regression. The head is a three-class gradient boosting
+classifier; gain is P(+1) − P(−1).
+
+All five accuracy limits (0, 1, 2, 3 and 5 points) were set before this model's test.
+
+### Headline
+
+| Policy | Accuracy | Recorded cost | Bill saved (95% CI) | Accuracy lost, pp (95% CI) | Sent to Flash |
+|---|---:|---:|---:|---:|---:|
+| Always GPT-5 | 61.84% | $61.30 | 0% | 0 | 0% |
+| Router, tuned for 0 pp | 61.70% | $60.87 | 0.7% (0.5 to 0.9) | 0.15 (−0.1 to 0.4) | 3.8% |
+| **Router, tuned for 1 pp** | **60.73%** | **$59.34** | **3.2% (2.2 to 4.2)** | **1.12 (0.5 to 1.7)** | **15.2%** |
+| Router, tuned for 2 pp | 59.90% | $56.27 | 8.2% (6.7 to 9.9) | 1.94 (1.2 to 2.7) | 29.1% |
+| Router, tuned for 3 pp | 59.47% | $54.71 | 10.7% (9.0 to 12.7) | 2.38 (1.5 to 3.3) | 33.1% |
+| Router, tuned for 5 pp | 56.94% | $45.70 | 25.4% (22.3 to 29.0) | 4.90 (3.6 to 6.2) | 50.5% |
+| Always Flash | 45.87% | $14.85 | 75.8% | 15.97 | 100% |
+
+![Trade-off on the locked test](../results/final/gbm/report/fig1_rq1_tradeoff.png)
+
+### Did the accuracy target hold?
+
+| Tuned for | Loss on validation | Loss on test |
+|---|---:|---:|
+| 0 pp | 0.00 | 0.15 |
+| 1 pp | 0.96 | 1.12 |
+| 2 pp | 1.96 | 1.94 |
+| 3 pp | 2.97 | 2.38 |
+| 5 pp | 4.97 | 4.90 |
+
+The targets held closely at 1, 2 and 5 points. At 0 points the test lost a little; at 3
+points the test lost less than the target.
+
+![Target versus actual](../results/final/gbm/report/fig3_allowance_check.png)
+
+### Where the saving comes from (1 pp target)
+
+| Benchmark | Questions | GPT-5 right | Flash right | Sent to Flash | Bill saved | Accuracy lost, pp |
+|---|---:|---:|---:|---:|---:|---:|
+| SimpleQA | 856 | 50.0% | 31.1% | 0.2% | 0.3% | 0.12 |
+| MMLU-Pro | 599 | 87.6% | 81.3% | 50.8% | 29.3% | 3.34 |
+| HLE | 319 | 23.8% | 6.3% | 0.6% | 0.2% | 0.31 |
+| LiveCodeBench | 211 | 85.8% | 58.3% | 0.9% | 0.1% | 0.00 |
+| GPQA | 40 | 87.5% | 65.0% | 2.5% | 0.2% | 0.00 |
+| LiveMathBench | 24 | 83.3% | 66.7% | 8.3% | −11.9% | 4.17 |
+| AIME | 11 | 81.8% | 63.6% | 0.0% | 0.0% | 0.00 |
+| Equal-benchmark average | | | | | 2.6% | 1.13 |
+
+![By benchmark](../results/final/gbm/report/fig2_rq1_by_benchmark.png)
+
+Almost all of the saving comes from MMLU-Pro, as with logistic regression. The router
+sends about half of MMLU-Pro to Flash and almost nothing from SimpleQA, HLE, coding or
+AIME. (The negative saving on LiveMathBench is two questions.)
+
+### How much does each point of accuracy buy?
+
+| Policy | Bill saved per point of accuracy lost |
+|---|---:|
+| Router, tuned for 1 pp | 2.9% |
+| Router, tuned for 2 pp | 4.2% |
+| Router, tuned for 3 pp | 4.5% |
+| Router, tuned for 5 pp | 5.2% |
+| Always Flash | 4.7% |
+
+At the main 1-point target the router buys less saving per point than always using Flash
+(2.9% against 4.7%). At the looser limits it catches up and slightly beats Flash at 5
+points.
+
+### Is the router more than benchmark recognition?
+
+Shuffling the router's choices inside each benchmark, keeping the number sent to Flash
+(2,000 shuffles):
+
+| Tuned for | Router: saved / lost | Shuffled: saved / lost (95% range of loss) | Router's accuracy advantage | Shuffles at least as accurate |
+|---|---|---|---:|---:|
+| 1 pp | 3.2% / 1.12 pp | 4.7% / 1.02 pp (0.58 to 1.41) | −0.09 pp | 72.2% |
+| 2 pp | 8.2% / 1.94 pp | 11.0% / 2.24 pp (1.84 to 2.62) | +0.29 pp | 9.4% |
+| 3 pp | 10.7% / 2.38 pp | 14.1% / 2.83 pp (2.38 to 3.30) | +0.45 pp | 2.5% |
+| 5 pp | 25.4% / 4.90 pp | 30.2% / 6.09 pp (5.29 to 6.94) | +1.19 pp | 0.4% |
+
+At the 1-point target the router is not more accurate than policies with the same
+per-benchmark routing rates: most shuffles do as well or better. From 2 points on it does
+pick better individual questions, and the advantage grows as more are sent to Flash. As
+with the other models, the shuffles save more money because they send more expensive
+questions to Flash.
+
+### If the workload had more coding
+
+| Coding share | Saved / lost at 1 pp target | Saved / lost at 5 pp target |
+|---|---:|---:|
+| 10% | 3.2% / 1.12 | 25.5% / 4.91 |
+| 25% | 2.4% / 0.93 | 20.1% / 4.41 |
+| 50% | 1.4% / 0.62 | 13.5% / 3.57 |
+
+### Sensitivity checks
+
+| Check | Bill saved (1 pp target) | Accuracy lost, pp |
+|---|---:|---:|
+| Main result | 3.2% | 1.12 |
+| HLE with repaired costs (2,167 questions) | 2.8% | 1.06 |
+| Costs at list prices | 3.2% | 1.12 |
+
+### Router overhead
+
+Fitting took 2.3 seconds and prediction about 0.07 ms per question on a laptop CPU. That is
+negligible next to an average GPT-5 call, so gross and net savings are effectively the same.
+
+### Summary for gradient boosting
+
+- Tuned for a 1-point loss, the router cut the bill by 3.2% and lost 1.12 points.
+- Tuned for 2 points: 8.2% saved for 1.94 points. 3 points: 10.7% for 2.38. 5 points:
+  25.4% for 4.90.
+- The accuracy targets held closely on the test at 1, 2 and 5 points.
+- The saving comes almost entirely from sending MMLU-Pro to Flash.
+- At the main 1-point target it is not clearly better than benchmark-level routing rates.
+- Development predicted 4.7% at 1.12 points; the test matched the loss but saved less
+  (3.2%).
+
 ## Fine-tuned text encoder (ModernBERT-base)
 
 ModernBERT-base with a three-class head, fine-tuned end to end (`src/router/encoder.py`).
@@ -269,35 +390,34 @@ record the GPU). The model weights are about 600 MB.
 - It sends questions from both SimpleQA and MMLU-Pro to Flash, and keeps coding and HLE on
   GPT-5.
 
-## Logistic regression versus the text encoder
+## Comparing the three models
 
-| Tuned for | Logistic: saved / lost | Encoder: saved / lost |
-|---|---|---|
-| 0 pp | 0.1% / 0.05 pp | 2.6% / 0.29 pp |
-| **1 pp** | **5.7% / 1.17 pp** | **4.9% / 1.26 pp** |
-| 2 pp | 10.3% / 1.99 pp | 12.9% / 2.96 pp |
-| 3 pp | 16.1% / 3.20 pp | 20.1% / 4.03 pp |
-| 5 pp | 25.8% / 5.10 pp | 28.0% / 6.31 pp |
-| Saved per point lost (1 to 5 pp) | 4.9% to 5.2% | 3.9% to 5.0% |
-| Mean validation error (development) | 0.2215 | 0.2215 |
-| Fitting | 3.6 s on a laptop CPU | 8.0 min on a T4 GPU |
+| Tuned for | Logistic: saved / lost | GBM: saved / lost | Encoder: saved / lost |
+|---|---|---|---|
+| 0 pp | 0.1% / 0.05 pp | 0.7% / 0.15 pp | 2.6% / 0.29 pp |
+| **1 pp** | **5.7% / 1.17 pp** | **3.2% / 1.12 pp** | **4.9% / 1.26 pp** |
+| 2 pp | 10.3% / 1.99 pp | 8.2% / 1.94 pp | 12.9% / 2.96 pp |
+| 3 pp | 16.1% / 3.20 pp | 10.7% / 2.38 pp | 20.1% / 4.03 pp |
+| 5 pp | 25.8% / 5.10 pp | 25.4% / 4.90 pp | 28.0% / 6.31 pp |
+| Saved per point lost (1 to 5 pp) | 4.9% to 5.2% | 2.9% to 5.2% | 3.9% to 5.0% |
+| Fitting | 3.6 s on a laptop CPU | 2.3 s on a laptop CPU | 8.0 min on a T4 GPU |
 
-- At the main 1-point target the two are close, with logistic regression slightly ahead
-  (more saved, less lost). Their intervals overlap.
-- At the looser targets the encoder saves more, but only by sending more questions to
-  Flash, and it loses correspondingly more accuracy: it overshoots each target by about a
-  point. Per point of accuracy given up, logistic regression buys more saving.
-- On the development data their average error is the same.
-- Logistic regression is far simpler and cheaper to train and run.
+- At the main 1-point target logistic regression saves the most (5.7%), then the encoder
+  (4.9%), then gradient boosting (3.2%). Losses are close (about 1.1 to 1.3 points).
+- Gradient boosting holds its accuracy targets more tightly than the encoder, which
+  overshoots on the test at every limit.
+- At the looser targets the encoder saves the most, but by sending more to Flash and
+  losing more accuracy. Per point of accuracy given up, logistic regression still buys
+  more saving at the primary target.
+- Logistic regression and gradient boosting both train in a few seconds on a laptop CPU;
+  the encoder needs a GPU and minutes.
 
-On these results the fine-tuned ModernBERT matches but does not beat the TF-IDF logistic
-regression. The final model is still named from the development results
-(`docs/DEV_RESULTS.md`), not from this page.
+The final model is still named from the development results (`docs/DEV_RESULTS.md`), not
+from this page.
 
 ## What these results do not cover
 
-- Two models of three. Gradient boosting has not been tested, and the choice of final
-  model is pending.
+- The choice of final model from the three development runs is still pending.
 - These benchmarks in this mix. The workload tables show the saving depends on the mix.
 - Intervals reflect which test questions were drawn, not refitting or re-tuning. The
   encoder was trained with one seed; its variation across seeds was not measured.

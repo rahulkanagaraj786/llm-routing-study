@@ -220,6 +220,6 @@ RQ2 pipeline's development run (`results/rq2_dev_selection/`, written up in
 
 ## Not done
 
-- Logistic regression and the text encoder have since been evaluated on the locked test
-  split (`docs/RQ1_RESULTS.md`). Gradient boosting has not been tested.
+- All three models have since been evaluated on the locked test split
+  (`docs/RQ1_RESULTS.md`).
 - The selection rule has not yet been applied with all three models' development results.
