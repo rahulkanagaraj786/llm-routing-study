@@ -12,7 +12,9 @@ tuned on the validation split and frozen. Full tables and figures per model are 
 |---|---|---|
 | Regularized logistic regression | Rahul | run on 2026-11-16, below |
 | Gradient boosting | to be assigned | pending |
-| Fine-tuned text encoder | to be assigned | pending |
+| Fine-tuned text encoder (ModernBERT-base) | Priyanka | run on 2026-11-18, below |
+
+A side-by-side comparison of the two tested models is at the end of this page.
 
 The final model is named from the development results of all three
 (`docs/DEV_RESULTS.md`), not from the numbers on this page.
@@ -150,10 +152,154 @@ effectively the same. Serving costs (an always-on machine, added delay) were not
   6 points of loss; beyond that, less.
 - Development and test agree: the development run predicted 6.4% at 1.08 points.
 
-### What this result does not cover
+## Fine-tuned text encoder (ModernBERT-base)
 
-- One model only. The other two models' results, and the choice of final model, are pending.
-- These benchmarks in this mix. The workload table shows the saving depends on the mix.
-- Intervals reflect which test questions were drawn, not refitting or re-tuning.
+ModernBERT-base with a three-class head, fine-tuned end to end (`src/router/encoder.py`).
+Trained on 6,216 questions, cutoffs tuned on 2,091 validation questions. Settings from the
+development run: learning rate 2e-5 (chosen over 5e-5). Prompts up to 1,024 tokens, batches
+of 16, up to 3 epochs with early stopping on the validation questions, fp16 mixed precision,
+seed 221. Trained on a Google Colab Tesla T4 GPU.
+
+All five accuracy limits (0, 1, 2, 3 and 5 points) were set before this model's test.
+
+### Headline
+
+| Policy | Accuracy | Recorded cost | Bill saved (95% CI) | Accuracy lost, pp (95% CI) | Sent to Flash |
+|---|---:|---:|---:|---:|---:|
+| Always GPT-5 | 61.84% | $61.30 | 0% | 0 | 0% |
+| Router, tuned for 0 pp | 61.55% | $59.72 | 2.6% (2.0 to 3.3) | 0.29 (−0.2 to 0.7) | 7.6% |
+| **Router, tuned for 1 pp** | **60.58%** | **$58.28** | **4.9% (3.8 to 6.1)** | **1.26 (0.6 to 2.0)** | **17.6%** |
+| Router, tuned for 2 pp | 58.88% | $53.39 | 12.9% (10.9 to 15.0) | 2.96 (1.9 to 4.1) | 36.2% |
+| Router, tuned for 3 pp | 57.82% | $49.00 | 20.1% (17.5 to 22.7) | 4.03 (2.7 to 5.3) | 48.1% |
+| Router, tuned for 5 pp | 55.53% | $44.13 | 28.0% (24.8 to 31.4) | 6.31 (4.8 to 7.8) | 59.4% |
+| Always Flash | 45.87% | $14.85 | 75.8% | 15.97 | 100% |
+
+![Trade-off on the locked test](../results/final/encoder/report/fig1_rq1_tradeoff.png)
+
+### Did the accuracy target hold?
+
+| Tuned for | Loss on validation | Loss on test |
+|---|---:|---:|
+| 0 pp | 0.00 | 0.29 |
+| 1 pp | 0.96 | 1.26 |
+| 2 pp | 1.96 | 2.96 |
+| 3 pp | 2.97 | 4.03 |
+| 5 pp | 4.97 | 6.31 |
+
+The cutoffs hit their targets on validation but overshot on the test at every limit, by
+about 0.3 points at 0 and 1 point and by about 1 to 1.3 points at 2, 3 and 5 points.
+
+![Target versus actual](../results/final/encoder/report/fig3_allowance_check.png)
+
+### Where the saving comes from (1 pp target)
+
+| Benchmark | Questions | GPT-5 right | Flash right | Sent to Flash | Bill saved | Accuracy lost, pp |
+|---|---:|---:|---:|---:|---:|---:|
+| SimpleQA | 856 | 50.0% | 31.1% | 14.5% | 18.0% | 0.93 |
+| MMLU-Pro | 599 | 87.6% | 81.3% | 39.4% | 16.8% | 2.84 |
+| HLE | 319 | 23.8% | 6.3% | 0.0% | 0.0% | 0.00 |
+| LiveCodeBench | 211 | 85.8% | 58.3% | 0.0% | 0.0% | 0.00 |
+| GPQA | 40 | 87.5% | 65.0% | 2.5% | 3.8% | 0.00 |
+| LiveMathBench | 24 | 83.3% | 66.7% | 4.2% | −12.2% | 4.17 |
+| AIME | 11 | 81.8% | 63.6% | 0.0% | 0.0% | 0.00 |
+| Equal-benchmark average | | | | | 3.8% | 1.13 |
+
+![By benchmark](../results/final/encoder/report/fig2_rq1_by_benchmark.png)
+
+Unlike logistic regression, the encoder splits its savings between SimpleQA and MMLU-Pro.
+It keeps all of HLE, coding and AIME on GPT-5. (The negative saving on LiveMathBench is one
+question, which happened to cost more on Flash than on GPT-5.)
+
+### How much does each point of accuracy buy?
+
+| Policy | Bill saved per point of accuracy lost |
+|---|---:|
+| Router, tuned for 1 pp | 3.9% |
+| Router, tuned for 2 pp | 4.4% |
+| Router, tuned for 3 pp | 5.0% |
+| Router, tuned for 5 pp | 4.4% |
+| Always Flash | 4.7% |
+
+Per point of accuracy given up, the encoder saves about as much as always using Flash does,
+and less than that at the 1, 2 and 5 point limits.
+
+### Is the router more than benchmark recognition?
+
+Shuffling the router's choices inside each benchmark, keeping the number sent to Flash
+(2,000 shuffles):
+
+| Tuned for | Router: saved / lost | Shuffled: saved / lost (95% range of loss) | Router's accuracy advantage | Shuffles at least as accurate |
+|---|---|---|---:|---:|
+| 1 pp | 4.9% / 1.26 pp | 5.9% / 1.89 pp (1.21 to 2.57) | +0.63 pp | 4.0% |
+| 2 pp | 12.9% / 2.96 pp | 14.4% / 3.92 pp (3.16 to 4.71) | +0.96 pp | 1.1% |
+| 3 pp | 20.1% / 4.03 pp | 24.3% / 5.76 pp (4.85 to 6.60) | +1.73 pp | 0.0% |
+| 5 pp | 28.0% / 6.31 pp | 34.1% / 7.71 pp (6.84 to 8.64) | +1.40 pp | 0.1% |
+
+As with logistic regression, the encoder picks better individual questions than policies
+with the same per-benchmark routing rates.
+
+### If the workload had more coding
+
+| Coding share | Saved / lost at 1 pp target | Saved / lost at 5 pp target |
+|---|---:|---:|
+| 10% | 5.0% / 1.27 | 28.1% / 6.33 |
+| 25% | 3.6% / 1.05 | 21.0% / 5.43 |
+| 50% | 2.0% / 0.70 | 12.2% / 3.94 |
+
+### Sensitivity checks
+
+| Check | Bill saved (1 pp target) | Accuracy lost, pp |
+|---|---:|---:|
+| Main result | 4.9% | 1.26 |
+| HLE with repaired costs (2,167 questions) | 4.3% | 1.20 |
+| Costs at list prices | 4.9% | 1.26 |
+
+### Router overhead
+
+Fitting took 8.0 minutes and prediction about 6.3 ms per question on a Tesla T4 GPU (the
+report's hardware column shows the host CPU, because the final-evaluation script does not
+record the GPU). The model weights are about 600 MB.
+
+### Summary for the text encoder
+
+- Tuned for a 1-point loss, the router cut the bill by 4.9% and lost 1.26 points.
+- Tuned for 2 points: 12.9% saved for 2.96 points. 3 points: 20.1% for 4.03. 5 points:
+  28.0% for 6.31.
+- It overshot every accuracy target on the test, by more than logistic regression did.
+- It sends questions from both SimpleQA and MMLU-Pro to Flash, and keeps coding and HLE on
+  GPT-5.
+
+## Logistic regression versus the text encoder
+
+| Tuned for | Logistic: saved / lost | Encoder: saved / lost |
+|---|---|---|
+| 0 pp | 0.1% / 0.05 pp | 2.6% / 0.29 pp |
+| **1 pp** | **5.7% / 1.17 pp** | **4.9% / 1.26 pp** |
+| 2 pp | 10.3% / 1.99 pp | 12.9% / 2.96 pp |
+| 3 pp | 16.1% / 3.20 pp | 20.1% / 4.03 pp |
+| 5 pp | 25.8% / 5.10 pp | 28.0% / 6.31 pp |
+| Saved per point lost (1 to 5 pp) | 4.9% to 5.2% | 3.9% to 5.0% |
+| Mean validation error (development) | 0.2215 | 0.2215 |
+| Fitting | 3.6 s on a laptop CPU | 8.0 min on a T4 GPU |
+
+- At the main 1-point target the two are close, with logistic regression slightly ahead
+  (more saved, less lost). Their intervals overlap.
+- At the looser targets the encoder saves more, but only by sending more questions to
+  Flash, and it loses correspondingly more accuracy: it overshoots each target by about a
+  point. Per point of accuracy given up, logistic regression buys more saving.
+- On the development data their average error is the same.
+- Logistic regression is far simpler and cheaper to train and run.
+
+On these results the fine-tuned ModernBERT matches but does not beat the TF-IDF logistic
+regression. The final model is still named from the development results
+(`docs/DEV_RESULTS.md`), not from this page.
+
+## What these results do not cover
+
+- Two models of three. Gradient boosting has not been tested, and the choice of final
+  model is pending.
+- These benchmarks in this mix. The workload tables show the saving depends on the mix.
+- Intervals reflect which test questions were drawn, not refitting or re-tuning. The
+  encoder was trained with one seed; its variation across seeds was not measured.
 - The test questions were held out from all model fitting, tuning and selection. The
   earlier pilot and the data audit did touch them in aggregate.
