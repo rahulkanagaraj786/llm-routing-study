@@ -6,6 +6,8 @@ __pycache__/
 # large or reproducible data
 data/raw/
 data/processed/*.gz
+data/processed/paired_v2.jsonl
+data/processed/paired_v2_provenance.json
 
 # fitted models
 results/**/model/
