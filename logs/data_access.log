@@ -128,3 +128,8 @@
 2026-11-17T01:37:48	guard_test	source_pool_dev_filtered	5640
 2026-11-17T01:37:49	guard_test	selection_pool_dev_unfiltered	6011
 2026-11-17T01:37:51	guard_test	rq1_dev_all_benchmarks	8307
+2026-11-19T13:23:44	guard_test	splits=train,val;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	5640
+2026-11-19T13:23:45	guard_test	source_pool_dev_filtered	5640
+2026-11-19T13:23:46	guard_test	selection_pool_dev_unfiltered	6011
+2026-11-19T13:23:48	guard_test	rq1_dev_all_benchmarks	8307
+2026-11-19T13:24:55	check: refit gbm on train, cutoffs on val, to verify committed RQ1 cutoffs	rq1_dev_all_benchmarks	8307

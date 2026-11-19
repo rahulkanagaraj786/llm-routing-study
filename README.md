@@ -21,9 +21,9 @@ repository.
 | Split manifest, locked test split, sealed held-out benchmarks | done, frozen |
 | Shared pipeline: loader, cutoff tuning, evaluation, reports | done |
 | Logistic regression (reference model) | development run and RQ1 test done (`docs/RQ1_RESULTS.md`) |
-| Gradient boosting (Pravalhika) | development run done; RQ1 test not run yet |
+| Gradient boosting (Pravalhika) | development run and RQ1 test done |
 | Fine-tuned text encoder, ModernBERT-base (Priyanka) | development run and RQ1 test done, on a Colab T4 GPU |
-| Final evaluation, RQ1 | logistic regression and the encoder tested; gradient boosting pending |
+| Final evaluation, RQ1 | all three models tested once; primary model not yet named |
 | RQ2 | design on hold; separate pipeline in `rq2/`, disabled until the team agrees the experiments |
 
 Read in this order:
