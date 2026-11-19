@@ -7,10 +7,12 @@ Settings fixed in advance (docs/PROTOCOL.md, section 5). Only the learning rate 
 everything else is a constructor default and is recorded with every result:
   - answerdotai/ModernBERT-base at a pinned revision; prompts truncated to 1,024 tokens
   - AdamW, weight decay 0.01, 10% linear warm-up then linear decay, gradient clipping at 1.0
-  - batches of 16 prompts, padded to the longest prompt in the batch
+  - batches of 16 prompts of similar length (length-grouped, batch order shuffled), padded to
+    the longest prompt in the batch
   - at most 3 epochs; early stopping on the validation questions passed to fit() (patience 1),
     keeping the weights of the best epoch
-  - bf16 mixed precision on a CUDA GPU that supports it, fp32 elsewhere; seed 221
+  - bf16 mixed precision on a CUDA GPU with native bf16 (A100, L4, ...), fp32 elsewhere
+    (including the T4, which only emulates bf16); seed 221
 
 Device: CUDA if available, then Apple MPS, then CPU. A batch that runs out of GPU memory is
 split in half (gradients are accumulated, so the update is the same) and the split is counted.
@@ -47,6 +49,32 @@ def _is_oom(err: BaseException) -> bool:
     return isinstance(err, torch.OutOfMemoryError) or "out of memory" in str(err).lower()
 
 
+def _native_bf16() -> bool:
+    """True only on GPUs with real bf16 support (Ampere or newer: A100, L4, H100...). On older
+    cards such as the T4, torch reports bf16 as available but emulates it slowly; use fp32 there."""
+    import torch
+    try:
+        return bool(torch.cuda.is_bf16_supported(including_emulation=False))
+    except TypeError:  # older torch without the argument
+        return torch.cuda.get_device_capability()[0] >= 8
+
+
+def length_grouped_batches(lengths, batch_size: int, rng, mega: int = 50) -> list[np.ndarray]:
+    """Shuffle, cut into chunks of `mega` batches, sort each chunk by length, split it into
+    batches, then shuffle the batch order. Batches hold prompts of similar length, so little
+    compute goes to padding, while which prompts meet and the batch order stay random.
+    (The same idea as `group_by_length` in Hugging Face's Trainer.)"""
+    perm = rng.permutation(len(lengths))
+    lengths = np.asarray(lengths)
+    batches = []
+    step = batch_size * mega
+    for s in range(0, len(perm), step):
+        chunk = perm[s: s + step]
+        chunk = chunk[np.argsort(-lengths[chunk], kind="stable")]
+        batches += [chunk[i: i + batch_size] for i in range(0, len(chunk), batch_size)]
+    return [batches[i] for i in rng.permutation(len(batches))]
+
+
 def _empty_cache(device) -> None:
     import torch
     gc.collect()
@@ -61,10 +89,11 @@ class EncoderRouter(Router):
 
     def __init__(self, lr: float = 2e-5, max_length: int = 1024, batch_size: int = 16, max_epochs: int = 3,
                  patience: int = 1, weight_decay: float = 0.01, warmup_frac: float = 0.1, max_grad_norm: float = 1.0,
-                 bf16: bool = True, model_name: str = MODEL_NAME, revision: str = MODEL_REVISION):
+                 bf16: bool = True, group_by_length: bool = True, model_name: str = MODEL_NAME,
+                 revision: str = MODEL_REVISION):
         super().__init__(lr=lr, max_length=max_length, batch_size=batch_size, max_epochs=max_epochs, patience=patience,
                          weight_decay=weight_decay, warmup_frac=warmup_frac, max_grad_norm=max_grad_norm, bf16=bf16,
-                         model_name=model_name, revision=revision)
+                         group_by_length=group_by_length, model_name=model_name, revision=revision)
         self.model = None
         self.tokenizer = None
         self.history: list[dict] = []
@@ -75,14 +104,13 @@ class EncoderRouter(Router):
     # ---- helpers ------------------------------------------------------------------------
     def _autocast(self):
         import torch
-        if self.device.type == "cuda" and self.config["bf16"] and torch.cuda.is_bf16_supported():
+        if self.precision == "bf16-mixed":
             return torch.autocast("cuda", dtype=torch.bfloat16)
         return contextlib.nullcontext()
 
     @property
     def precision(self) -> str:
-        import torch
-        if self.device.type == "cuda" and self.config["bf16"] and torch.cuda.is_bf16_supported():
+        if self.device.type == "cuda" and self.config["bf16"] and _native_bf16():
             return "bf16-mixed"
         return "fp32"
 
@@ -168,7 +196,16 @@ class EncoderRouter(Router):
         val_y = np.asarray(val_y, dtype=float) if val_ids is not None else None
 
         bs = c["batch_size"]
-        steps_per_epoch = int(np.ceil(len(ids) / bs))
+        lengths = [len(x) for x in ids]
+
+        def epoch_batches(epoch):
+            rng = np.random.default_rng(SEED + epoch)
+            if c["group_by_length"]:
+                return length_grouped_batches(lengths, bs, rng)
+            perm = rng.permutation(len(ids))
+            return [perm[i: i + bs] for i in range(0, len(perm), bs)]
+
+        steps_per_epoch = len(epoch_batches(1))  # the same for every epoch
         total = steps_per_epoch * c["max_epochs"]
         warm = max(1, int(round(c["warmup_frac"] * total)))
         decay, no_decay = [], []
@@ -183,17 +220,17 @@ class EncoderRouter(Router):
         for epoch in range(1, c["max_epochs"] + 1):
             te = time.perf_counter()
             self.model.train()
-            perm = np.random.default_rng(SEED + epoch).permutation(len(ids))
-            loss_sum = 0.0
-            for b in range(steps_per_epoch):
-                idx = perm[b * bs: (b + 1) * bs]
+            loss_sum, padded = 0.0, 0
+            for idx in epoch_batches(epoch):
+                padded += len(idx) * max(lengths[i] for i in idx)
                 opt.zero_grad(set_to_none=True)
                 loss_sum += self._train_step([ids[i] for i in idx], [labels[i] for i in idx], len(idx))
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), c["max_grad_norm"])
                 opt.step()
                 sched.step()
             rec = dict(epoch=epoch, train_loss=loss_sum / len(ids), epoch_train_seconds=time.perf_counter() - te,
-                       batches=steps_per_epoch, oom_splits=self.oom_splits)
+                       batches=steps_per_epoch, oom_splits=self.oom_splits,
+                       padding_fraction=1.0 - sum(lengths) / max(1, padded))
             if val_ids is None:
                 self.history.append(rec)
                 continue

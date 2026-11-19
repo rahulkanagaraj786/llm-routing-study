@@ -176,12 +176,14 @@ does not change it afterwards.
 Fixed settings of the text encoder (`src/router/encoder.py`), declared before its first run:
 `answerdotai/ModernBERT-base` at revision `8949b909ec900327062f0ebf497f51aef5e6f0c8`, encoder
 and three-class head fine-tuned together with cross-entropy, gain = P(+1) − P(−1). Prompts
-truncated to 1,024 tokens; batches of 16 prompts padded to the longest in the batch (a batch
-that runs out of GPU memory is split in half with gradients accumulated, so the update is the
-same); AdamW, weight decay 0.01 (none on biases and norms), 10% linear warm-up then linear
+truncated to 1,024 tokens; batches of 16 prompts grouped by length (shuffled, cut into
+chunks of 50 batches, sorted by length within a chunk, batch order shuffled), each padded to
+the longest in the batch (a batch that runs out of GPU memory is split in half with
+gradients accumulated, so the update is the same); AdamW, weight decay 0.01 (none on biases and norms), 10% linear warm-up then linear
 decay, gradient clipping at 1.0; at most 3 epochs with early stopping on the calibration fold
-(patience 1, best epoch kept); bf16 mixed precision on a CUDA GPU, fp32 elsewhere; seed 221,
-one seed. Run on the course GPU server (`msbc`). GPU kernels are not bit-for-bit
+(patience 1, best epoch kept); bf16 mixed precision on a CUDA GPU with native bf16 (A100,
+L4), fp32 elsewhere; seed 221, one seed. Run on a GPU: the course server (`msbc`) or Google
+Colab Pro; the GPU used is recorded with every result. GPU kernels are not bit-for-bit
 deterministic, so a rerun can differ slightly in the last digits.
 
 ## 6. Development comparison and algorithm selection
