@@ -41,7 +41,7 @@ def check(family: str) -> None:
         raise SystemExit(f"unknown model '{family}'. Known models: {', '.join(names())}")
     if FAMILIES[family]["cls"] is None:
         raise SystemExit(f"'{family}' has not been written yet. Its owner copies src/router/template_model.py, "
-                         "fills it in, and sets cls and grid for it in src/router/registry.py (see docs/TEAM_GUIDE.md).")
+                         "fills it in, and sets cls and grid for it in src/router/registry.py.")
 
 
 def make(family: str, config: dict):

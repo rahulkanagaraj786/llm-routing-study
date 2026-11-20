@@ -27,7 +27,6 @@ repository.
 | RQ2 | design on hold; separate pipeline in `rq2/`, disabled until the team agrees the experiments |
 
 Read in this order:
-0. `docs/TEAM_GUIDE.md`: if you are adding or running a model, start here.
 1. `docs/PROTOCOL.md`: the evaluation design, the selection rule, and every change to it.
 2. `docs/DATA_AUDIT.md`: what the data is and its known problems.
 3. `docs/DEV_RESULTS.md`: development results of all three models.

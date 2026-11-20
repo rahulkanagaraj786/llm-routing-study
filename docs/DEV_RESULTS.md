@@ -8,8 +8,7 @@ are development estimates, not final results. The locked test results are in
 
 Source files: `results/dev_selection/<model>/`, `results/dev_selection/selection.json`,
 `results/dev_selection/diagnostics.json`, `results/dev_selection/dev_tradeoff.png`.
-Procedure: `docs/PROTOCOL.md` section 6. How to produce these for another model:
-`docs/TEAM_GUIDE.md`.
+Procedure: `docs/PROTOCOL.md` section 6. Commands: `README.md`, "Running a model".
 
 ## Status of the three models
 

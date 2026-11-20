@@ -1,7 +1,9 @@
 """Skeleton for a new router model. Copy this file, rename it, and fill in the two methods.
 
 Worked example to read first: LogisticRouter in models.py.
-Full instructions: docs/TEAM_GUIDE.md.
+Rules for the model: use only the question text (no scores, costs, answers or benchmark
+names); fit all preprocessing on the questions passed to fit(); use val_prompts and val_y
+only for early stopping; fix the random seed. How to run it: README.md, "Running a model".
 
 Steps:
   1. Copy this file, e.g. to src/router/gbm.py, and rename the class.
