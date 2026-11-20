@@ -187,8 +187,9 @@ All five accuracy limits (0, 1, 2, 3 and 5 points) were set before this model's 
 | 3 pp | 2.97 | 2.38 |
 | 5 pp | 4.97 | 4.90 |
 
-The targets held closely at 1, 2 and 5 points. At 0 points the test lost a little; at 3
-points the test lost less than the target.
+The 2 and 5 point targets held (1.94 and 4.90). At 1 point the test lost slightly more
+than the target (1.12), and at 0 points a little (0.15). At 3 points it lost less than the
+target (2.38).
 
 ![Target versus actual](../results/final/gbm/report/fig3_allowance_check.png)
 
@@ -238,9 +239,10 @@ Shuffling the router's choices inside each benchmark, keeping the number sent to
 | 5 pp | 25.4% / 4.90 pp | 30.2% / 6.09 pp (5.29 to 6.94) | +1.19 pp | 0.4% |
 
 At the 1-point target the router is not more accurate than policies with the same
-per-benchmark routing rates: most shuffles do as well or better. From 2 points on it does
-pick better individual questions, and the advantage grows as more are sent to Flash. As
-with the other models, the shuffles save more money because they send more expensive
+per-benchmark routing rates: most shuffles do as well or better. From 3 points on it
+clearly picks better individual questions (2.5% and 0.4% of shuffles were as accurate at 3
+and 5 points), and the advantage grows as more are sent to Flash; at 2 points the evidence
+is weak (9.4%). As with the other models, the shuffles save more money because they send more expensive
 questions to Flash.
 
 ### If the workload had more coding
@@ -269,7 +271,8 @@ negligible next to an average GPT-5 call, so gross and net savings are effective
 - Tuned for a 1-point loss, the router cut the bill by 3.2% and lost 1.12 points.
 - Tuned for 2 points: 8.2% saved for 1.94 points. 3 points: 10.7% for 2.38. 5 points:
   25.4% for 4.90.
-- The accuracy targets held closely on the test at 1, 2 and 5 points.
+- On the test the 2 and 5 point targets held; the 1-point target was slightly exceeded
+  (1.12).
 - The saving comes almost entirely from sending MMLU-Pro to Flash.
 - At the main 1-point target it is not clearly better than benchmark-level routing rates.
 - Development predicted 4.7% at 1.12 points; the test matched the loss but saved less
