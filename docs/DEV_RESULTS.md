@@ -1,9 +1,10 @@
 # Development results (RQ1)
 
-Date: 2026-11-16. These come from the RQ1 development run: the train and validation
-questions of all seven benchmarks (8,307 questions), scored out of fold. No router from
-the revised protocol has been evaluated on the locked test split. These are development
-estimates, not final results.
+Dates: logistic regression 2026-11-16, gradient boosting and the text encoder 2026-11-18;
+selection applied 2026-11-20. These come from the RQ1 development run: the train and
+validation questions of all seven benchmarks (8,307 questions), scored out of fold. They
+are development estimates, not final results. The locked test results are in
+`docs/RQ1_RESULTS.md` and played no part in anything on this page.
 
 Source files: `results/dev_selection/<model>/`, `results/dev_selection/selection.json`,
 `results/dev_selection/diagnostics.json`, `results/dev_selection/dev_tradeoff.png`.
@@ -18,8 +19,8 @@ Procedure: `docs/PROTOCOL.md` section 6. How to produce these for another model:
 | Gradient boosting | Pravalhika Kurapati | done, below |
 | Fine-tuned text encoder (ModernBERT-base) | Priyanka | done, below |
 
-The final model is named from this table once all three have development results. Test
-results play no part in that choice.
+Selected model: **logistic regression**, named on 2026-11-20 from these development results
+only (see "Selection" below). Test results played no part in that choice.
 
 ## Baselines on the same questions
 
@@ -162,7 +163,7 @@ variability from refitting or from choosing cutoffs.
 7. **Provisional selection still prefers logistic.** Both models meet the development loss
    check. With the encoder deferred, GBM saves about 1.7 points less than logistic at 1 pp
    (90% CI about −2.3 to −1.2), so it does not replace logistic under the selection rule.
-   Final choice waits until the encoder has development results too.
+   The final choice, with the encoder included, is under "Selection" below.
 
 ### Retrospective view at equal loss
 
@@ -205,9 +206,70 @@ The mean calibration error is the same as logistic regression's (0.2215 against 
 four decimals). About 1% of training prompts were longer than 1,024 tokens and were
 truncated. Prediction takes about 6.6 ms per question on the T4.
 
-The out-of-fold savings and losses at each target, and the comparison with logistic
-regression under the selection rule, come from `scripts/06_select_algorithm.py`, which has
-not been run with the encoder yet.
+Cutoff tuned for a target on one fold, then applied to a fold the router never saw (from
+`results/dev_selection/selection.json`):
+
+| Target loss | Gross savings (95% CI) | Actual loss, pp (95% CI) | Sent to Flash |
+|---|---:|---:|---:|
+| 0 pp | 0.7% (0.5 to 0.9) | 0.00 (−0.12 to 0.12) | 1.8% |
+| **1 pp** | **6.7% (6.1 to 7.4)** | **1.23 (0.86 to 1.61)** | 22.2% |
+| 2 pp | 11.4% (10.5 to 12.4) | 2.17 (1.68 to 2.65) | 32.1% |
+| 3 pp | 16.5% (15.4 to 17.7) | 3.14 (2.60 to 3.71) | 40.7% |
+| 5 pp | 25.7% (24.1 to 27.4) | 4.85 (4.17 to 5.58) | 55.0% |
+
+All five targets were declared in advance for this model. Intervals are paired bootstraps
+over questions with decisions fixed. They do not include variability from refitting or
+from choosing cutoffs.
+
+### By benchmark at the 1 pp target
+
+| Benchmark | Questions | Sent to Flash | Gross savings | Accuracy loss, pp |
+|---|---:|---:|---:|---:|
+| SimpleQA | 3,459 | 10.2% | 11.6% | 0.90 |
+| MMLU-Pro | 2,394 | 61.1% | 33.7% | 2.76 |
+| HLE | 1,312 | 1.2% | 0.5% | 0.23 |
+| LiveCodeBench | 844 | 0.0% | 0.0% | 0.00 |
+| GPQA | 158 | 8.2% | 4.2% | 1.27 |
+| LiveMathBench | 93 | 3.2% | 1.3% | 0.00 |
+| AIME | 47 | 0.0% | 0.0% | 0.00 |
+
+### What this shows
+
+1. **About the same as logistic regression at the 1-point target.** 6.7% saved for 1.23
+   points lost, against logistic's 6.4% for 1.08. The savings difference is +0.27 points
+   (90% CI −0.36 to 0.88), so the two cannot be told apart on these questions.
+2. **The saving comes from MMLU-Pro and, unlike the other two models, also SimpleQA.** It
+   sends 61% of MMLU-Pro and 10% of SimpleQA to Flash, and keeps coding, AIME and almost all
+   of HLE with GPT-5.
+3. **It predicts about as well as the simpler models.** Out-of-fold advantage error 0.2215,
+   against 0.2221 for logistic regression and 0.2228 for gradient boosting.
+4. The within-benchmark shuffle, correlation and per-fold figures given for the other two
+   models were not computed for the encoder on development questions. Its shuffle check on
+   the test is in `docs/RQ1_RESULTS.md`.
+
+## Selection
+
+Applied on 2026-11-20 with `scripts/06_select_algorithm.py` (output
+`results/dev_selection/selection.json`), using the rule in `docs/PROTOCOL.md` section 6,
+which has not changed since 2026-11-16. Development results only (protocol log entry 19).
+
+| Model | Saved at 1 pp | Lost, pp | Qualifies (≤ 1.5 pp) | Savings minus logistic (90% CI) | Replaces logistic? |
+|---|---:|---:|---|---:|---|
+| Logistic regression | 6.42% | 1.08 | yes | | |
+| Gradient boosting | 4.73% | 1.12 | yes | −1.69 (−2.26 to −1.15) | no |
+| Text encoder | 6.69% | 1.23 | yes | +0.27 (−0.36 to 0.88) | no: under the 1.0-point minimum, interval includes zero |
+
+- **Selected: logistic regression** (C = 0.3, with the prompt statistics). It leads the
+  report; the other two models are reported alongside it.
+- **Highest savings without the parsimony guard: the text encoder** (6.69%). The protocol
+  requires it to be reported alongside the selected model.
+- The provisional selection with the encoder deferred gave the same answer.
+- Each model's test result records a hash of its development summary, taken when the test
+  ran. All three match the files used here, so no development result changed after any
+  test.
+
+For context only, not part of the rule: at the 3-point target the same rule would also keep
+logistic regression (gradient boosting saves 0.24 points more, the encoder 0.95 less).
 
 ## How this differs from earlier runs
 
@@ -220,6 +282,6 @@ RQ2 pipeline's development run (`results/rq2_dev_selection/`, written up in
 
 ## Not done
 
-- All three models have since been evaluated on the locked test split
-  (`docs/RQ1_RESULTS.md`).
-- The selection rule has not yet been applied with all three models' development results.
+- Development diagnostics (within-benchmark shuffle, correlation, per-fold range) for the
+  text encoder.
+- The text encoder was trained with one seed; its variation across seeds was not measured.
