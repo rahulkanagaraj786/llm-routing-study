@@ -240,7 +240,7 @@ from choosing cutoffs.
 2. **The saving comes from MMLU-Pro and, unlike the other two models, also SimpleQA.** It
    sends 61% of MMLU-Pro and 10% of SimpleQA to Flash, and keeps coding, AIME and almost all
    of HLE with GPT-5.
-3. **It predicts no better than the simpler models.** Out-of-fold advantage error 0.2215,
+3. **It predicts about as well as the simpler models.** Out-of-fold advantage error 0.2215,
    against 0.2221 for logistic regression and 0.2228 for gradient boosting.
 4. The within-benchmark shuffle, correlation and per-fold figures given for the other two
    models were not computed for the encoder on development questions. Its shuffle check on
