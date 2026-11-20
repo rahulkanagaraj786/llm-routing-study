@@ -44,7 +44,7 @@ src/router/models.py       shared text features; logistic regression (the refere
 src/router/template_model.py   skeleton to copy for a new model
 src/router/final.py        the shared "fit, freeze cutoffs, score" step
 rq2/                       separate pipeline for RQ2, on hold
-scripts/                   numbered in run order, 00 to 09
+scripts/                   numbered in run order, 00 to 11
 manifests/                 split manifest and its hashes
 results/audit              audit numbers, token lengths
 results/dev_selection      out-of-fold predictions, cutoffs, selection.json
@@ -95,6 +95,8 @@ python scripts/09_report_final.py <model>                # tables and figures
   cutoffs on the validation split, score the locked test split once.
 - `python scripts/06_select_algorithm.py` compares the models on development results and
   names the primary one.
+- `python scripts/11_dev_diagnostics.py` writes descriptive diagnostics for every model's
+  development run (`results/dev_selection/diagnostics.json`).
 
 ## Rules that keep the evaluation honest
 

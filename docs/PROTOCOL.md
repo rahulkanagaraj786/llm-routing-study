@@ -589,3 +589,16 @@ entry 19). RQ2 has not been run.
     primary model selected. How to run a model is in `README.md`; the rules for running and
     recording one are in section 7, and the rules for model code are in
     `src/router/template_model.py`. The guide remains in the repository history.
+
+22. 2026-11-20, development diagnostics saved as a script. The within-benchmark shuffle,
+    correlation, variance explained, per-rotation results and equal-loss view reported in
+    `docs/DEV_RESULTS.md` had been computed outside the repository (logistic regression's in
+    an earlier working session, gradient boosting's by its owner). They are now written by
+    `scripts/11_dev_diagnostics.py` for all three models, from the committed out-of-fold
+    predictions and the development rows only. Logistic regression's figures are reproduced
+    exactly. Gradient boosting's shuffle, correlation and per-rotation figures are
+    reproduced; under the definitions used for the other models its variance explained is
+    2.1% (was 2.2%) and its equal-loss savings at 0.5, 1.5 and 2 points are 2.3%, 6.6% and
+    9.0% (were 2.2%, 6.3% and 8.5%). The text encoder's figures are added. These figures are
+    descriptive and play no part in any choice. The script also records the outcome mix and
+    each benchmark's share of the GPT-5 bill, which explain why the savings are small.
