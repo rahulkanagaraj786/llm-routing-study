@@ -87,6 +87,8 @@ python scripts/09_report_final.py <model>                # tables and figures
   the locked test split once.
 - `python scripts/06_select_algorithm.py` compares the models on development results and
   names the primary one.
+- `python scripts/11_dev_diagnostics.py` writes descriptive diagnostics for every model's
+  development run (`results/dev_selection/diagnostics.json`).
 
 ## Rules that keep the evaluation honest
 

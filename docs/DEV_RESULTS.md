@@ -7,7 +7,8 @@ are development estimates, not final results. The locked test results are in
 `docs/RQ1_RESULTS.md` and played no part in anything on this page.
 
 Source files: `results/dev_selection/<model>/`, `results/dev_selection/selection.json`,
-`results/dev_selection/diagnostics.json`, `results/dev_selection/dev_tradeoff.png`.
+`results/dev_selection/diagnostics.json` (written by `scripts/11_dev_diagnostics.py`),
+`results/dev_selection/dev_tradeoff.png`.
 Procedure: `docs/PROTOCOL.md` section 6. Commands: `README.md`, "Running a model".
 
 ## Status of the three models
@@ -158,7 +159,7 @@ variability from refitting or from choosing cutoffs.
    (range 1.11 to 1.58) against the router's 1.12. Only 4% of 2,000 shuffles were as
    accurate. The shuffles save more (6.3% against 4.7%).
 6. **The signal is weak overall.** Predicted gain correlates 0.15 with the outcome and
-   explains 2.2% of its variance.
+   explains 2.1% of its variance.
 7. **Provisional selection still prefers logistic.** Both models meet the development loss
    check. With the encoder deferred, GBM saves about 1.7 points less than logistic at 1 pp
    (90% CI about −2.3 to −1.2), so it does not replace logistic under the selection rule.
@@ -171,10 +172,10 @@ not what a tuned cutoff achieved, and it is slightly optimistic.
 
 | Actual loss | Gross savings |
 |---|---:|
-| 0.5 pp | 2.2% |
+| 0.5 pp | 2.3% |
 | 1.0 pp | 4.3% |
-| 1.5 pp | 6.3% |
-| 2.0 pp | 8.5% |
+| 1.5 pp | 6.6% |
+| 2.0 pp | 9.0% |
 
 ### Compute
 
@@ -242,9 +243,26 @@ from choosing cutoffs.
    of HLE with GPT-5.
 3. **It predicts about as well as the simpler models.** Out-of-fold advantage error 0.2215,
    against 0.2221 for logistic regression and 0.2228 for gradient boosting.
-4. The within-benchmark shuffle, correlation and per-fold figures given for the other two
-   models were not computed for the encoder on development questions. Its shuffle check on
-   the test is in `docs/RQ1_RESULTS.md`.
+4. **It picks better individual questions than benchmark-level routing.** Shuffling its
+   choices inside each benchmark, keeping the number sent to Flash, gives a 1.95-point loss
+   on average (range 1.64 to 2.25) against the router's 1.23. No shuffle out of 2,000 was
+   as accurate. The shuffles save slightly more (7.5% against 6.7%).
+5. **The target was roughly met here, but not reliably.** The pooled loss at the 1-point
+   target was 1.23, and across the five folds it ranged from 0.48 to 2.05.
+6. **The signal is weak overall.** Predicted gain correlates 0.17 with the outcome and
+   explains 2.7% of its variance.
+
+### Retrospective view at equal loss
+
+Read off the pooled out-of-fold predictions afterwards. This describes the curve; it is
+not what a tuned cutoff achieved, and it is slightly optimistic.
+
+| Actual loss | Gross savings |
+|---|---:|
+| 0.5 pp | 2.7% |
+| 1.0 pp | 6.3% |
+| 1.5 pp | 8.4% |
+| 2.0 pp | 11.2% |
 
 ## Selection
 
@@ -281,6 +299,4 @@ RQ2 pipeline's development run (`results/rq2_dev_selection/`, written up in
 
 ## Not done
 
-- Development diagnostics (within-benchmark shuffle, correlation, per-fold range) for the
-  text encoder.
 - The text encoder was trained with one seed; its variation across seeds was not measured.
