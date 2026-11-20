@@ -25,8 +25,6 @@ advantage is above a cutoff. Everything is offline: nothing here calls an LLM.
 | Model selection, from development results only               | done: logistic regression is the primary model     |
 | RQ2                                                          | on hold; separate pipeline in `rq2/`, switched off |
 
-If you are adding or running a model, start with `docs/TEAM_GUIDE.md`.
-
 Results: `docs/RQ1_RESULTS.md` (all three models on the locked test split, with a
 side-by-side comparison) and `docs/DEV_RESULTS.md` (their development runs and the
 selection of logistic regression as the primary model).
@@ -47,7 +45,7 @@ rq2/                           separate pipeline for RQ2, on hold
 manifests/                     split manifest and its hashes
 data/                          instructions for building the data (not stored here)
 tests/                         checks for the evaluation code and the data guards
-docs/                          team guide, protocol, data audit, EDA, results
+docs/                          protocol, data audit, EDA, results
 ```
 
 ## Setup

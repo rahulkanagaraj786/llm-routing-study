@@ -53,7 +53,7 @@ Later changes go in the deviation log at the end, with a reason.
 |---|---|
 | Model pair | GPT-5 and Gemini 2.5 Flash, unchanged |
 | Candidate models | Regularized logistic regression, gradient boosting, and a fine-tuned text encoder (ModernBERT or similar). Random forest is no longer a candidate; its development runs are kept as a record |
-| Owners | One owner per model. Each owner writes their own model code against the shared contract (`src/router/base.py`) and runs it through the shared scripts (`docs/TEAM_GUIDE.md`) |
+| Owners | One owner per model. Each owner writes their own model code against the shared contract (`src/router/base.py`) and runs it through the shared scripts (a team guide, removed on 2026-11-20 once all three models were done; log entry 21) |
 | Shared pipeline | Data, splits, cutoff tuning, evaluation and reporting are common to all models and are not changed per model |
 | Testing | Every candidate is evaluated on the locked splits, once, with the settings fixed by its own development run |
 
@@ -571,8 +571,8 @@ entry 19). RQ2 has not been run.
 
 20. 2026-11-20, recording gaps found when checking the teammates' runs, noted after the
     fact. (a) Text encoder: its development results were committed at 22:20 Pacific time on
-    2026-11-18, about 1.5 hours after its RQ1 test ran (20:42), not before as the team guide
-    asks. The test's result file holds a hash of the development summary taken when the
+    2026-11-18, about 1.5 hours after its RQ1 test ran (20:42), not before as section 7
+    requires. The test's result file holds a hash of the development summary taken when the
     test ran, and it matches the committed summary, so the development results and settings
     were not changed after the test. Entry 17 does not record the team's go-ahead.
     (b) Gradient boosting's development run (2026-11-18, `results/dev_selection/gbm/`) had
@@ -583,3 +583,9 @@ entry 19). RQ2 has not been run.
     16:12. That is not the setting that was chosen, and the real run picks its setting by
     the rule (lowest calibration error), so the pilot could not change the choice. Neither
     gap touches the test split, and no result changes.
+
+21. 2026-11-20, team guide removed. `docs/TEAM_GUIDE.md`, the step-by-step guide for adding
+    and running a model, was removed now that all three models have been run and the
+    primary model selected. How to run a model is in `README.md`; the rules for running and
+    recording one are in section 7, and the rules for model code are in
+    `src/router/template_model.py`. The guide remains in the repository history.
