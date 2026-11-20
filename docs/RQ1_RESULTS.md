@@ -16,8 +16,10 @@ tuned on the validation split and frozen. Full tables and figures per model are 
 
 A side-by-side comparison of the three models is at the end of this page.
 
-The final model is named from the development results of all three
-(`docs/DEV_RESULTS.md`), not from the numbers on this page.
+**Primary model: logistic regression**, selected on 2026-11-20 from the development results
+of all three (`docs/DEV_RESULTS.md`, protocol log entry 19), not from the numbers on this
+page. The text encoder had the highest development savings and is reported alongside, as
+is gradient boosting.
 
 ## Logistic regression
 
@@ -412,12 +414,11 @@ record the GPU). The model weights are about 600 MB.
 - Logistic regression and gradient boosting both train in a few seconds on a laptop CPU;
   the encoder needs a GPU and minutes.
 
-The final model is still named from the development results (`docs/DEV_RESULTS.md`), not
-from this page.
+Logistic regression is the primary model. It was selected from the development results
+(`docs/DEV_RESULTS.md`); the test results on this page played no part in that choice.
 
 ## What these results do not cover
 
-- The choice of final model from the three development runs is still pending.
 - These benchmarks in this mix. The workload tables show the saving depends on the mix.
 - Intervals reflect which test questions were drawn, not refitting or re-tuning. The
   encoder was trained with one seed; its variation across seeds was not measured.

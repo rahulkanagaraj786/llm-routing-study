@@ -166,7 +166,7 @@ Candidates from 2026-11-16 (this replaces the table above):
 
 | Candidate (`name`) | Owner | Search grid | Status |
 |---|---|---|---|
-| Regularized logistic regression (`logistic`) | Rahul | C ∈ {0.1, 0.3, 1, 3, 10} × statistics {off, on} = 10 | development run done |
+| Regularized logistic regression (`logistic`) | Rahul | C ∈ {0.1, 0.3, 1, 3, 10} × statistics {off, on} = 10 | development run and RQ1 test done (log entry 10) |
 | Gradient boosting (`gbm`) | Pravalhika Kurapati | max_depth ∈ {3, 5} × learning_rate ∈ {0.05, 0.1} × statistics {off, on} = 8; fixed n_estimators=200, min_samples_leaf=20, subsample=0.8, max_features="sqrt", seed 221 | development run and RQ1 test done (log entry 18) |
 | Fine-tuned text encoder (`encoder`) | Priyanka | learning rate ∈ {2e-5, 5e-5} = 2, chosen in rotation 0 and reused (see below) | development run and RQ1 test done (log entries 16 and 17) |
 
@@ -198,6 +198,12 @@ kernels are not bit-for-bit deterministic, so a rerun can differ slightly in the
 > it runs on differ. The earlier source-pool development run described in the "Data" and
 > "History" paragraphs is kept as RQ2's development run (`results/rq2_dev_selection/`).
 > Test questions are never used in either.
+
+> **Wording note added 2026-11-20.** Gradient boosting replaced random forest as the middle
+> candidate on 2026-11-16 (section 5), so the parsimony order below reads: logistic
+> regression, gradient boosting, ModernBERT. For RQ1 the pooled out-of-fold questions are
+> the 8,307 development questions, not the 5,640 of the source-pool run. The rule itself is
+> unchanged; this note only brings the wording in line with what was applied (log entry 19).
 
 Data: the train+val rows of the source pool, 5,640 questions (SimpleQA 3,459, filtered
 MMLU-Pro 2,023, GPQA 158), in the 5 folds already recorded in the manifest. The 370
@@ -259,7 +265,7 @@ The selected family's configuration for all later fits is the one with the lowes
 calibration MSE across rotations (for ModernBERT, the rotation-0 choice). Nothing is
 retuned afterwards.
 
-## 7. Main study, RQ1 (not run yet)
+## 7. Main study, RQ1 (run once per model: log entries 10, 17 and 18)
 
 Fit the selected algorithm and frozen configuration on the train split of all seven
 benchmarks (6,216), choose cutoffs for 0, 1, 2, 3, 5 pp on the validation split (2,091), freeze,
@@ -373,9 +379,12 @@ Still open:
    costs are primary and a list-price sensitivity figure is reported.
 2. ~~Who runs ModernBERT on a GPU, and by when.~~ Resolved 2026-11-18: the text encoder
    was run by its owner on a Google Colab Tesla T4 (log entries 16 and 17).
-3. The team's go-ahead to run `scripts/07_final_eval.py --unlock-final`.
+3. ~~The team's go-ahead to run `scripts/07_final_eval.py --unlock-final`.~~ Closed
+   2026-11-20: all three final evaluations have been run (log entries 10, 17 and 18).
 
-Status: no router from the revised protocol has been evaluated on the locked splits.
+Status (2026-11-20): each of the three routers has been evaluated once on the locked test
+split (log entries 10, 17 and 18), and logistic regression is the primary model (log
+entry 19). RQ2 has not been run.
 
 ## Deviation log
 
@@ -537,3 +546,40 @@ Status: no router from the revised protocol has been evaluated on the locked spl
     machine. All five accuracy limits (0, 1, 2, 3 and 5 points) were declared before this
     test. Results: `results/final/gbm/` and `docs/RQ1_RESULTS.md`. From this point nothing
     about gradient boosting may change.
+
+19. 2026-11-20, selection with all three models. `scripts/06_select_algorithm.py` was run on
+    the development results of all three models, with no candidate deferred or dropped,
+    using the rule of section 6 as it has stood since 2026-11-16. All three qualify at the
+    1-point target (out-of-fold loss 1.08, 1.12 and 1.23 points; cap 1.5). Logistic
+    regression is kept: gradient boosting saves 1.69 points less (90% interval −2.26 to
+    −1.15), and the text encoder saves 0.27 points more (−0.36 to 0.88), short of the
+    1.0-point minimum and with an interval that includes zero. **Selected: logistic
+    regression** (C = 0.3, with the prompt statistics). The highest savings without the
+    parsimony guard are the text encoder's (6.69% against 6.42%); it is reported alongside,
+    as section 6 requires. The selection was applied after all three test results were
+    known. It uses development results only: each test result records a hash of its model's
+    development summary taken when the test ran, and all three match the summaries used
+    here. The outcome is the same as the provisional selection with the encoder deferred.
+    `results/dev_selection/selection.json` and `dev_tradeoff.png` were regenerated, so the
+    selection hash recorded in gradient boosting's test result (`b7af5afe…`, the provisional
+    two-model file, kept in the repository history) no longer matches the current file. The
+    new file marks the working tree as modified only because `logs/data_access.log`, which
+    is tracked, gains a line when the script reads the development rows; no code had been
+    modified. Section 6 received a wording note (gradient boosting in place of random
+    forest, 8,307 questions); the rule is unchanged. The development figure no longer prints
+    labels at the line ends, which were cut off with three models; no number changed.
+
+20. 2026-11-20, recording gaps found when checking the teammates' runs, noted after the
+    fact. (a) Text encoder: its development results were committed at 22:20 Pacific time on
+    2026-11-18, about 1.5 hours after its RQ1 test ran (20:42), not before as the team guide
+    asks. The test's result file holds a hash of the development summary taken when the
+    test ran, and it matches the committed summary, so the development results and settings
+    were not changed after the test. Entry 17 does not record the team's go-ahead.
+    (b) Gradient boosting's development run (2026-11-18, `results/dev_selection/gbm/`) had
+    no entry of its own. Its grid was committed in the code (`GBM_GRID`) at 16:04 Pacific,
+    before the run, and has not changed since; the run's summary records all eight settings.
+    The grid was written into section 5 only after the run. A one-setting timing pilot (max_depth 5, learning_rate 0.1, statistics on;
+    `results/_gbm_runtime_pilot/`) ran on development rows at 16:06, before the real run at
+    16:12. That is not the setting that was chosen, and the real run picks its setting by
+    the rule (lowest calibration error), so the pilot could not change the choice. Neither
+    gap touches the test split, and no result changes.

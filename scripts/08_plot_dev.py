@@ -22,7 +22,6 @@ XMAX = 3.5
 for a in (1.0, 2.0):
     ax.axvline(a, color=GRID, lw=1, zorder=1)
     ax.text(a, 1.0, f"{a:g} pp allowance", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=8, color=INK2)
-ends = []
 for fam, (color, label) in SERIES.items():
     f = BASE / fam / "oof_predictions.csv"
     if not f.exists():
@@ -40,12 +39,6 @@ for fam, (color, label) in SERIES.items():
     for a in d:
         m = P.evaluate(d[a], tab.outcomes)
         ax.plot(m["accuracy_loss_pp"], m["gross_savings_pct"], "o", ms=8, color=color, mec=SURFACE, mew=2, zorder=4)
-    ends.append((y[keep][np.argmax(x[keep])], label))
-ends.sort()
-for i, (yv, label) in enumerate(ends):  # direct labels at the line ends, nudged apart
-    yv = max(yv, ends[i - 1][0] + 2.2) if i else yv
-    ends[i] = (yv, label)
-    ax.text(XMAX + 0.05, yv, label, fontsize=9, color=INK, va="center", ha="left")
 ax.set_xlim(-0.3, XMAX); ax.set_ylim(0, None)
 ax.set_xlabel("Accuracy loss vs always GPT-5 (percentage points)", color=INK2, fontsize=9)
 ax.set_ylabel("Gross API cost saved vs always GPT-5 (%)", color=INK2, fontsize=9)
@@ -57,9 +50,10 @@ for s in ("left", "bottom"):
     ax.spines[s].set_color(GRID)
 ax.tick_params(colors=INK2, labelsize=8, length=0)
 leg = ax.legend(loc="upper left", frameon=False, fontsize=9, labelcolor=INK)
-fig.text(0.01, 0.01, "Lines: every cutoff applied to pooled out-of-fold gains. Dots: cutoffs chosen on a calibration fold for 0, 1 and 2 pp, applied to unseen folds.\n"
+fig.text(0.01, 0.01, "Lines: every cutoff applied to pooled out-of-fold gains. Dots: cutoffs chosen on a calibration fold for 0, 1, 2 and 3 pp\n"
+                     "(5 pp lies off the chart), applied to unseen folds. "
                      "Train and validation questions of all seven benchmarks. Not a test result.", fontsize=7.5, color=INK2, va="bottom")
-fig.subplots_adjust(left=0.08, right=0.83, top=0.88, bottom=0.2)
+fig.subplots_adjust(left=0.08, right=0.97, top=0.88, bottom=0.2)
 out = S.D.ROOT / "results/dev_selection/dev_tradeoff.png"
 fig.savefig(out, facecolor=SURFACE)
 print("wrote", out.relative_to(S.D.ROOT))

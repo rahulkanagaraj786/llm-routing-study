@@ -23,7 +23,7 @@ repository.
 | Logistic regression (reference model) | development run and RQ1 test done (`docs/RQ1_RESULTS.md`) |
 | Gradient boosting (Pravalhika) | development run and RQ1 test done |
 | Fine-tuned text encoder, ModernBERT-base (Priyanka) | development run and RQ1 test done, on a Colab T4 GPU |
-| Final evaluation, RQ1 | all three models tested once; primary model not yet named |
+| Final evaluation, RQ1 | all three models tested once; logistic regression selected as primary (from development results) |
 | RQ2 | design on hold; separate pipeline in `rq2/`, disabled until the team agrees the experiments |
 
 Read in this order:
