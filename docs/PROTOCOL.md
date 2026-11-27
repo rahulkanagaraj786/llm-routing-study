@@ -731,6 +731,8 @@ entry 19). RQ2 workstreams A and A2 were designed (section 8, log entry 23) and 
     labelled as such: (a) `rq2/posthoc_prompt_statistics.py`, which refits A's router,
     reproducing every recorded gain, then recomputes the gains with the prompt statistics held
     at their training averages, reading only prompt text for the target sets; it also reports
-    GPT-5's edge and prompt length by source benchmark on the train split; (b) label-position
-    fixes in two figures of `rq2/report_rq2.py`, which change no number. Nothing about either
-    router, its cutoffs or the scored questions changed after the run.
+    GPT-5's edge and prompt length by source benchmark on the train split; (b) label fixes
+    in two figures of `rq2/report_rq2.py`, which change no number; (c) the docstring of
+    `scripts/07_final_eval.py`, which said RQ2's design was still being decided, now points
+    to `rq2/` (no code changed). Nothing about either router, its cutoffs or the scored
+    questions changed after the run.

@@ -131,11 +131,11 @@ The hindsight cutoff is the one the protocol's rule would choose on the set's ow
 | A | HLE | 2 pp | 34.5% / 76.2% | 44.4% / 14.90 | 12.0%, 9.1% / 1.96 |
 | A | HLE | 3 pp | 39.3% / 79.5% | 46.3% / 15.14 | 18.5%, 13.1% / 2.94 |
 | A | HLE | 5 pp | 58.9% / 90.1% | 52.7% / 16.80 | 27.5%, 18.5% / 4.97 |
-| A2 | Source-pool test, other subjects | 0 pp | 10.0% / 11.8% | 6.6% / 0.91 | 2.6%, 1.6% / 0.00 |
-| A2 | Source-pool test, other subjects | 1 pp | 25.4% / 27.5% | 17.8% / 1.83 | 17.6%, 10.2% / 0.99 |
-| A2 | Source-pool test, other subjects | 2 pp | 33.3% / 34.6% | 24.3% / 2.36 | 31.6%, 21.6% / 1.98 |
-| A2 | Source-pool test, other subjects | 3 pp | 41.1% / 40.5% | 29.8% / 2.59 | 43.3%, 32.1% / 2.97 |
-| A2 | Source-pool test, other subjects | 5 pp | 60.5% / 59.1% | 49.3% / 6.08 | 52.6%, 42.9% / 4.94 |
+| A2 | Reference (other subjects) | 0 pp | 10.0% / 11.8% | 6.6% / 0.91 | 2.6%, 1.6% / 0.00 |
+| A2 | Reference (other subjects) | 1 pp | 25.4% / 27.5% | 17.8% / 1.83 | 17.6%, 10.2% / 0.99 |
+| A2 | Reference (other subjects) | 2 pp | 33.3% / 34.6% | 24.3% / 2.36 | 31.6%, 21.6% / 1.98 |
+| A2 | Reference (other subjects) | 3 pp | 41.1% / 40.5% | 29.8% / 2.59 | 43.3%, 32.1% / 2.97 |
+| A2 | Reference (other subjects) | 5 pp | 60.5% / 59.1% | 49.3% / 6.08 | 52.6%, 42.9% / 4.94 |
 | A2 | Held-out subjects | 0 pp | 10.0% / 22.9% | 11.8% / 0.60 | 18.1%, 9.2% / 0.00 |
 | A2 | Held-out subjects | 1 pp | 25.4% / 60.6% | 43.5% / 5.82 | 25.1%, 14.0% / 0.80 |
 | A2 | Held-out subjects | 2 pp | 33.3% / 77.3% | 58.8% / 5.62 | 34.7%, 21.3% / 1.81 |
@@ -193,12 +193,12 @@ Differences between sets for the A2 router (independent bootstrap, each set resa
 
 | Comparison | Target level | Savings difference (95% CI) | Loss difference, pp (95% CI) |
 |---|---|---:|---:|
-| Held-out subjects minus Source-pool test, other subjects | 0 pp | +5.2 (1.9 to 8.9) | -0.31 (-2.13 to 1.37) |
+| Held-out subjects minus Reference (other subjects) | 0 pp | +5.2 (1.9 to 8.9) | -0.31 (-2.13 to 1.37) |
 |  | 1 pp | +25.6 (19.7 to 31.1) | +4.00 (0.86 to 7.00) |
 |  | 2 pp | +34.5 (29.0 to 39.7) | +3.27 (-0.35 to 6.77) |
 |  | 3 pp | +40.5 (35.6 to 45.5) | +4.44 (0.76 to 8.22) |
 |  | 5 pp | +31.1 (27.1 to 35.2) | +1.95 (-2.11 to 6.26) |
-| LiveCodeBench minus Source-pool test, other subjects | 0 pp | +82.2 (79.7 to 84.3) | +25.53 (22.71 to 28.55) |
+| LiveCodeBench minus Reference (other subjects) | 0 pp | +82.2 (79.7 to 84.3) | +25.53 (22.71 to 28.55) |
 |  | 1 pp | +71.0 (67.7 to 74.1) | +24.62 (21.62 to 27.68) |
 |  | 2 pp | +64.5 (61.1 to 67.9) | +24.09 (21.19 to 27.16) |
 |  | 3 pp | +59.0 (55.2 to 62.8) | +23.86 (20.93 to 27.09) |
