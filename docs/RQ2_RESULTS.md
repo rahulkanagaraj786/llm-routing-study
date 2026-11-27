@@ -29,18 +29,22 @@ statistics, settings chosen in the source-pool development run. The full tables 
     −0.03, while GPT-5's real edge on LiveCodeBench is 26 points, the largest of any set. So
     every coding question falls below even the 0-point cutoff.
   - *Order:* within each new set, the predicted gains do not pick out the questions only
-    GPT-5 gets right (AUC 0.49 coding, 0.53 math, 0.49 HLE, against 0.64 on the source test).
-    So even a cutoff re-tuned in hindsight on the coding questions' own answers would save
-    only 12.8% at the 3-point target.
+    GPT-5 gets right. The AUC is about 0.5, which is chance (0.49 coding, 0.53 math,
+    0.49 HLE). On HLE, 96% of within-benchmark shuffles were at least as accurate as the
+    router; on the source test at 3 points, only 0.2% were. So even a cutoff re-tuned in
+    hindsight on the coding questions' own answers would save only 12.8% at the 3-point
+    target.
 - **A router that had seen the benchmark does not fail this way.** On the same 211 coding
   test questions, the RQ1 router (trained with LiveCodeBench) sent none to Flash and lost
   nothing. The transfer router lost 27.49 points more (21.33 to 33.65).
-- **New topics (A2) hurt far less than new kinds of task, and part of it is not about the
-  topics being new.**
+- **New topics (A2) hurt too, but far less than new kinds of task.**
   - A router trained without MMLU-Pro law, history and philosophy lost 7.03 points (3.61 to
-    10.59) on those subjects at the 3-point target, against 26.45 on coding.
-  - A router that was trained with those subjects did no better on their 91 test questions
-    (3.30 points lost by each).
+    10.59) on those subjects at the 3-point target. That is 4.44 points more than on its
+    reference (0.76 to 8.22), and 19.42 fewer than on coding (14.95 to 23.71).
+  - Part of that loss may come from the mix rather than from the topics being new. GPT-5's
+    edge on these subjects is small, so a cutoff tuned on the source mix sends most of
+    them to Flash. A 91-question check against a router trained with them is too small to
+    separate the two explanations.
 - **Why coding goes to Flash** (a post-hoc check that reads prompts only):
   - In training, long prompts were mostly MMLU-Pro, where GPT-5's edge is small (6 points;
     median 127 words). SimpleQA's one-sentence questions carry an 18-point edge.
@@ -114,7 +118,7 @@ outcomes. It is not achievable without those labels and is never the router's re
 shows whether a miss comes from where the cutoff sits or from how the router orders the
 questions.
 
-| Set | Mean predicted gain | Real mean advantage | AUC, only-GPT-5-right questions | Frozen cutoff at 3 pp: sent / saved / lost | Hindsight cutoff at 3 pp: sent / saved / lost |
+| Set | Mean predicted gain | Real mean advantage | AUC, only-GPT-5-right questions (0.5 = chance) | Frozen cutoff at 3 pp: sent / saved / lost | Hindsight cutoff at 3 pp: sent / saved / lost |
 |---|---:|---:|---:|---:|---:|
 | Source-pool test | 0.138 | 0.146 | 0.643 | 39.9% / 28.9% / 2.42 | 46.2% / 35.2% / 2.99 |
 | LiveCodeBench | −0.034 | 0.264 | 0.493 | 100% / 88.8% / 26.45 | 10.4% / 12.8% / 2.94 |
@@ -126,10 +130,15 @@ questions.
 - **The level is wrong.** On coding the predicted gains lie between −0.047 and −0.014
   (5th to 95th percentile). All of that is below the 0-point cutoff of 0.011, so nothing
   stays on GPT-5. On math and HLE the predicted gains are also far below the real advantage.
-- **The order is uninformative.** An AUC of about 0.5 means the router cannot tell, within
-  coding, math or HLE, which questions need GPT-5. In the within-benchmark shuffle on HLE,
-  96% of random choices at the same rate were at least as accurate as the router's at
-  1 point. On the source test only 0.2% were, at 3 points.
+- **The order is uninformative.** An AUC of about 0.5 is what a random order gives, so
+  within coding, math or HLE the router cannot tell which questions need GPT-5.
+  - The like-for-like check is the within-benchmark shuffle. On HLE at 1 point, 96% of
+    within-benchmark shuffles were at least as accurate as the router; on the source test
+    at 3 points, only 0.2% were.
+  - On coding and math the shuffle says nothing, because everything went to Flash.
+  - The source test's AUC of 0.64 is pooled over three benchmarks, so part of it comes from
+    telling the benchmarks apart. It is not a like-for-like comparison with the
+    single-benchmark sets.
 - **Re-tuning the cutoff alone would not rescue it.** Even with hindsight, the best cutoff
   at 3 points saves 12.8% on coding, 14.4% on math and 13.1% on HLE, against 35.2% on the
   source test. Those hindsight figures are optimistic, because the cutoff is fitted to the
@@ -200,17 +209,19 @@ Differences at 3 points (independent bootstrap, each set resampled on its own):
 
 - **New kinds of task fail far worse than new topics.** That difference, about 19 points,
   is the clearest A2 result.
-- **The held-out subjects lose more than the reference, but the cause is unclear.**
-  - The router's average predicted gain on them (0.073) matches their real average
-    advantage (0.080), so the level is about right. But GPT-5's edge on these subjects is
-    small (8 points, against 15 on the reference), so most of them fall below a cutoff
-    tuned on the source mix. 89% went to Flash, and with a weak order (AUC 0.54) that costs
-    about 7 points.
-  - A router that *was* trained with these subjects also sent most of their 91 test
-    questions to Flash (82%, against 91% for the A2 router). The two lost the same, 3.30
-    points each (difference 0.00, −4.44 to 4.44).
-  - So the evidence that an unseen topic hurts in itself is weak. The loss reflects how
-    the subjects' small GPT-5 edge interacts with a cutoff tuned on a different mix.
+- **The held-out subjects lose 4.44 points more than the reference (0.76 to 8.22).** This is
+  the declared comparison, and its interval excludes zero. New topics do cost accuracy,
+  though far less than new kinds of task.
+  - Part of the loss may come from the mix rather than from the topics being new. The
+    router's average predicted gain on these subjects (0.073) is close to their real
+    average advantage (0.080), so its level is about right. But GPT-5's edge on them is
+    small (8 points, against 15 on the reference), so most fall below a cutoff tuned on the
+    source mix. 89% went to Flash, and with a weak order (AUC 0.54) that costs about
+    7 points.
+  - The descriptive check on the subjects' 91 test questions cannot separate the two
+    explanations. A router trained with these subjects also sent most of them to Flash
+    (82%, against 91% for the A2 router), and both lost 3.30 points. But the interval for
+    the difference (−4.44 to 4.44) is too wide to tell anything.
 - **By subject** (descriptive; history has 85 questions), at 3 points:
   - law: 7.29 points lost (2.09 to 12.54);
   - history: 4.71 (−3.61 to 13.95);
@@ -239,6 +250,10 @@ Differences at 3 points (independent bootstrap, each set resampled on its own):
   chosen on development questions that include the held-out subjects. None of this touches
   the transfer router's training questions or its cutoffs (protocol section 8, "What was
   known").
+- **The 3-point choice does not drive the coding result.** The primary level was chosen
+  after RQ1's results. But on LiveCodeBench the router's decisions are identical at every
+  level from 0 to 5 points (all to Flash), so any level would have given the same
+  conclusion.
 - **One router family.** Only logistic regression was evaluated. The text encoder, which
   reads text differently, was not tested for transfer.
 - **Small samples.** Math (175 questions) and the single subjects are small; their results
