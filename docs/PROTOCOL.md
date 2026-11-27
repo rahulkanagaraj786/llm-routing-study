@@ -286,45 +286,147 @@ scored a second time on the locked test split with the 499 repaired HLE rows adm
 Also reported for RQ1, from the same frozen decisions: the within-benchmark shuffle
 diagnostic and the workload-mix sensitivity check (both defined in section 9).
 
-## 8. Transfer to held-out benchmarks, RQ2 (not run yet)
+## 8. Transfer to held-out benchmarks, RQ2 (workstreams A and A2 settled 2026-11-26)
 
-> **On hold (2026-11-16).** The team has not yet decided which RQ2 experiments to run. The
-> design below is one candidate and may change. Nothing in it is run by the current
-> scripts; it has its own pipeline in `rq2/`, which refuses to run while on hold. Until RQ2 is
-> settled, the three benchmarks named here stay out of model development, so that every
-> option remains open.
+> **Settled for workstreams A and A2 on 2026-11-26 (log entry 23).** This replaces the
+> on-hold note of 2026-11-16. It was written and committed before any RQ2 router was
+> scored on a sealed row. RQ2 evaluates logistic regression only. Workstreams B (a small
+> labelled sample of the new kind of question), C (shifting workloads, and warning signs
+> that need no labels) and C2 (a fall-back rule) are added to this section by their owners
+> before they run. They reuse A's frozen router and may not change it.
 
-Claim being tested: transfer to held-out coding and math benchmarks. The claim is about
-benchmarks the router never saw, not about training data free of related material.
+Claim being tested: transfer to held-out coding and math benchmarks, and to HLE. The claim
+is about benchmarks the router never saw, not about training data free of related
+material.
 
-One router serves all three tests. It uses the selected algorithm and frozen
-configuration, is trained on the source pool's train split (4,210 questions), and has its
-cutoffs for 0, 1 and 2 pp tuned on the source pool's validation split (1,430). No
-question from LiveCodeBench, AIME, LiveMathBench or HLE is used for training, validation,
-algorithm selection or cutoff tuning. The router and cutoffs are frozen, then scored
-separately on each held-out benchmark, using every eligible question of it.
+### What was known before RQ2
 
-| Priority | Target | Questions |
+- The four target benchmarks are not new to the team. RQ1's development run (amendment 9)
+  used their train and validation questions, RQ1's tests scored their test questions, and
+  `docs/DEV_RESULTS.md` and `docs/RQ1_RESULTS.md` report results for each of them. The
+  earlier note that they "stay out of model development" stopped being true with
+  amendment 9.
+- No RQ2 router has been scored on them. The RQ2 router never trains on them, and none of
+  its settings, training questions or cutoffs is chosen with their outcomes.
+- The algorithm is logistic regression. RQ1's selection (log entry 19, on development
+  questions of all seven benchmarks, so including the targets' train and validation
+  questions) and the source-pool selection of 2026-11-16
+  (`results/rq2_dev_selection/selection.json`, the other two models deferred) both chose
+  it. Its settings, C = 0.3 with the simple prompt statistics, come from the source-pool
+  development run only (`results/rq2_dev_selection/logistic/summary.json`).
+- The 3-point primary target level was chosen after RQ1's test results were known, because
+  the 1-point level saved little there (5.7% on the RQ1 test). No RQ2 output existed then.
+- The EDA (`docs/EDA.md`, section 5) showed GPT-5's average advantage by MMLU-Pro subject on
+  the train split; philosophy was among the highest, law and history in the middle. A2's
+  subjects are chosen by topic, not from those numbers.
+
+### Workstream A: one transfer router
+
+Router: logistic regression, C = 0.3 with the statistics, trained on the source pool's
+train split (4,210 questions). Cutoffs for 0, 1, 2, 3 and 5 pp are chosen on the source
+pool's validation split (1,430) by the rule of section 6, step 3, written to disk, and
+frozen before any target is scored. No question from LiveCodeBench, AIME, LiveMathBench or
+HLE is used for training, validation, settings or cutoffs. The frozen router is scored
+separately on each set below, using every eligible question of each held-out benchmark.
+
+| Role | Target | Questions |
 |---|---|---:|
-| Reference | Source pool, locked test rows (same types as training) | 1,406 |
+| Reference | Source pool, locked test (same types as training) | 1,406 |
 | Primary | Coding: LiveCodeBench | 1,055 |
 | Secondary | Math: AIME (58) + LiveMathBench (117) | 175 |
-| Secondary | HLE | 1,631 (2,130 in the cost sensitivity check) |
+| Secondary | HLE | 1,631 |
+| Sensitivity (required) | HLE with repaired costs | 2,130 |
 
-- The source-pool reference is the same frozen router and cutoffs scored on test
-  questions of the types it was trained on. It shows what changes when that router
-  transfers. It is not a second RQ1.
-- The within-benchmark shuffle diagnostic (section 9) is reported for every target.
+**Primary RQ2 result:** the frozen router on LiveCodeBench at the 3-point target level:
+gross savings and accuracy loss with their 95% intervals, and the bootstrap probability that
+the loss is within 3 points, next to the same router's result on the source-pool reference
+at 3 points. Every other number in RQ2 is secondary. The reference is not a second RQ1; it
+shows what changes when the router meets questions of a new kind.
+
+How a result is read (fixed now; applied to every set and target level, with LiveCodeBench
+at 3 points as the headline):
+- Accuracy: *within the target* if the loss is at most the target level; *clearly
+  exceeded* if the whole 95% interval is above it; otherwise *exceeded, not clearly*.
+- Savings: *clear savings* if the 95% interval is above zero.
+- The trade-off is said to hold on a set only if the loss is within the target and the
+  savings are clear. A router that meets the target by sending almost nothing to Flash
+  does not count as holding.
+
+Secondary analyses of A, all from the same frozen decisions:
+1. Every target level on every set, by benchmark (AIME and LiveMathBench also separately),
+   the within-benchmark shuffle (section 9), and LiveCodeBench at list prices (open
+   item 1).
+2. The router that saw the benchmark. On the target benchmarks' test-split questions
+   (LiveCodeBench 211, math 35, HLE 319), the RQ2 router's decisions are compared with the
+   RQ1 router's frozen decisions from its RQ1 test
+   (`results/final/logistic/predictions_rq1__locked_test.csv`) at each target level, with
+   a paired bootstrap over duplicate groups for the differences in savings and loss. The
+   RQ1 router was trained on these benchmarks' train questions and tuned on all seven
+   benchmarks' validation questions, so the difference is what not seeing the benchmark
+   costs. No RQ1 result is recomputed or changed.
+3. Ranking versus cutoff (diagnostic). For each set and target level: the share sent to
+   Flash on the set against the share on the source validation questions; how well the
+   predicted gain orders the set's questions (correlation with Y, and the AUC for picking
+   out the questions only GPT-5 gets right); the ceiling (GPT-5 only where only GPT-5 is
+   right); and the *hindsight cutoff*, the one the section 6 rule would choose on the set's
+   own outcomes, with its savings and loss. The hindsight cutoff uses the outcomes being
+   scored, so it is never reported as the router's result. It shows whether a miss comes
+   from the cutoff (the order is useful but the cutoff is in the wrong place) or from the
+   order itself, and it bounds what re-tuning only the cutoff could gain (workstream B).
+
+### Workstream A2: new topics versus new kinds of task
+
+A2 asks whether the router fails on any unfamiliar topic (near transfer) or only on a new
+kind of task (far transfer).
+
+- Held-out subjects: MMLU-Pro law, history and philosophy, its three humanities subjects.
+  They are the furthest in topic from the remaining subjects (science, engineering, health,
+  business, economics, psychology, "other") and from GPQA, and they keep MMLU-Pro's
+  multiple-choice format. SimpleQA includes general-knowledge questions on similar topics,
+  so the claim is "MMLU-Pro subjects the router never saw", not "no related material".
+- A2 router: the same algorithm and settings, not re-chosen. Those settings were chosen on
+  development questions that include these subjects' train and validation questions;
+  reusing them keeps A and A2 comparable. It is trained on the source pool's train split
+  without the three subjects (3,888 questions), with cutoffs on the validation split without
+  them (1,345). Any source-pool question whose near-duplicate group contains a question of
+  the three subjects is also removed from A2's training, validation and reference questions
+  (none at present).
+- Scored on: the reference, the source pool's locked test without the three subjects
+  (1,315); near transfer, every eligible question of the three subjects from all splits
+  (498: law 288, history 85, philosophy 125); and far transfer, LiveCodeBench, math and HLE
+  (the same questions as in A).
+- A2's main comparison (secondary to RQ2's primary): at 3 points, the A2 router's loss and
+  savings on the held-out subjects and on LiveCodeBench, each next to its reference, with
+  independent bootstrap intervals for the differences (subjects minus reference,
+  LiveCodeBench minus reference, subjects minus LiveCodeBench). The three subjects are also
+  reported separately, as descriptive results (history has 85 questions; one question is
+  1.18 pp).
+- Seen versus unseen subjects (descriptive): on the 91 locked-test questions of the three
+  subjects, A's router (trained with them) against A2's router (trained without them),
+  paired bootstrap.
+- A's reading rule applies.
+
+### Common to A and A2
+
 - Math is secondary because of its size: one question is 0.57 pp, so two net additional
   errors already exceed a 1 pp loss. It is reported with its interval and read as
   descriptive.
-- The allowance is defined on the source pool's validation questions. On a held-out
-  benchmark the loss is measured against always-GPT-5 on that benchmark.
-- MMLU-Pro subjects are read from the prompt template ("Answer the following math
-  question…"). The original HLE dataset has `category` and `raw_subject` fields; they
-  are not needed because all of HLE is held out.
-- HLE cost sensitivity (required): the same frozen router and cutoffs are scored again
-  on all 2,130 HLE questions with repaired costs.
+- Target levels are defined on the source pool's validation questions. On a held-out set
+  the loss is measured against always-GPT-5 on that set.
+- MMLU-Pro subjects are read from the prompt template ("Answer the following law
+  question…"). HLE's `category` and `raw_subject` fields are not needed because all of HLE
+  is held out.
+- HLE cost sensitivity (required): the same frozen router and cutoffs are scored again on
+  all 2,130 HLE questions with repaired costs.
+- Both routers are fitted and scored in one run of `python rq2/run_rq2_transfer.py logistic
+  --unlock-final`, from a committed state, once; the script refuses a second run. Before
+  it, `--plan` prints question counts, and `--dry-run` rehearses everything on source-pool
+  development questions only: GPQA plays the far target, MMLU-Pro biology and health play
+  the held-out subjects, and law, history and philosophy are left out entirely, so no
+  sealed question and no question of the three real subjects is scored. The result file
+  records the hashes of this document and of the development summary, and copies the
+  record of sealed reads. `rq2/report_rq2.py` writes the tables and figures from the saved
+  results only.
 
 Optional check after freezing: the RQ1 router may be applied once to ARC-AGI v1
 (`--with-arc-agi`), reported as an unused benchmark from the same archive. It is off by
@@ -382,9 +484,9 @@ Still open:
 3. ~~The team's go-ahead to run `scripts/07_final_eval.py --unlock-final`.~~ Closed
    2026-11-20: all three final evaluations have been run (log entries 10, 17 and 18).
 
-Status (2026-11-20): each of the three routers has been evaluated once on the locked test
+Status (2026-11-26): each of the three routers has been evaluated once on the locked test
 split (log entries 10, 17 and 18), and logistic regression is the primary model (log
-entry 19). RQ2 has not been run.
+entry 19). RQ2 workstreams A and A2 are designed (section 8, log entry 23) and not yet run.
 
 ## Deviation log
 
@@ -602,3 +704,17 @@ entry 19). RQ2 has not been run.
     9.0% (were 2.2%, 6.3% and 8.5%). The text encoder's figures are added. These figures are
     descriptive and play no part in any choice. The script also records the outcome mix and
     each benchmark's share of the GPT-5 bill, which explain why the savings are small.
+
+23. 2026-11-26, RQ2 design for workstreams A and A2 (section 8), written and committed
+    before any RQ2 router was scored on a sealed question (`logs/data_access.log` has no
+    RQ2 read). Changes from the candidate design of 2026-11-16: (a) cutoffs for all five
+    target levels, with 3 points as RQ2's primary level, chosen after RQ1's test results
+    were known; (b) a declared primary result (LiveCodeBench at 3 points) and a rule for
+    reading every result; (c) added: the same-question comparison with the RQ1 router, the
+    ranking-versus-cutoff diagnostic, and workstream A2 (MMLU-Pro law, history and
+    philosophy held out); (d) the statement that the target benchmarks stay out of model
+    development, out of date since amendment 9, replaced by an account of what was known;
+    (e) RQ2 evaluates logistic regression only; the text encoder and gradient boosting are
+    not run for RQ2. The router's settings (C = 0.3 with the statistics) are those of the
+    source-pool development run of 2026-11-16, unchanged. `rq2/run_rq2_transfer.py` was
+    rewritten to match and enabled.
