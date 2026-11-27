@@ -1,0 +1,42 @@
+{
+  "purpose": "rq2_workstream_b_overlap_audit",
+  "label_blind": true,
+  "near_dup_rule": {
+    "description": "character 4-gram TF-IDF cosine on normalized question text",
+    "threshold": 0.85,
+    "function": "router.splits.near_duplicate_clusters",
+    "dedup_text": "router.splits.dedup_text"
+  },
+  "inputs": {
+    "source_pool_train_val_n": 5641,
+    "lcb_train_n": 633,
+    "lcb_val_n": 211,
+    "lcb_test_n": 211,
+    "combined_n": 6696,
+    "n_pairs_at_threshold": 214
+  },
+  "contaminated_clusters_n": 0,
+  "contaminated_clusters": [],
+  "exclusions": {
+    "lcb_train_clusters_dropped": [],
+    "lcb_test_clusters_dropped": [],
+    "lcb_train_qids_excluded": [],
+    "lcb_test_qids_excluded": []
+  },
+  "frozen_sets": {
+    "label_pool_n": 633,
+    "eval_n": 211,
+    "lcb_val_unused_n": 211,
+    "min_label_pool_required": 400,
+    "label_pool_meets_min": true
+  },
+  "lcb_manifest_cross_split_clusters": {},
+  "a_predictions_check": {
+    "a_predictions_path": "results/rq2/logistic/predictions_rq2_transfer__code.csv",
+    "a_predictions_n": 1055,
+    "cleaned_eval_n": 211,
+    "cleaned_eval_missing_from_a_predictions": [],
+    "a_covers_cleaned_eval": true
+  },
+  "status": "ok"
+}
