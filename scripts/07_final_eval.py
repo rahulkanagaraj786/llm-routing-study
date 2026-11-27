@@ -12,7 +12,7 @@ cutoffs for 0, 1 and 2 points on the validation split, freezes them, then scores
 test split once. It also reports the within-benchmark shuffle diagnostic, the workload-mix
 check, and the same test with repaired HLE costs (docs/PROTOCOL.md sections 7 and 9).
 
-RQ2 (transfer to unseen benchmarks) is not in this script. Its design is still being decided.
+RQ2 (transfer to unseen benchmarks) is not in this script: see rq2/run_rq2_transfer.py and docs/PROTOCOL.md section 8.
 
 Output: results/final/<model>/final_results_rq1.json, predictions, cutoffs and the fitted model.
 Option: --with-arc-agi adds the optional ARC-AGI check.

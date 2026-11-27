@@ -2,14 +2,14 @@
 
 RQ2 asks: does the cost and accuracy trade-off still hold on kinds of questions the router
 never saw in training? The design is in `docs/PROTOCOL.md` section 8 (log entry 23). RQ2
-evaluates logistic regression only.
+evaluates logistic regression only. Results of A and A2: `docs/RQ2_RESULTS.md`.
 
 ## Workstreams
 
 | | Experiment | Owner | State |
 |---|---|---|---|
-| A | One router trained on the source pool only (SimpleQA, GPQA, MMLU-Pro without math and computer science), scored on LiveCodeBench (primary), AIME + LiveMathBench, HLE, and the pool's own test questions (reference). Compared with the RQ1 router on the same questions; ranking-versus-cutoff diagnostic | Rahul | designed 2026-11-26 |
-| A2 | The same recipe trained without MMLU-Pro law, history and philosophy: new topics (those subjects) against new kinds of task (coding, math, HLE) | Rahul | designed 2026-11-26 |
+| A | One router trained on the source pool only (SimpleQA, GPQA, MMLU-Pro without math and computer science), scored on LiveCodeBench (primary), AIME + LiveMathBench, HLE, and the pool's own test questions (reference). Compared with the RQ1 router on the same questions; ranking-versus-cutoff diagnostic | Rahul | run once, 2026-11-26 |
+| A2 | The same recipe trained without MMLU-Pro law, history and philosophy: new topics (those subjects) against new kinds of task (coding, math, HLE) | Rahul | run once, 2026-11-26 |
 | B | A small labelled sample of the new kind of question: re-tune only the cutoff, or retrain | Pravalhika | to be designed |
 | C | Shifting workloads, and warning signs that need no labels | Priyanka | to be designed |
 | C2 | Send unfamiliar questions to GPT-5, with the threshold set on source data only | Priyanka | to be designed |
@@ -28,6 +28,7 @@ owner writes their design into section 8 before running.
     python rq2/run_rq2_transfer.py logistic --dry-run        # rehearsal on source-pool development questions
     python rq2/run_rq2_transfer.py logistic --unlock-final   # the real run, ONCE
     python rq2/report_rq2.py logistic                        # tables and figures from the saved results
+    python rq2/posthoc_prompt_statistics.py logistic         # post hoc: why coding goes to Flash (prompts only)
 
 The rehearsal uses development questions only: GPQA plays the far target, MMLU-Pro biology
 and health play the held-out subjects, and law, history and philosophy are left out, so

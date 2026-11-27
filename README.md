@@ -10,8 +10,8 @@ repository.
 
 - **RQ1.** How much can a router save compared with always using GPT-5, and what does
   that do to accuracy?
-- **RQ2.** Does that trade-off hold on benchmarks the router never saw? (Design still
-  being decided; the current code covers RQ1.)
+- **RQ2.** Does that trade-off hold on benchmarks the router never saw? Workstreams A and
+  A2 are done (`docs/RQ2_RESULTS.md`); B, C and C2 are still to be designed.
 
 ## Where things stand
 
@@ -24,13 +24,15 @@ repository.
 | Gradient boosting (Pravalhika) | development run and RQ1 test done |
 | Fine-tuned text encoder, ModernBERT-base (Priyanka) | development run and RQ1 test done, on a Colab T4 GPU |
 | Final evaluation, RQ1 | all three models tested once; logistic regression selected as primary (from development results) |
-| RQ2 | design on hold; separate pipeline in `rq2/`, disabled until the team agrees the experiments |
+| RQ2, workstreams A and A2 (Rahul) | designed and run once on 2026-11-26 (`docs/RQ2_RESULTS.md`) |
+| RQ2, workstreams B, C and C2 (Pravalhika, Priyanka) | to be designed (`rq2/README.md`) |
 
 Read in this order:
 1. `docs/PROTOCOL.md`: the evaluation design, the selection rule, and every change to it.
 2. `docs/DATA_AUDIT.md`: what the data is and its known problems.
 3. `docs/DEV_RESULTS.md`: development results of all three models.
 4. `docs/RQ1_RESULTS.md`: RQ1 test results, one section per model.
+5. `docs/RQ2_RESULTS.md`: RQ2 results (transfer to unseen kinds of questions).
 
 ## Layout
 
@@ -43,13 +45,14 @@ src/router/registry.py     the list of models and their owners
 src/router/models.py       shared text features; logistic regression (the reference model)
 src/router/template_model.py   skeleton to copy for a new model
 src/router/final.py        the shared "fit, freeze cutoffs, score" step
-rq2/                       separate pipeline for RQ2, on hold
+rq2/                       separate pipeline for RQ2 (run, report, post-hoc check)
 scripts/                   numbered in run order, 00 to 11
 manifests/                 split manifest and its hashes
 results/audit              audit numbers, token lengths
 results/dev_selection      out-of-fold predictions, cutoffs, selection.json
 results/final              created by the final evaluation
-docs/                      protocol, audit, development results
+results/rq2                created by the RQ2 run
+docs/                      protocol, audit, EDA, results
 tests/                     evaluator and sealed-data guard checks
 Handoff/                   proposal and the original pilot package, unchanged
 ```

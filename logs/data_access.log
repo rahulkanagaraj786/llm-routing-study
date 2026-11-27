@@ -157,3 +157,19 @@
 2026-11-26T22:39:58	guard_test	selection_pool_dev_unfiltered	6011
 2026-11-26T22:39:59	guard_test	rq1_dev_all_benchmarks	8307
 2026-11-26T22:40:45	rq2_dry_run:logistic	source_pool_dev_filtered	5640
+2026-11-26T22:44:55	final:rq2:logistic:train	splits=train;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	4210
+2026-11-26T22:44:56	final:rq2:logistic:val	splits=val;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	1430
+2026-11-26T22:44:58	final:rq2:logistic:source_test	splits=test;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=True	1406
+2026-11-26T22:44:59	final:rq2:logistic:target:code	splits=train,val,test;benchmarks=livecodebench;unlock_final=True	1055
+2026-11-26T22:45:00	final:rq2:logistic:target:math	splits=train,val,test;benchmarks=aime,livemathbench;unlock_final=True	175
+2026-11-26T22:45:01	final:rq2:logistic:target:hle	splits=train,val,test;benchmarks=hle;unlock_final=True	1631
+2026-11-26T22:45:02	final:rq2:logistic:target:hle_repaired	splits=train,val,test;benchmarks=hle;unlock_final=True	2130
+2026-11-26T22:47:28	posthoc:rq2:logistic:train	splits=train;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	4210
+2026-11-26T22:47:31	posthoc:rq2:logistic:prompt_statistics	prompt text only, no outcomes; source_pool_locked_test,code,math,hle	4267
+2026-11-26T22:48:04	posthoc:rq2:source_train_by_benchmark	splits=train;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	4210
+2026-11-26T22:50:47	posthoc:rq2:logistic:train	splits=train;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	4210
+2026-11-26T22:50:49	posthoc:rq2:logistic:prompt_statistics	prompt text only, no outcomes; source_pool_locked_test,code,math,hle	4267
+2026-11-26T22:51:49	guard_test	splits=train,val;benchmarks=simpleqa,mmlupro,gpqa;unlock_final=False	5640
+2026-11-26T22:51:50	guard_test	source_pool_dev_filtered	5640
+2026-11-26T22:51:51	guard_test	selection_pool_dev_unfiltered	6011
+2026-11-26T22:51:53	guard_test	rq1_dev_all_benchmarks	8307

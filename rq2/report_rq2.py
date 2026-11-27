@@ -45,7 +45,7 @@ SET_NAMES = {
     REF2: "Source-pool test without the held-out subjects (reference)" if not DRY else "Rehearsal reference without the stand-in subjects",
     "held_out_subjects": f"Held-out MMLU-Pro subjects ({SUBJ})",
 }
-SHORT = {**SET_NAMES, "source_pool_locked_test": "Source-pool test", REF2: "Reference without the subjects" if not DRY else "Rehearsal reference",
+SHORT = {**SET_NAMES, "source_pool_locked_test": "Source-pool test", REF2: "Source-pool test, other subjects" if not DRY else "Rehearsal reference",
          "held_out_subjects": "Held-out subjects", "code": "LiveCodeBench", "math": "Math", "pseudo_reference": "Rehearsal reference",
          "gpqa_as_holdout": "GPQA (rehearsal)"}
 TAG = "DEVELOPMENT REHEARSAL, not a result" if DRY else ""
@@ -296,7 +296,8 @@ rows = [(f"{SHORT.get(n, n)} (n = {sA['targets'][n]['n']:,})", metrics_at(sA["ta
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.3), sharey=True)
 dot_rows(ax1, rows, "loss", "loss_ci", target=float(PA))
 ax1.set_xlabel("Accuracy loss against always-GPT-5 (points)")
-ax1.text(float(PA), len(rows) - 0.45, f" {PA}-point target", color=INK2, fontsize=9, va="bottom")
+ax1.set_ylim(-0.5, len(rows) - 0.1)
+ax1.text(float(PA), len(rows) - 0.35, f" {PA}-point target", color=INK2, fontsize=9, va="center")
 dot_rows(ax2, rows, "sav", "sav_ci")
 ax2.set_xlabel("Gross savings against always-GPT-5 (%)")
 ax2.axvline(0, color=GRID, lw=1)
@@ -355,7 +356,7 @@ handles = [Line2D([], [], marker="o", ls="", ms=8, color=c, mec=SURFACE, mew=2, 
            ((NEUTRAL, "same kinds as training"), (BLUE, "new topics, same format"), (ORANGE, "new kinds of task"))]
 fig.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.2, 0.92), ncol=3, frameon=False, fontsize=10)
 fig.suptitle(f"A2: a router trained without MMLU-Pro {SUBJ}, at the {PA}-point target level", x=0.01, ha="left", fontsize=13, color=INK)
-fig.subplots_adjust(left=0.24, right=0.98, top=0.84, bottom=0.2, wspace=0.08)
+fig.subplots_adjust(left=0.27, right=0.98, top=0.84, bottom=0.2, wspace=0.08)
 footer(fig, "Dots: frozen decisions; lines: 95% bootstrap intervals over duplicate groups. Indented rows are the held-out subjects one "
             "by one (small samples, descriptive). The same router is scored on every row.")
 fig.savefig(OUT / "fig3_rq2_near_far.png", dpi=150); plt.close(fig)
