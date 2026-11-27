@@ -1,54 +1,45 @@
-# RQ2: transfer to unseen kinds of questions (on hold)
-
-**Status: not to be run.** The team is focusing on RQ1 and has not yet decided which RQ2
-experiments to do. This folder is a separate pipeline so that RQ1 can be finished without
-touching it. `run_rq2_transfer.py` refuses to run until the design is settled.
+# RQ2: transfer to unseen kinds of questions
 
 RQ2 asks: does the cost and accuracy trade-off still hold on kinds of questions the router
-never saw in training?
+never saw in training? The design is in `docs/PROTOCOL.md` section 8 (log entry 23). RQ2
+evaluates logistic regression only.
 
-## The candidate design in the script
+## Workstreams
 
-One option, already coded, not agreed:
+| | Experiment | Owner | State |
+|---|---|---|---|
+| A | One router trained on the source pool only (SimpleQA, GPQA, MMLU-Pro without math and computer science), scored on LiveCodeBench (primary), AIME + LiveMathBench, HLE, and the pool's own test questions (reference). Compared with the RQ1 router on the same questions; ranking-versus-cutoff diagnostic | Rahul | designed 2026-11-26 |
+| A2 | The same recipe trained without MMLU-Pro law, history and philosophy: new topics (those subjects) against new kinds of task (coding, math, HLE) | Rahul | designed 2026-11-26 |
+| B | A small labelled sample of the new kind of question: re-tune only the cutoff, or retrain | Pravalhika | to be designed |
+| C | Shifting workloads, and warning signs that need no labels | Priyanka | to be designed |
+| C2 | Send unfamiliar questions to GPT-5, with the threshold set on source data only | Priyanka | to be designed |
 
-1. Train one router on a "source pool" only: SimpleQA, GPQA, and MMLU-Pro without its math
-   and computer-science questions.
-2. Tune its cutoffs on that pool's validation questions and freeze them.
-3. Score the frozen router on:
-   - the source pool's locked test questions (same kinds as training, the reference point);
-   - LiveCodeBench (coding);
-   - AIME + LiveMathBench (math, only 175 questions);
-   - HLE (very hard expert questions).
+**Primary RQ2 result:** A's router on LiveCodeBench at the 3-point target level, next to
+the same router on the source pool's test questions. Everything else is secondary. The
+reading rule (within the target, clearly exceeded, clear savings) is fixed in section 8.
 
-## Open questions for the team
+B, C and C2 reuse A's frozen router and its saved predictions
+(`results/rq2/logistic/predictions_rq2_transfer__*.csv`) and must not change it. Each
+owner writes their design into section 8 before running.
 
-- Is "train on three knowledge benchmarks, test on coding, math and HLE" the experiment we
-  want, or should each benchmark be held out in turn?
-- Should each owner run RQ2 for their model, or only the primary model?
-- Is the comparison point the same router on familiar test questions, or the RQ1 router?
-- Do we re-tune the cutoff on a small sample of the new kind of question, to show how much
-  that helps a company?
-- How much weight does math get, given it has only 175 questions?
+## Running A and A2
 
-## What stays shared with RQ1
+    python rq2/run_rq2_transfer.py logistic --plan           # question counts; reads no outcomes
+    python rq2/run_rq2_transfer.py logistic --dry-run        # rehearsal on source-pool development questions
+    python rq2/run_rq2_transfer.py logistic --unlock-final   # the real run, ONCE
+    python rq2/report_rq2.py logistic                        # tables and figures from the saved results
 
-- The data, the splits and the eligibility rules (`src/router/data.py`, `splits.py`).
-- The models and their settings (`src/router/registry.py`, each model's development run).
-- The "fit, freeze the cutoffs, score" step and every measurement (`src/router/final.py`,
-  `policy.py`).
+The rehearsal uses development questions only: GPQA plays the far target, MMLU-Pro biology
+and health play the held-out subjects, and law, history and philosophy are left out, so
+nothing about the real targets is seen. The real run fits both routers, freezes their
+cutoffs, scores every set once, computes the comparisons and diagnostics from the frozen
+decisions, and refuses to run a second time. Output: `results/rq2/logistic/`.
 
-RQ2 has its own development run, so that its router's settings are chosen without the
-held-out benchmarks:
+## Settings
 
-    python scripts/05_dev_compare.py <model> --source-pool
+The router's settings (C = 0.3 with the simple prompt statistics) come from RQ2's own
+development run, which used the source pool only:
 
-It uses SimpleQA, GPQA and filtered MMLU-Pro only and writes to
-`results/rq2_dev_selection/<model>/`. Logistic regression's is already there. (RQ1's
-development run uses all seven benchmarks; the two are independent.)
+    python scripts/05_dev_compare.py logistic --source-pool   # results/rq2_dev_selection/logistic/
 
-## When the design is settled
-
-1. Write the agreed design into `docs/PROTOCOL.md` section 8.
-2. Edit `run_rq2_transfer.py` to match it.
-3. Set `DESIGN_SETTLED = True` in that file.
-4. Rehearse with `--dry-run`, then run once per model with `--unlock-final`.
+RQ1's development run uses all seven benchmarks; the two are independent.
