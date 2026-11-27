@@ -286,7 +286,7 @@ scored a second time on the locked test split with the 499 repaired HLE rows adm
 Also reported for RQ1, from the same frozen decisions: the within-benchmark shuffle
 diagnostic and the workload-mix sensitivity check (both defined in section 9).
 
-## 8. Transfer to held-out benchmarks, RQ2 (workstreams A and A2 settled 2026-11-26)
+## 8. Transfer to held-out benchmarks, RQ2 (workstreams A and A2 settled and run 2026-11-26: log entries 23 and 24)
 
 > **Settled for workstreams A and A2 on 2026-11-26 (log entry 23).** This replaces the
 > on-hold note of 2026-11-16. It was written and committed before any RQ2 router was
@@ -486,7 +486,8 @@ Still open:
 
 Status (2026-11-26): each of the three routers has been evaluated once on the locked test
 split (log entries 10, 17 and 18), and logistic regression is the primary model (log
-entry 19). RQ2 workstreams A and A2 are designed (section 8, log entry 23) and not yet run.
+entry 19). RQ2 workstreams A and A2 were designed (section 8, log entry 23) and run once
+(log entry 24); workstreams B, C and C2 are not yet designed.
 
 ## Deviation log
 
@@ -718,3 +719,18 @@ entry 19). RQ2 workstreams A and A2 are designed (section 8, log entry 23) and n
     not run for RQ2. The router's settings (C = 0.3 with the statistics) are those of the
     source-pool development run of 2026-11-16, unchanged. `rq2/run_rq2_transfer.py` was
     rewritten to match and enabled.
+
+24. 2026-11-26, RQ2 workstreams A and A2 run. `python rq2/run_rq2_transfer.py logistic
+    --unlock-final` was run once, from commit `0f26701` with no uncommitted changes, after
+    `--plan` and a `--dry-run` on development questions. The result file records the hash of
+    this document as committed there, and five sealed reads, all made in this run: the
+    source-pool test, LiveCodeBench, math, HLE, and HLE with repaired costs. There were no
+    earlier RQ2 reads. Results: `results/rq2/logistic/` and `docs/RQ2_RESULTS.md`. Primary
+    result: on LiveCodeBench at 3 points, all 1,055 questions went to Flash and the loss was
+    26.45 points (23.72 to 29.22), clearly exceeded. Added after the results were known, and
+    labelled as such: (a) `rq2/posthoc_prompt_statistics.py`, which refits A's router,
+    reproducing every recorded gain, then recomputes the gains with the prompt statistics held
+    at their training averages, reading only prompt text for the target sets; it also reports
+    GPT-5's edge and prompt length by source benchmark on the train split; (b) label-position
+    fixes in two figures of `rq2/report_rq2.py`, which change no number. Nothing about either
+    router, its cutoffs or the scored questions changed after the run.

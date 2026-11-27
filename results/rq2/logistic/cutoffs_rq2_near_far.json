@@ -1,0 +1,42 @@
+{
+  "0": {
+    "allowance_pp": 0.0,
+    "cutoff": 0.051328424650537816,
+    "n_calibration": 1345,
+    "calibration_accuracy": 0.6185873605947956,
+    "calibration_cost": 17.637943350000004,
+    "calibration_cheap_fraction": 0.09962825278810408
+  },
+  "1": {
+    "allowance_pp": 1.0,
+    "cutoff": 0.07853831635410609,
+    "n_calibration": 1345,
+    "calibration_accuracy": 0.6089219330855019,
+    "calibration_cost": 15.663894250000002,
+    "calibration_cheap_fraction": 0.25353159851301116
+  },
+  "2": {
+    "allowance_pp": 2.0,
+    "cutoff": 0.0941355091845374,
+    "n_calibration": 1345,
+    "calibration_accuracy": 0.5992565055762081,
+    "calibration_cost": 14.563674550000004,
+    "calibration_cheap_fraction": 0.33308550185873603
+  },
+  "3": {
+    "allowance_pp": 3.0,
+    "cutoff": 0.11077294141719266,
+    "n_calibration": 1345,
+    "calibration_accuracy": 0.5888475836431227,
+    "calibration_cost": 13.074839400000005,
+    "calibration_cheap_fraction": 0.4111524163568773
+  },
+  "5": {
+    "allowance_pp": 5.0,
+    "cutoff": 0.15888377471980725,
+    "n_calibration": 1345,
+    "calibration_accuracy": 0.5687732342007435,
+    "calibration_cost": 9.413660000000014,
+    "calibration_cheap_fraction": 0.6052044609665428
+  }
+}

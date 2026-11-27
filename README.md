@@ -9,8 +9,9 @@ advantage is above a cutoff. Everything is offline: nothing here calls an LLM.
 
 - **RQ1.** How much can a router save compared with always using GPT-5, and what does
   that do to accuracy?
-- **RQ2.** Does that trade-off hold on kinds of questions the router never saw? (Design
-  still being decided; the current code covers RQ1.)
+- **RQ2.** Does that trade-off hold on kinds of questions the router never saw?
+  Workstreams A and A2 are done (`docs/RQ2_RESULTS.md`); B, C and C2 are still to be
+  designed.
 
 ## Status
 
@@ -23,11 +24,15 @@ advantage is above a cutoff. Everything is offline: nothing here calls an LLM.
 | Gradient boosting                                            | development run and RQ1 test done                  |
 | Fine-tuned text encoder (ModernBERT-base)                    | development run and RQ1 test done                  |
 | Model selection, from development results only               | done: logistic regression is the primary model     |
-| RQ2                                                          | on hold; separate pipeline in `rq2/`, switched off |
+| RQ2, workstreams A and A2                                    | designed and run once on 2026-11-26                |
+| RQ2, workstreams B, C and C2                                 | to be designed (`rq2/README.md`)                   |
 
 Results: `docs/RQ1_RESULTS.md` (all three models on the locked test split, with a
 side-by-side comparison) and `docs/DEV_RESULTS.md` (their development runs and the
 selection of logistic regression as the primary model).
+
+RQ2 results: `docs/RQ2_RESULTS.md` (transfer to unseen kinds of questions, workstreams A
+and A2), with tables and figures in `results/rq2/logistic/report/`.
 
 ## Layout
 
@@ -41,7 +46,7 @@ src/router/models.py           shared text features; logistic regression (refere
 src/router/template_model.py   skeleton to copy for a new model
 src/router/final.py            the shared "fit, freeze cutoffs, score" step
 scripts/                       numbered in run order
-rq2/                           separate pipeline for RQ2, on hold
+rq2/                           separate pipeline for RQ2 (run, report, post-hoc check)
 manifests/                     split manifest and its hashes
 data/                          instructions for building the data (not stored here)
 tests/                         checks for the evaluation code and the data guards
