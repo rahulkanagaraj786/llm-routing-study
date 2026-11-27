@@ -10,8 +10,8 @@ advantage is above a cutoff. Everything is offline: nothing here calls an LLM.
 - **RQ1.** How much can a router save compared with always using GPT-5, and what does
   that do to accuracy?
 - **RQ2.** Does that trade-off hold on kinds of questions the router never saw?
-  Workstreams A and A2 are done (`docs/RQ2_RESULTS.md`); B, C and C2 are still to be
-  designed.
+  Workstreams A and A2 are done (`docs/RQ2_RESULTS.md`); B is designed (not yet
+  unlocked); C and C2 are still to be designed (`rq2/README.md`).
 
 ## Status
 
@@ -25,7 +25,8 @@ advantage is above a cutoff. Everything is offline: nothing here calls an LLM.
 | Fine-tuned text encoder (ModernBERT-base)                    | development run and RQ1 test done                  |
 | Model selection, from development results only               | done: logistic regression is the primary model     |
 | RQ2, workstreams A and A2                                    | designed and run once on 2026-11-26                |
-| RQ2, workstreams B, C and C2                                 | to be designed (`rq2/README.md`)                   |
+| RQ2, workstream B                                            | designed 2026-11-27; not yet unlocked (`rq2/README.md`) |
+| RQ2, workstreams C and C2                                    | to be designed (`rq2/README.md`)                   |
 
 Results: `docs/RQ1_RESULTS.md` (all three models on the locked test split, with a
 side-by-side comparison) and `docs/DEV_RESULTS.md` (their development runs and the

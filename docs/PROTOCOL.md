@@ -286,14 +286,14 @@ scored a second time on the locked test split with the 499 repaired HLE rows adm
 Also reported for RQ1, from the same frozen decisions: the within-benchmark shuffle
 diagnostic and the workload-mix sensitivity check (both defined in section 9).
 
-## 8. Transfer to held-out benchmarks, RQ2 (workstreams A and A2 settled and run 2026-11-26: log entries 23 and 24)
+## 8. Transfer to held-out benchmarks, RQ2 (A and A2 run 2026-11-26; B designed 2026-11-27: log entries 23–25)
 
-> **Settled for workstreams A and A2 on 2026-11-26 (log entry 23).** This replaces the
-> on-hold note of 2026-11-16. It was written and committed before any RQ2 router was
-> scored on a sealed row. RQ2 evaluates logistic regression only. Workstreams B (a small
-> labelled sample of the new kind of question), C (shifting workloads, and warning signs
-> that need no labels) and C2 (a fall-back rule) are added to this section by their owners
-> before they run. They reuse A's frozen router and may not change it.
+> **Settled for workstreams A and A2 on 2026-11-26 (log entry 23); run once (log entry 24).**
+> **Workstream B designed on 2026-11-27 (log entry 25), before any B unlock.** This replaces
+> the on-hold note of 2026-11-16. RQ2 evaluates logistic regression only. Workstream B
+> reuses A's frozen router and its saved predictions and must not change them; its own
+> outputs go under `results/rq2/logistic/b_fewshot/`. Workstreams C and C2 are added by
+> their owners before they run.
 
 Claim being tested: transfer to held-out coding and math benchmarks, and to HLE. The claim
 is about benchmarks the router never saw, not about training data free of related
@@ -432,6 +432,92 @@ Optional check after freezing: the RQ1 router may be applied once to ARC-AGI v1
 (`--with-arc-agi`), reported as an unused benchmark from the same archive. It is off by
 default. SWE-bench Verified is not evaluated.
 
+### Workstream B: simulated few-shot adaptation on coding (designed 2026-11-27; not yet run)
+
+B asks: given that A's frozen router fails on LiveCodeBench, how many labelled LiveCodeBench
+**train** questions (`k`) are needed to improve the cost–accuracy trade-off on a held-out
+LiveCodeBench **test** set? This is **simulated** few-shot adaptation (splits are
+hash-stratified by near-duplicate cluster, not chronological). It is not another zero-shot
+transfer test; that is A. Primary RQ2 result remains A's LiveCodeBench result at 3 pp.
+
+Owner: Pravalhika. Algorithm and settings stay logistic regression, C = 0.3 with the
+simple prompt statistics (same as A). Hyperparameters are not re-chosen.
+
+**Overlap audit (done before this design was locked, label-blind).** Script:
+`rq2/audit_rq2_b_overlap.py`. Near-duplicates use the project rule (character 4-gram TF-IDF
+cosine ≥ 0.85 on normalized question text; `router.splits.near_duplicate_clusters`). Only
+prompt/query text was read; no outcomes or costs. Source side for the audit: selection-pool
+train+val without MMLU-Pro math/CS, **including** rows that `boundary_duplicate_qids()`
+would drop from A's training (so known holdout near-dups are not hidden). Result: zero
+contaminated clusters. Frozen sets (unchanged from the raw LCB splits):
+
+| Set | n | Role |
+|---|---:|---|
+| Label pool (LCB train) | 633 | Only place `k` labels are drawn from |
+| LCB val | 211 | Unused (keeps the labelling budget equal to `k`) |
+| Eval (LCB test) | 211 | Never labelled; fixed exam set |
+
+Artifacts: `results/rq2/logistic/b_fewshot/overlap_audit.json`, `label_pool_qids.json`,
+`eval_qids.json`. A's saved coding predictions cover all 211 eval qids. A's published
+files under `results/rq2/logistic/` are not modified.
+
+**Sampling.** Seeds 0…9. For each seed, shuffle the 633 label-pool qids without looking at
+labels; for each `k` take the nested prefix of length `k`.
+`k ∈ {0, 10, 25, 50, 100, 200, 400}`. If the success rule is never met, report “not within
+the tested range,” not “never.”
+
+**Arms** (same LCB label budget `k`, different spend). Documented separately so cutoffs are
+not confused with predictions:
+
+- **`k=0`:** Reuse A's saved predictions and A's **original saved cutoffs**, filtered by qid
+  to the B eval set. Do not re-run A inference. Do not re-select cutoffs.
+- **Retune-only:** Reuse A's saved predictions without re-running inference, but **select a
+  new cutoff** using only the `k` labelled LCB-train questions (and A's saved gains on those
+  qids).
+- **Retrain:** Fit a **separate** B logistic model on source-pool training data plus the `k`
+  labelled LCB-train examples (**no sample reweighting**). Select its cutoff using
+  source-pool validation only (source-domain labels, not extra LCB budget).
+
+| Arm | Predictions | Cutoff |
+|---|---|---|
+| `k=0` | A's saved (qid-filtered) | A's original saved cutoffs |
+| Retune-only | A's saved (qid-filtered) | Newly selected on the `k` LCB-train labels |
+| Retrain | New B model | Selected on source-pool validation |
+
+Cutoff selection (retune-only and retrain) uses `policy.select_cutoff` for each allowance in
+{0, 1, 2, 3, 5} pp: minimize recorded cost subject to accuracy loss ≤ allowance on the
+permitted cutoff data; ties as implemented (higher accuracy, then higher cutoff);
+always-GPT-5 is always feasible. Primary headline level: **3 pp**. None of these arms edit
+A's artifacts; retune cutoffs and retrain fits are written only under
+`results/rq2/logistic/b_fewshot/`.
+
+**Metrics on the fixed B eval set.** Accuracy loss (pp) = always-GPT-5 accuracy − router
+accuracy. Gross savings % = 100 × (1 − router cost / always-GPT-5 cost). Share sent to Flash
+is reported separately. Learning curves: mean over the 10 seeds with seed-based t-intervals
+(label-sample variability only; conditional on the fixed eval set). For `k=0` there is no
+seed variability (A's artifact is deterministic).
+
+**Success rule (pre-declared).** For each of the seven tested `k` values, a one-sided
+t upper bound on mean retrain test loss across seeds at α = 0.05/7 (Bonferroni). The
+smallest `k` whose upper bound is ≤ 3 pp is reported; if none, “not within tested range.”
+Always also plot loss and savings versus `k` for both arms.
+
+**Test-cluster bootstrap (headline `k=0` and the success-selected `k`, if any).** Resample
+eval near-duplicate clusters with replacement; apply the same resample to all ten
+seed-specific routers and always-GPT-5; average the ten seed losses each replicate. This
+is uncertainty for the reported ten-seed mean, kept separate from seed intervals.
+
+**Running B.** Design must be in this section before any unlock (this paragraph). Scripts
+(to be added on the same branch): `rq2/run_rq2_fewshot.py` and `rq2/report_rq2_b.py`, with
+`--plan`, `--dry-run` and `--unlock-final`. Dry-run must not read sealed LiveCodeBench test
+outcomes. Unlock runs once after team go-ahead and refuses if
+`results/rq2/logistic/b_fewshot/final_results_rq2_b.json` already exists. Output:
+`results/rq2/logistic/b_fewshot/` (dry-run twin under `results/rq2_dryrun/logistic/b_fewshot/`).
+Results write-up: `docs/RQ2_RESULTS.md` (Workstream B section).
+
+Out of scope for this run: retrain+retune as a third arm; math/HLE few-shot curves; other
+model families; changing A's published results.
+
 ## 9. Metrics and uncertainty
 
 - Accuracy = mean selected correctness. Cost = sum of selected recorded costs.
@@ -484,10 +570,11 @@ Still open:
 3. ~~The team's go-ahead to run `scripts/07_final_eval.py --unlock-final`.~~ Closed
    2026-11-20: all three final evaluations have been run (log entries 10, 17 and 18).
 
-Status (2026-11-26): each of the three routers has been evaluated once on the locked test
+Status (2026-11-27): each of the three routers has been evaluated once on the locked test
 split (log entries 10, 17 and 18), and logistic regression is the primary model (log
 entry 19). RQ2 workstreams A and A2 were designed (section 8, log entry 23) and run once
-(log entry 24); workstreams B, C and C2 are not yet designed.
+(log entry 24). Workstream B is designed (log entry 25) and not yet unlocked; C and C2 are
+not yet designed.
 
 ## Deviation log
 
@@ -736,3 +823,12 @@ entry 19). RQ2 workstreams A and A2 were designed (section 8, log entry 23) and 
     `scripts/07_final_eval.py`, which said RQ2's design was still being decided, now points
     to `rq2/` (no code changed). Nothing about either router, its cutoffs or the scored
     questions changed after the run.
+
+25. 2026-11-27, RQ2 workstream B design. Written into section 8 before any B unlock.
+    Simulated few-shot adaptation on LiveCodeBench only: nested `k` labels from LCB train,
+    eval on LCB test, LCB val unused; arms retune-only (A's saved predictions) and retrain
+    (new fit; cutoffs on source-pool validation); `k=0` reuses A's saved predictions and
+    original saved cutoffs by qid; retune-only reuses A's saved predictions but selects a
+    new cutoff on the `k` labels. Label-blind overlap audit (`rq2/audit_rq2_b_overlap.py`)
+    found zero contaminated clusters; frozen qid lists are in
+    `results/rq2/logistic/b_fewshot/`. A's artifacts are not modified. B is not yet run.
